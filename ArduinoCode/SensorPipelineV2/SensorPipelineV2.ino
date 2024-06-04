@@ -114,7 +114,7 @@ void setup()
   //String fileName = "NewFile.txt";
   myLog.begin();
   Serial.println("OpenLog initialized");
-  myLog.println("OpenLog initialized for Sensor_Pipeline.ino");
+  // myLog.println("OpenLog initialized for Sensor_Pipeline.ino");
 
   // myLog.println("Time to make a directory");
   // myLog.changeDirectory(".."); //Make sure we're in the root directory
@@ -143,10 +143,7 @@ void setup()
   // SERIAL_PORT.print(dirName);
   // SERIAL_PORT.println(F(" Directory Created"));
   
-  String initfileName = nextFileName + ".txt";
-  myLog.append(initfileName);
-  myLog.println("IMU Output: Scaled");
-  myLog.println("Acc (mg) X, Y, Z, Gyr (DPS) X, Y, Z, Mag (uT) X, Y, Z, Temp, Pa, PSI, atm");
+  
   //myLog.syncFile();
   /** MicroPressure Initialization **/
   if(!mpr.begin()) {
@@ -155,6 +152,8 @@ void setup()
   } else {
     SERIAL_PORT.println("MicroPressure Sensor Connected");
   }
+
+  myLog.append("Test0.txt");
 
 }
 String fileName = "";
@@ -176,17 +175,8 @@ void loop()
       if(startFlag == OFF) {
         startFlag = ON;
 
-        /** File Name Creation **/
-        fileName = nextFileName + ".txt";
-        myLog.append(fileName);
-        myLog.print(fileName);
-        myLog.println(" File Created");
-        int fileNum = nextFileName.substring(4).toInt() + 1;
-        String whyDoINeedThis = "Test";
-        nextFileName = whyDoINeedThis + fileNum;
-
         /** Initial Write to SD Card **/ 
-        SERIAL_PORT.println(nextFileName);
+        //SERIAL_PORT.println(nextFileName);
         SERIAL_PORT.println("First Button click, Data Collection Started");
         myLog.println("IMU Output: Scaled");
         myLog.println("Acc (mg) X, Y, Z, Gyr (DPS) X, Y, Z, Mag (uT) X, Y, Z, Temp, Pa, PSI, atm");
@@ -198,6 +188,16 @@ void loop()
         myLog.print(" Single button click acknowledged, data collection ENDED for file: ");
         myLog.println(fileName);
         myLog.syncFile();
+
+        /** File Name Creation **/
+        fileName = nextFileName + ".txt";
+        myLog.append(fileName);
+        myLog.print(fileName);
+        myLog.println(" File Created");
+        int fileNum = nextFileName.substring(4).toInt() + 1;
+        String whyDoINeedThis = "Test";
+        nextFileName = whyDoINeedThis + fileNum;
+
         // startFlag = PAUSE;
         startFlag = OFF;
       }
@@ -208,20 +208,6 @@ void loop()
       //   myLog.syncFile();
       //   startFlag = ON;
       // }
-    }
-    else { //double click registered -- eventually double click = write to disk
-      //SERIAL_PORT.println("Time since last click:");
-      //SERIAL_PORT.println(lastClickTime);
-      if(startFlag == ON || startFlag == PAUSE) {
-        startFlag = OFF; 
-        myLog.print(millis());
-        myLog.println(" Data Collection Ended.");
-        SERIAL_PORT.println("Data collection ended, click to restart");
-        myLog.syncFile();
-      }
-      else if(startFlag == OFF) {
-        SERIAL_PORT.println("Data collection already ended");
-      }
     }
 
     /** Button Debouncing **/
@@ -240,9 +226,9 @@ void loop()
       if (millis() - init_time > LOG_INTERVAL) { 
         myICM.getAGMT();
         printScaledAGMT(&myICM); // This function takes into account the scale settings from when the measurement was made to calculate the values with units
-        myLog.print(millis());
-        myLog.print(" ");
-        writeScaledAGMT(&myICM);
+        // myLog.print(millis());
+        // myLog.print(" ");
+        // writeScaledAGMT(&myICM);
         myLog.syncFile();
         init_time = millis(); 
       }
