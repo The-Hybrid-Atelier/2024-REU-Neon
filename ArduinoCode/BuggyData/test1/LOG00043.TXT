@@ -1,0 +1,8 @@
+OenLog initialized for Sensor_Pipeline.ino
+Time to make a directory
+ Output: Scaled
+Acc (mg) X, Y, Z, Gyr (DPS) X, Y, Z, Mag (uT) X, Y, Z, Temp, Pa, PSI, atm
+OpenLog initialized for Sensor_Pipeline.ino
+Time to make a directory
+ Output: Scaled
+Acc (mg) X, Y, Z, Gyr (DPS) X, Y, Z, Mag (uT) X, Y, Z, Temp, Pa, PSI, atm

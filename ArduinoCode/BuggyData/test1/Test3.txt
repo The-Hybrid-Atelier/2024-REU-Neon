@@ -1,0 +1,7 @@
+Test3.txt File Created
+IMU Output: Scaled
+Acc (mg) X, Y, Z, Gyr (DPS) X, Y, Z, Mag (uT) X, Y, Z, Temp, Pa, PSI, atm
+153904  00913.57, 00571.78,-00344.24,-00002.91,-00043.03,-00042.47,-00040.95, 00027.60,-00026.85, 00031.67,98576.31,14.30,0.97
+154091 Single button click acknowledged, data collection Paused.
+162666 Single button click acknowledged, data collection resumed.
+162822 Data Collection Ended.
