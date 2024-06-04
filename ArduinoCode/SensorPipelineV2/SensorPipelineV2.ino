@@ -152,7 +152,7 @@ void setup()
   } else {
     SERIAL_PORT.println("MicroPressure Sensor Connected");
   }
-
+  myLog.create("Test0.txt");
   myLog.append("Test0.txt");
 
 }
@@ -170,33 +170,39 @@ void loop()
 
     /** Single Button Press **/
     if(lastClickTime > 150) { //if single press: start collect if not yet started
-
+      
       /** If off, start collecting data **/
       if(startFlag == OFF) {
         startFlag = ON;
-
-        /** Initial Write to SD Card **/ 
-        //SERIAL_PORT.println(nextFileName);
-        SERIAL_PORT.println("First Button click, Data Collection Started");
-        myLog.println("IMU Output: Scaled");
-        myLog.println("Acc (mg) X, Y, Z, Gyr (DPS) X, Y, Z, Mag (uT) X, Y, Z, Temp, Pa, PSI, atm");
-  
-      }
-      else if (startFlag == ON) { 
-        SERIAL_PORT.println("Single button click acknowledged, data collection ENDED.");
-        myLog.print(millis());
-        myLog.print(" Single button click acknowledged, data collection ENDED for file: ");
-        myLog.println(fileName);
-        myLog.syncFile();
-
+        
         /** File Name Creation **/
         fileName = nextFileName + ".txt";
+        myLog.begin();
+        myLog.create(fileName);
+        myLog.syncFile();
         myLog.append(fileName);
         myLog.print(fileName);
         myLog.println(" File Created");
         int fileNum = nextFileName.substring(4).toInt() + 1;
         String whyDoINeedThis = "Test";
         nextFileName = whyDoINeedThis + fileNum;
+
+        /** Initial Write to SD Card **/ 
+        //SERIAL_PORT.println(nextFileName);
+        SERIAL_PORT.println("First Button click, Data Collection Started");
+        myLog.println("IMU Output: Scaled");
+        myLog.println("Acc (mg) X, Y, Z, Gyr (DPS) X, Y, Z, Mag (uT) X, Y, Z, Temp, Pa, PSI, atm");
+        myLog.syncFile();
+  
+      }
+      else if (startFlag == ON) { 
+        SERIAL_PORT.println("Single button click acknowledged, data collection ENDED.");
+        myLog.append(fileName);
+        myLog.print(millis());
+        myLog.print(" Single button click acknowledged, data collection ENDED for file: ");
+        myLog.println(fileName);
+        myLog.syncFile();
+        
 
         // startFlag = PAUSE;
         startFlag = OFF;
