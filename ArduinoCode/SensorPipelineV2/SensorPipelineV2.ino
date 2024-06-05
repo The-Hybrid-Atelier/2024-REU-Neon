@@ -232,9 +232,9 @@ void loop()
       if (millis() - init_time > LOG_INTERVAL) { 
         myICM.getAGMT();
         printScaledAGMT(&myICM); // This function takes into account the scale settings from when the measurement was made to calculate the values with units
-        // myLog.print(millis());
-        // myLog.print(" ");
-        // writeScaledAGMT(&myICM);
+        myLog.print(millis());
+        myLog.print(" ");
+        writeScaledAGMT(&myICM);
         myLog.syncFile();
         init_time = millis(); 
       }
