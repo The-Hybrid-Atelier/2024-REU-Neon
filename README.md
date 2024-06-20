@@ -1,2 +1,22 @@
-temp
-This stores all of the code involved in the UT Arlington Hybrid Atelier 2024 Neon project 
+NEXT.js app -- React Frontend
+https://nextjs.org/
+
+```
+cd sensor-captions-app
+```
+
+
+To install
+```
+npm install
+```
+
+To run
+ ```
+ npm run dev
+ ```
+
+
+
+react-youtube
+https://github.com/tjallingt/react-youtube
