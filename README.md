@@ -9,6 +9,7 @@ cd sensor-captions-app
 To install
 ```
 npm install
+npm install react-chartjs-2 chart.js chartjs-plugin-annotation
 ```
 
 To run

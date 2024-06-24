@@ -1,5 +1,122 @@
-import Image from "next/image";
+// Video.js
 
+"use client"; // This marks the component as client-side in Next.js
+
+import React, { useState, useEffect, useRef } from 'react';
+import YouTube from 'react-youtube';
+import './globals.css';
+
+//all vido events + btns
+const videoData = {
+  madLBend: {
+    id: 'wvIOqabJv4k',
+    events: [
+      { label: 'Event1', time: 0 },
+      { label: 'Event2', time: 15 },
+      { label: 'Event3', time: 30 }
+    ]
+  },
+  madUBend: {
+    id: '1GqPAZwEu_0',
+    events: [
+      { label: 'Event1', time: 15 },
+      { label: 'Event2', time: 50 },
+      { label: 'Event3', time: 90 }
+    ]
+  }
+};
+
+//state of th vid, storee the vid, player instance, playback time, the chart url, and the interval, finally the size
+const Video = () => {
+  const [selectedVideo, setSelectedVideo] = useState('madLBend');
+  const [player, setPlayer] = useState(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [chartImage, setChartImage] = useState(null);
+  const intervalRef = useRef(null);
+  const [videoSize, setVideoSize] = useState({ width: '500px', height: '300px' });
+
+
+  //gets the chart
+  useEffect(() => {
+    fetchChartImage(0);
+  }, []);
+
+  //updates chart everytime
+  useEffect(() => {
+    if (player) {
+      intervalRef.current = setInterval(() => {
+        setCurrentTime(player.getCurrentTime());
+      }, 100);
+      return () => clearInterval(intervalRef.current);
+    }
+  }, [player]);
+
+  //gets chart img based on video
+  const fetchChartImage = (time) => {
+    fetch(`/api/get_chart_image?video=${selectedVideo}&time=${time}`)
+      .then(response => response.blob())
+      .then(imgBlob => {
+        const imageUrl = URL.createObjectURL(imgBlob);
+        setChartImage(imageUrl);
+      })
+      .catch(error => {
+        console.error('Error in getting chart image:', error);
+      });
+  };
+
+  //changes vid off of dropdown
+  const doVidChange = (event) => {
+    setSelectedVideo(event.target.value);
+    setChartImage(null);
+    fetchChartImage(0); 
+  };
+
+  const onReady = (event) => {
+    setPlayer(event.target);
+  };
+
+  //goes to a specific part of the vid
+  const handleSeek = (time) => {
+    if (player) {
+      player.seekTo(time, true);
+    }
+  };
+
+  //formatting
+  return (
+    <div>
+      <h1>Glass Bending Visual</h1>
+      <div>
+        <label htmlFor="videoSelect">Select A Video:</label>
+        <select id="videoSelect" onChange={doVidChange} value={selectedVideo}>
+          <option value="madLBend">madLBend</option>
+          <option value="madUBend">madUBend</option>
+        </select>
+      </div>
+      <YouTube
+        videoId={videoData[selectedVideo].id}
+        onReady={onReady}
+      />
+      <div>
+        {videoData[selectedVideo].events.map((event, index) => (
+          <button key={index} onClick={() => handleSeek(event.time)}>
+            {event.label}
+          </button>
+        ))}
+      </div>
+      {chartImage && (
+        <div style={{ width: '100%', marginTop: '20px' }}>
+          <img src="./pressure_plot.png" alt="Pressure over Time Plot Madaline L Bend" style={{ width: '100%' }} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Video;
+
+
+/*
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -111,3 +228,4 @@ export default function Home() {
     </main>
   );
 }
+*/
