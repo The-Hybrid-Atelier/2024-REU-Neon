@@ -5,9 +5,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import YouTube from 'react-youtube';
 import './globals.css';
+import HowlerPlayer from './HowlerPlayer';
 
-
-const helloFlask = 'https://animated-trout-96xw6vx4wpgh9pj5-5000.app.github.dev/';
+const helloFlask = 'https://shiny-chainsaw-rqxjgrqrp9pfpq9w-5000.app.github.dev/';
 
 // Python Flask Connect Message
 const fetchHelloMessage = async () => {
@@ -140,6 +140,10 @@ const handleSeek = (time) => {
           {event.label}
         </button>
       ))}
+    </div>
+    <div>
+      <h1>Some text</h1>
+      <HowlerPlayer src="https://www.dropbox.com/scl/fi/db0dkwkmwgxjr3osk9brt/dj-airhorn-sound-39405.mp3?rlkey=74abhkr8qoy0j5dhorbbupt8n&st=vbdaweql&dl=0" />
     </div>
     {chartImage && (
       <div style={{ width: '100%', marginTop: '20px' }}>
