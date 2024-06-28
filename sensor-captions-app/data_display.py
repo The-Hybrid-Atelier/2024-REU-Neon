@@ -80,7 +80,7 @@ def hello_world():
     return jsonify({"message": "Connected"})  # Return JSON
 
 @app.route('/plot')
-def plot_data():
+def plot_data(): #/workspaces/2024-REU-Neon/sensor-captions-app/app/fbend1EX.csv
     filepaths = ["/workspaces/2024-REU-Neon/sensor-captions-app/app/fbend1EX.csv"]
     img = read_and_plot(filepaths)
     return send_file(img, mimetype='image/png')
