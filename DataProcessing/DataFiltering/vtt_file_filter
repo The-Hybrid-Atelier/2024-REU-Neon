@@ -1,0 +1,46 @@
+import csv
+
+def detectEvents(csv_file_path, vtt_file_path, threshold=99000):
+    events = []
+    currEvent = None
+
+    with open(csv_file_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            time = int(row['Time'])
+            pa = float(row['Pa'])
+            
+            if pa > threshold and currEvent is None:
+                currEvent = {'start': time}
+            elif pa < threshold and currEvent is not None:
+                currEvent['end'] = time
+                events.append(currEvent)
+                currEvent = None
+        
+        if currEvent is not None:
+            currEvent['end'] = time
+            events.append(currEvent)
+
+    with open(vtt_file_path, 'w') as vttfile:
+        vttfile.write("WEBVTT\n")
+        vttfile.write("Kind: captions\n")
+        vttfile.write("Language: en\n\n")
+        
+        for event in events:
+            startTime = event['start'] / 1000
+            endTime = event['end'] / 1000
+            start = format(startTime)
+            end = format(endTime)
+            vttfile.write(f"{start} --> {end} align:start position:0%\n")
+            vttfile.write("blowing\n\n")
+
+def format(milliseconds):
+    hours = int(milliseconds // 3600)
+    minutes = int((milliseconds % 3600) // 60)
+    seconds = int(milliseconds % 60)
+    milliseconds = int((milliseconds - int(milliseconds)) * 1000)
+    return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:03}"
+
+csv_file_path = 'MadL_bend1EX.csv'
+vtt_file_path = 'MadL_bend1.vtt'
+detectEvents(csv_file_path, vtt_file_path)
