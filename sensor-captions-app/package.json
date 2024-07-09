@@ -18,7 +18,9 @@
     "react-dom": "^18",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.5",
-    "supercolliderjs": "^1.0.1"
+    "supercolliderjs": "^1.0.1",
+    "videojs": "^1.0.0",
+    "videojs-youtube": "^3.0.1"
   },
   "devDependencies": {
     "eslint": "^8",

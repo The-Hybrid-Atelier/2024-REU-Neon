@@ -1,35 +1,61 @@
-// Importing necessary libraries and components
-import React, { useRef, useEffect } from 'react'; // React library imports
-import YouTube from 'react-youtube'; // YouTube component for embedding YouTube videos
-import { Button } from 'semantic-ui-react'; // Button component from Semantic UI for styling
-import './neon.css'; // Importing custom CSS for styling
+'use client'
 
-// Sample data for demonstration purposes
-const cues = [{time: 30, sound: {frequency: 440, duration: 1}}]; // Array of cue objects with time and sound properties
+import React from 'react';
 
-// Video component definition
-const Video = () => {
+// This imports the functional component from the previous sample.
+import VideoJS from './VideoJS'
+import "videojs-youtube";
 
-    // Options for the YouTube player
-    const videoOptions = {
-        width: '1000px', // Width of the video player
-        height: '600px', // Height of the video player
-        playerVars: {
-            autoplay: 0, // Video will not autoplay
-            mute: 0, // Video will not be muted by default
-            volume: 100 // Set the volume to 100 (unmuted)
-        },
-    };
+const App = () => {
+  const playerRef = React.useRef(null);
 
-    // Refs for managing state without re-rendering
-    const videoRef = useRef(null); // Reference to the YouTube player
+  const videoJsOptions = {
+    techOrder: ["youtube"],
+    autoplay: false,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    sources: [
+      {
+        src: "https://www.youtube.com/watch?v=IxQB14xVas0",
+        type: "video/youtube",
+      },
+    ],
+  }
+  // const videoJsOptions = {
+  //   autoplay: true,
+  //   controls: true,
+  //   responsive: true,
+  //   fluid: true,
+  //   sources: [{
+  //     src: '../public/6-5-24 U Bend Trial 1 Video cropped.mp4',
+  //     type: 'video/mp4'
+  //   }]
+  // };
 
-    const lastSecondRef = useRef(0); // Reference to store the last second timestamp
-    const lastMinuteRef = useRef(0); // Reference to store the last minute timestamp
+  const handlePlayerReady = (player) => {
+    playerRef.current = player;
 
-    // Function to navigate the video to a specific timestamp
-    const navigateTo = (seconds) => {
-        if (videoRef.current && videoRef.current.internalPlayer) {
-            videoRef.current.internalPlayer.seekTo(seconds); // Using the YouTube player's seekTo function
-        }
-    };
+    // You can handle player events here, for example:
+    player.on('waiting', () => {
+      videojs.log('player is waiting');
+    });
+
+    player.on('dispose', () => {
+      videojs.log('player will dispose');
+    });
+  };
+
+  return (
+    <>
+      <div>Rest of app here</div>
+
+      <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
+      
+
+      <div>Rest of app here</div>
+    </>
+  );
+}
+
+export default App;

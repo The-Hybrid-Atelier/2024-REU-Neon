@@ -78,6 +78,7 @@ const Video = () => {
 //updates chart everytime
 useEffect(() => {
   if (player) {
+    
     intervalRef.current = setInterval(() => {
       setCurrentTime(player.getCurrentTime());
     }, 100);
@@ -106,7 +107,19 @@ const doVidChange = (event) => {
 };
 
 const onReady = (event) => {
+  console.log('ready');
   setPlayer(event.target);
+  let tPlayer = event.target;
+  debugger;
+  if (tPlayer) {
+    tPlayer.addEventListener('onCueChange', function(event) {
+      var cues = event.cues;
+      console.log('cue change event:', cues);
+    });
+  }
+  else {
+    console.log('player not initialized');
+  }
 };
 
 //goes to a specific part of the vid
@@ -143,7 +156,7 @@ const handleSeek = (time) => {
     </div>
     <div>
       <h1>Some text</h1>
-      <HowlerPlayer src="https://www.dropbox.com/scl/fi/db0dkwkmwgxjr3osk9brt/dj-airhorn-sound-39405.mp3?rlkey=74abhkr8qoy0j5dhorbbupt8n&st=vbdaweql&dl=0" />
+      <HowlerPlayer src="./dj-airhorn-sound-39405.mp3" />
     </div>
     {chartImage && (
       <div style={{ width: '100%', marginTop: '20px' }}>
