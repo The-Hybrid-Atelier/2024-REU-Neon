@@ -17,7 +17,7 @@ const App = () => {
     fluid: true,
     sources: [
       {
-        src: "https://www.youtube.com/watch?v=IxQB14xVas0",
+        src: "https://www.youtube.com/watch?v=wvIOqabJv4k",
         type: "video/youtube",
       },
     ],
@@ -32,10 +32,18 @@ const App = () => {
   //     type: 'video/mp4'
   //   }]
   // };
+  const captionOption = {
+    kind: 'captions',
+    srclang: 'en',
+    label: 'English',
+    src: '../MadL_bend1.vtt'
+  };
 
   const handlePlayerReady = (player) => {
     playerRef.current = player;
-
+    player.addRemoteTextTrack(captionOption);
+    const tracks = player.remoteTextTracks();
+    console.log(tracks.length);
     // You can handle player events here, for example:
     player.on('waiting', () => {
       videojs.log('player is waiting');
@@ -50,7 +58,9 @@ const App = () => {
     <>
       <div>Rest of app here</div>
 
-      <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
+      <VideoJS options={videoJsOptions} onReady={handlePlayerReady} 
+        
+      />
       
 
       <div>Rest of app here</div>
