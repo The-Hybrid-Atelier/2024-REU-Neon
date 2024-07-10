@@ -1,13 +1,15 @@
 'use client'
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 // This imports the functional component from the previous sample.
 import VideoJS from './VideoJS'
 import "videojs-youtube";
+import HowlerPlayer from './HowlerPlayer';
 
 const App = () => {
   const playerRef = React.useRef(null);
+  const howlPlayerRef = React.useRef(null);
 
   const videoJsOptions = {
     techOrder: ["youtube"],
@@ -36,23 +38,64 @@ const App = () => {
     kind: 'captions',
     srclang: 'en',
     label: 'English',
-    src: '../MadL_bend1.vtt'
+    src: 'MadL_bend2.vtt'
   };
+
+  const handleCueChange = () => {
+    if (howlPlayerRef.current) {
+      console.log('playAudio from cuechange triggered')
+      howlPlayerRef.current.playAudio();
+    }
+    else {
+      console.log('not in current howlPlayerRef, audio not triggered.');
+    }
+    // console.log('cuechange triggered');
+    // audioElement.playAudio();
+  }
 
   const handlePlayerReady = (player) => {
     playerRef.current = player;
     player.addRemoteTextTrack(captionOption);
     const tracks = player.remoteTextTracks();
+    
     console.log(tracks.length);
-    // You can handle player events here, for example:
-    player.on('waiting', () => {
-      videojs.log('player is waiting');
-    });
+    
+
+    for (var i = 0; i < tracks.length; i++) {
+      var track = tracks[i];
+      console.log(track.cues);
+      console.log(track.kind);
+      console.log(track.label);
+    
+      // Find the metadata track that's labeled "ads".
+      if (track.kind === 'metadata' && track.label === 'ads') {
+        track.mode = 'hidden';
+    
+        // Store it for usage outside of the loop.
+        metadataTrack = track;
+      }
+    }
+    // var audioElement = document.getElementById('howlplayer');
+    // console.log(audioElement);
+          // Add a listener for the "cuechange" event and start ad playback.
+    tracks[0].addEventListener('cuechange', handleCueChange); //{
+
+    // // You can handle player events here, for example:
+    // player.on('waiting', () => {
+    //   videojs.log('player is waiting');
+    // });
 
     player.on('dispose', () => {
       videojs.log('player will dispose');
     });
+
+    
   };
+
+  
+
+
+
 
   return (
     <>
@@ -61,6 +104,7 @@ const App = () => {
       <VideoJS options={videoJsOptions} onReady={handlePlayerReady} 
         
       />
+      <HowlerPlayer ref={howlPlayerRef} src="dj-airhorn-sound-39405.mp3" />
       
 
       <div>Rest of app here</div>
