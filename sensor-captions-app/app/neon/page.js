@@ -1,15 +1,28 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // This imports the functional component from the previous sample.
 import VideoJS from './VideoJS'
 import "videojs-youtube";
 import HowlerPlayer from './HowlerPlayer';
+import { initWebSocket, getReadings } from '../utils/websocket';
+
 
 const App = () => {
   const playerRef = React.useRef(null);
   const howlPlayerRef = React.useRef(null);
+  
+  useEffect(() => {
+    const websocket = initWebSocket();
+
+    return () => {
+        if (websocket) {
+            
+            websocket.close();
+        }
+    };
+  }, []);
 
   const videoJsOptions = {
     techOrder: ["youtube"],
@@ -38,7 +51,7 @@ const App = () => {
     kind: 'captions',
     srclang: 'en',
     label: 'English',
-    src: 'MadL_bend2.vtt'
+    src: 'MadL_bend3.vtt'
   };
 
   const handleCueChange = () => {
@@ -57,7 +70,7 @@ const App = () => {
     playerRef.current = player;
     player.addRemoteTextTrack(captionOption);
     const tracks = player.remoteTextTracks();
-    
+    console.log(tracks);
     console.log(tracks.length);
     
 
@@ -67,13 +80,13 @@ const App = () => {
       console.log(track.kind);
       console.log(track.label);
     
-      // Find the metadata track that's labeled "ads".
-      if (track.kind === 'metadata' && track.label === 'ads') {
-        track.mode = 'hidden';
+    //   // Find the metadata track that's labeled "ads".
+    //   if (track.kind === 'metadata' && track.label === 'ads') {
+    //     track.mode = 'hidden';
     
-        // Store it for usage outside of the loop.
-        metadataTrack = track;
-      }
+    //     // Store it for usage outside of the loop.
+    //     metadataTrack = track;
+    //   }
     }
     // var audioElement = document.getElementById('howlplayer');
     // console.log(audioElement);
@@ -92,11 +105,6 @@ const App = () => {
     
   };
 
-  
-
-
-
-
   return (
     <>
       <div>Rest of app here</div>
@@ -105,7 +113,6 @@ const App = () => {
         
       />
       <HowlerPlayer ref={howlPlayerRef} src="dj-airhorn-sound-39405.mp3" />
-      
 
       <div>Rest of app here</div>
     </>
