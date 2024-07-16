@@ -3,7 +3,7 @@
 let websocket;
 
 export const initWebSocket = () => {
-    const gateway = `wss://${window.location.hostname}/ws`;
+    const gateway = `ws://192.168.1.79/ws`;
 
     websocket = new WebSocket(gateway);
     console.log('Trying to open a WebSocket connection…');
@@ -23,12 +23,21 @@ export const initWebSocket = () => {
         const myObj = JSON.parse(event.data);
         const keys = Object.keys(myObj);
 
-        keys.forEach((key) => {
-            document.getElementById(key).innerHTML = myObj[key];
-        });
+        // keys.forEach((key) => {
+        //     document.getElementById(key).innerHTML = myObj[key];
+        // });
     };
 
     return websocket; // Return websocket instance
+};
+
+
+export const vibrate = (value) => {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.send('vibrate' + value);
+    } else {
+        console.error('WebSocket is not open');
+    }
 };
 
 export const getReadings = () => {

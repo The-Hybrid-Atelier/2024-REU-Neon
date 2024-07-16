@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import VideoJS from './VideoJS'
 import "videojs-youtube";
 import HowlerPlayer from './HowlerPlayer';
-import { initWebSocket, getReadings } from '../utils/websocket';
+import { initWebSocket, getReadings, vibrate } from '../utils/websocket';
 
 
 const App = () => {
@@ -15,12 +15,12 @@ const App = () => {
   
   useEffect(() => {
     const websocket = initWebSocket();
-
+    getReadings();
     return () => {
-        if (websocket) {
+        // if (websocket) {
             
-            websocket.close();
-        }
+        //     websocket.close();
+        // }
     };
   }, []);
 
@@ -51,12 +51,35 @@ const App = () => {
     kind: 'captions',
     srclang: 'en',
     label: 'English',
-    src: 'MadL_bend3.vtt'
+    src: 'MadL_bend4.vtt'
   };
 
   const handleCueChange = () => {
     if (howlPlayerRef.current) {
       console.log('playAudio from cuechange triggered')
+      const player = playerRef.current;
+      const tracks = player.remoteTextTracks();
+    
+      const track = tracks[0];
+      console.log(track);
+      if (track.activeCues[0] != null) {
+        const capText = track.activeCues[0].text;
+        // Define the regular expression to match "VibrationSpeed" followed by a colon, optional whitespace, and a number
+        const regex = /VibrationSpeed\s*:\s*(\d+)/;
+
+        // Use the match method to extract the number
+        const match = capText.match(regex);
+
+        if (match) {
+          const vibrationSpeed = match[1];
+          console.log(`VibrationSpeed: ${vibrationSpeed}`);
+          vibrate(vibrationSpeed);
+        } else {
+          console.log('VibrationSpeed not found');
+        } 
+      }
+      
+      // console.log(cue);
       howlPlayerRef.current.playAudio();
     }
     else {
@@ -68,14 +91,15 @@ const App = () => {
 
   const handlePlayerReady = (player) => {
     playerRef.current = player;
-    player.addRemoteTextTrack(captionOption);
-    const tracks = player.remoteTextTracks();
+    playerRef.current.addRemoteTextTrack(captionOption);
+    const tracks = playerRef.current.remoteTextTracks();
     console.log(tracks);
     console.log(tracks.length);
     
 
     for (var i = 0; i < tracks.length; i++) {
-      var track = tracks[i];
+      const track = tracks[i];
+      track.mode = 'showing';
       console.log(track.cues);
       console.log(track.kind);
       console.log(track.label);
@@ -115,6 +139,7 @@ const App = () => {
       <HowlerPlayer ref={howlPlayerRef} src="dj-airhorn-sound-39405.mp3" />
 
       <div>Rest of app here</div>
+      <button onClick={vibrate}>Toggle Vibrate</button>
     </>
   );
 }
