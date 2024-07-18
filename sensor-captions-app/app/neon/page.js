@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import VideoJS from './VideoJS'
 import "videojs-youtube";
 import HowlerPlayer from './HowlerPlayer';
-import { initWebSocket, getReadings, vibrate } from '../utils/websocket';
+import { initWebSocket, getReadings, vibrate, light } from '../utils/websocket';
 
 
 const App = () => {
@@ -51,7 +51,7 @@ const App = () => {
     kind: 'captions',
     srclang: 'en',
     label: 'English',
-    src: 'MadL_bend4.vtt'
+    src: 'MadL_bend2v2.vtt'
   };
 
   const handleCueChange = () => {
@@ -65,17 +65,28 @@ const App = () => {
       if (track.activeCues[0] != null) {
         const capText = track.activeCues[0].text;
         // Define the regular expression to match "VibrationSpeed" followed by a colon, optional whitespace, and a number
-        const regex = /VibrationSpeed\s*:\s*(\d+)/;
-
+        const vibrationRegex = /VibrationSpeed\s*:\s*(\d+)/;
+        const lightRegex = /LightInten\s*:\s*(\d+)/;
+        const nextLightRegex = /NextLightInten\s*:\s*(\d+)/;
         // Use the match method to extract the number
-        const match = capText.match(regex);
-
-        if (match) {
-          const vibrationSpeed = match[1];
+        const vibration = capText.match(vibrationRegex);
+        const lightMatch = capText.match(lightRegex);
+        const nextLightMatch = capText.match(nextLightRegex);
+        if (vibration) {
+          const vibrationSpeed = vibration[1];
           console.log(`VibrationSpeed: ${vibrationSpeed}`);
           vibrate(vibrationSpeed);
         } else {
           console.log('VibrationSpeed not found');
+        } 
+        if (lightMatch && nextLightMatch) {
+          const lightIntensity = lightMatch[1];
+          const nextLightIntensity = nextLightMatch[1];
+          console.log(`lightIntensity: ${lightIntensity}`);
+          console.log(`nextLightIntensity: ${nextLightIntensity}`);
+          light(lightIntensity, nextLightIntensity);
+        } else {
+          console.log('light or NextLight intensity not found');
         } 
       }
       

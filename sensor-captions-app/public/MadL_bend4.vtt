@@ -13,6 +13,7 @@ Language: en
 Sound : 1
 LightInten : 1
 VibrationSpeed : 1
+NextVibrationSpeed: 10
 
 00:03:20.000 --> 00:03:20.999 align:start position:0%
 ■□□□□□□□□□□□□□□  98.67 kPa

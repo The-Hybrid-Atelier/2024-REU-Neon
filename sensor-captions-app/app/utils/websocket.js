@@ -40,6 +40,15 @@ export const vibrate = (value) => {
     }
 };
 
+export const light = (curr, next) => {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.send('light' + curr + "," + next);
+       
+    } else {
+        console.error('WebSocket is not open');
+    }
+};
+
 export const getReadings = () => {
     if (websocket && websocket.readyState === WebSocket.OPEN) {
         websocket.send('getReadings');
