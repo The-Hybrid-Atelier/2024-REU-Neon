@@ -6,16 +6,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import VideoJS from './VideoJS'
 import "videojs-youtube";
 import HowlerPlayer from './HowlerPlayer';
-import { initWebSocket, getReadings, vibrate, light } from '../utils/websocket';
+import { initWebSocket, getReadings, vibrate, light, collectData } from '../utils/websocket';
 
 
 const App = () => {
   const playerRef = React.useRef(null);
   const howlPlayerRef = React.useRef(null);
-  
+  const [isCollecting, setIsCollecting] = useState(false);
   useEffect(() => {
     const websocket = initWebSocket();
     getReadings();
+    
     return () => {
         // if (websocket) {
             
@@ -30,6 +31,7 @@ const App = () => {
     controls: true,
     responsive: true,
     fluid: true,
+    playbackRates: [0.1, 0.25, 0.5, 1, 1.5, 2],
     sources: [
       {
         src: "https://www.youtube.com/watch?v=wvIOqabJv4k",
@@ -51,7 +53,8 @@ const App = () => {
     kind: 'captions',
     srclang: 'en',
     label: 'English',
-    src: 'MadL_bend2v2.vtt'
+    src: 'MadL_bend1v3.vtt'
+
   };
 
   const handleCueChange = () => {
@@ -59,6 +62,7 @@ const App = () => {
       console.log('playAudio from cuechange triggered')
       const player = playerRef.current;
       const tracks = player.remoteTextTracks();
+      const rate = player.playbackRate();
     
       const track = tracks[0];
       console.log(track);
@@ -68,10 +72,12 @@ const App = () => {
         const vibrationRegex = /VibrationSpeed\s*:\s*(\d+)/;
         const lightRegex = /LightInten\s*:\s*(\d+)/;
         const nextLightRegex = /NextLightInten\s*:\s*(\d+)/;
+        const durationRegex = /Duration\s*:\s*(\d+)/;
         // Use the match method to extract the number
         const vibration = capText.match(vibrationRegex);
         const lightMatch = capText.match(lightRegex);
         const nextLightMatch = capText.match(nextLightRegex);
+        const durationMatch = capText.match(durationRegex);
         if (vibration) {
           const vibrationSpeed = vibration[1];
           console.log(`VibrationSpeed: ${vibrationSpeed}`);
@@ -79,12 +85,13 @@ const App = () => {
         } else {
           console.log('VibrationSpeed not found');
         } 
-        if (lightMatch && nextLightMatch) {
+        if (lightMatch && nextLightMatch && durationMatch) {
           const lightIntensity = lightMatch[1];
           const nextLightIntensity = nextLightMatch[1];
+          const duration = durationMatch[1];
           console.log(`lightIntensity: ${lightIntensity}`);
           console.log(`nextLightIntensity: ${nextLightIntensity}`);
-          light(lightIntensity, nextLightIntensity);
+          light(lightIntensity, nextLightIntensity, duration);
         } else {
           console.log('light or NextLight intensity not found');
         } 
@@ -99,6 +106,10 @@ const App = () => {
     // console.log('cuechange triggered');
     // audioElement.playAudio();
   }
+  const handleClick = () => {
+    setIsCollecting(prevState => !prevState);
+    collectData();
+  };
 
   const handlePlayerReady = (player) => {
     playerRef.current = player;
@@ -151,6 +162,10 @@ const App = () => {
 
       <div>Rest of app here</div>
       <button onClick={vibrate}>Toggle Vibrate</button>
+      <br/>
+      <button onClick={handleClick}>
+        {isCollecting ? 'Stop Collecting Data' : 'Start Collecting Data'}
+      </button>
     </>
   );
 }

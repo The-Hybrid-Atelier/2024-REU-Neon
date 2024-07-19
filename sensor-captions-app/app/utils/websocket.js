@@ -40,9 +40,9 @@ export const vibrate = (value) => {
     }
 };
 
-export const light = (curr, next) => {
+export const light = (curr, next, duration) => {
     if (websocket && websocket.readyState === WebSocket.OPEN) {
-        websocket.send('light' + curr + "," + next);
+        websocket.send('light' + curr + "," + next + "," + duration);
        
     } else {
         console.error('WebSocket is not open');
@@ -56,3 +56,11 @@ export const getReadings = () => {
         console.error('WebSocket is not open');
     }
 };
+
+export const collectData = () => {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.send('collect');
+    } else {
+        console.error('WebSocket is not open');
+    }
+}
