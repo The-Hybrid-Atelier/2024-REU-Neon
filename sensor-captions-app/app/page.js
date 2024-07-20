@@ -53,6 +53,8 @@ const Video = () => {
   const [helloMessage, setHelloMessage] = useState(""); // State for storing the hello message
   const intervalRef = useRef(null);
 
+  const [checkboxes, setCheckboxes] = useState(Array(4).fill(false)); // Adjusted for 4 checkboxes
+
   // Move fetchPlotImage inside the component
   const fetchPlotImage = async () => {
     try {
@@ -129,43 +131,70 @@ const handleSeek = (time) => {
   }
 };
 
+  // signals the values of checkboxes
+  const handleCheckboxChange = (index) => (event) => {
+    const newCheckboxes = [...checkboxes];
+    newCheckboxes[index] = event.target.checked;
+    setCheckboxes(newCheckboxes);
+  };
+
+  // checkbox names
+  const checkboxLabels = ["Sound", "Volume", "Intensity", "Vibration", "name 5"];
+
  // Formatting
  return (
-  <div>
-    <div style={{ position: 'absolute', top: '10px', right: '10px', color: 'red' }}>
-      {helloMessage} {/* Display the fetched hello message */}
-    </div>
-    <h1>Glass Bending Visual</h1>
-    <div>
-      <label htmlFor="videoSelect">Select A Video:</label>
-      <select id="videoSelect" onChange={doVidChange} value={selectedVideo}>
-        <option value="madLBend">madLBend</option>
-        <option value="madUBend">madUBend</option>
-      </select>
-    </div>
-    <YouTube
-      videoId={videoData[selectedVideo].id}
-      onReady={onReady}
-    />
-    <div>
-      {videoData[selectedVideo].events.map((event, index) => (
-        <button key={index} onClick={() => handleSeek(event.time)}>
-          {event.label}
-        </button>
+  <div className="container">
+    <div className="blue-background"></div>
+    <div className="left-panel">
+      {checkboxLabels.map((label, index) => (
+        <div key={index}>
+          <input
+            type="checkbox"
+            id={`checkbox-${index}`}
+            checked={checkboxes[index]}
+            onChange={handleCheckboxChange(index)}
+          />
+          <label htmlFor={`checkbox-${index}`}>{label}</label>
+        </div>
       ))}
     </div>
-    <div>
-      <h1>Some text</h1>
-      <HowlerPlayer src="./dj-airhorn-sound-39405.mp3" />
-    </div>
-    {chartImage && (
-      <div style={{ width: '100%', marginTop: '20px' }}>
-        <img src={chartImage} alt="Pressure over Time Plot" style={{ width: '100%' }} />
+    <div className="right-panel">
+      <div style={{ position: 'absolute', top: '10px', right: '10px', color: 'red' }}>
+        {helloMessage} {/* Display the fetched hello message */}
       </div>
-    )}
+      <h1>Glass Bending Visual</h1>
+      <div>
+        <label htmlFor="videoSelect" className="select-label">Select A Video:</label>
+        <select id="videoSelect" className="select-dropdown" onChange={doVidChange} value={selectedVideo}>
+          <option value="madLBend">madLBend</option>
+          <option value="madUBend">madUBend</option>
+        </select>
+      </div>
+      <div className="youtube-container">
+        <YouTube
+          videoId={videoData[selectedVideo].id}
+          onReady={onReady}
+        />
+      </div>
+      <div className="button-container">
+        {videoData[selectedVideo].events.map((event, index) => (
+          <button key={index} className="button" onClick={() => handleSeek(event.time)}>
+            {event.label}
+          </button>
+        ))}
+      </div>
+      <div className="player-container">
+        <h1>Some text</h1>
+        <HowlerPlayer src="./dj-airhorn-sound-39405.mp3" />
+      </div>
+      {chartImage && (
+        <div className="chart-container">
+          <img src={chartImage} className="chart-image" alt="Pressure over Time Plot" />
+        </div>
+      )}
+    </div>
   </div>
 );
 };
 
 export default Video;
-
