@@ -9,14 +9,14 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include "LittleFS.h"
-#include <Arduino_JSON.h>
+#include <ArduinoJson.h>
 // #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
 #include <string.h>
 
 /** NeoPixel Light Strip **/
 #define LED_PIN    14
-#define LED_COUNT 5 //5 for prototype1, 
+#define LED_COUNT 12 //5 for prototype1, 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 /** MicroPressusre **/
@@ -24,8 +24,10 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 SparkFun_MicroPressure mpr;
 
 // Replace with your network credentials
-const char* ssid = "RohitaK";
-const char* password = "apple123";
+// const char* ssid = "RohitaK";
+// const char* password = "apple123";
+const char* ssid = "atelier";
+const char* password = "ERB281282";
 bool collectMode = 0;
 
 // Create AsyncWebServer object on port 80
@@ -35,7 +37,7 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
 // Json Variable to Hold Sensor Readings
-JSONVar readings;
+StaticJsonDocument<200> jsonDoc;
 
 // Timer variables
 unsigned long lastTime = 0;
@@ -50,9 +52,7 @@ int lastIntensity = 0;
 
 // Get Sensor Readings and return JSON object
 String getSensorReadings(){
-  readings["pressure"] = "pressure";//String(mpr.readPressure(PA));
-  String jsonString = JSON.stringify(readings);
-  return jsonString;
+  return String(mpr.readPressure(PA));
 }
 
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
@@ -150,6 +150,7 @@ double* getRGB(double lightVal) {
 }
 
 void hueShift(int lightVal, int nextVal, int duration) {
+  playbackSpeed = jsonDoc["playbackSpeed"];
   static double currColor[3];
   static double nextColor[3];
   static double colorIncrement[3];
@@ -195,64 +196,48 @@ void colorWipe(uint32_t color, int wait) {
   }
 }
 
+void vibrate(int value) {
+
+}
+
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
-    
+    Serial.printf("Received: %s\n", data);
     String message = (char*)data;
     // Check if the message is "vibrate"
     Serial.println(message);
-    if (collectMode) {
-      collectMode = !collectMode;
-      timerDelay = 30000;
-    } else {
-      if (message.startsWith("NO VIBRATION RIGHT NOW")) {  //"vibrate"
-        String numberPart = message.substring(7); // "vibrate" is 7 characters long
-
-        // Convert the extracted part to an integer
-        int vibrationValue = numberPart.toInt();
-        Serial.println(vibrationValue);
-        intensity = (255/MAX_INTENSITY + 1) * vibrationValue;
-        Serial.println(intensity);
-        analogWrite(A0, intensity);
-      } else if (message.startsWith("collect")) {
-        timerDelay = 200;
-        collectMode = !collectMode;
-      } else if (message.startsWith("light")) {
-        String input = message.substring(5); // "light" is 5 characters long
-        int commaIndex1 = input.indexOf(',');
-        if (commaIndex1 != -1) {
-          String curr = input.substring(0, commaIndex1);
-          input = input.substring(commaIndex1 + 1);
-          Serial.println(input);
-          int commaIndex2 = input.indexOf(',');
-          String next = input.substring(0, commaIndex2);
-          Serial.println(next);
-          String dur = input.substring(commaIndex2 + 1);
-          Serial.println(dur);
-          double lightVal = curr.toInt();
-          double nextVal = next.toInt();
-          double duration = dur.toInt();
-          if (duration < 3000) {
-            hueShift(lightVal, nextVal, duration); 
-          }
-          strip.show();
-          
-        } else if (message.startsWith("playbackspeed")) {
-          String playbackMsg= message.substring(13);
-          playbackSpeed = playbackMsg.toDouble();
-        } else {
-          Serial.println("Light message received but missing comma between curr & next values.");
+    DeserializationError error = deserializeJson(jsonDoc, data);
+      if (error) {
+        Serial.print("deserializeJson() failed: ");
+        Serial.println(error.f_str());
+        return;
+    }
+    String device = jsonDoc["device"]; //haptic, LED, Pressure Sensor
+    String command = jsonDoc["api"]["command"];
+    if (device.equals("haptic")){
+      if (command.equals("vibrate")) {
+        vibrate(jsonDoc["api"]["params"]["intensity"]);
+      }
+    } else if (device.equals("LED")) {
+      if (command.equals("light")) {
+        int curr = jsonDoc["api"]["params"]["curr_intensity"];
+        int next = jsonDoc["api"]["params"]["next_intensity"];
+        int duration = jsonDoc["api"]["params"]["duration"];
+        if (duration < 3000) {
+          hueShift(curr, next, duration);
         }
-        
+      }
+    } else if (device.equals("Pressure Sensor")) {
+      if (command.equals("getReadings")) {
+        String sensorReadings = getSensorReadings();
+        Serial.print(sensorReadings);
+        notifyClients(sensorReadings);
+      } else if (command.equals("collect")) {
+        collectMode = !collectMode;
       }
     }
-      //if it is, send current sensor readings
-      String sensorReadings = getSensorReadings();
-      Serial.print(sensorReadings);
-      notifyClients(sensorReadings);
-    //}
   }
 }
 
@@ -312,13 +297,13 @@ void setup() {
   //colorWipe(strip.Color(255,   255,   255), 50); // White
               // Turn OFF all pixels ASAP
   strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
+  colorWipe(strip.Color(255,   0,   0), 50);
   strip.show();
 }
 
 void loop() {
   if (collectMode) {
-  
-    
+    timerDelay = 200;
     double max = 107777.0;
     double min = 98000.0;
     double scaleRange = max - min;
@@ -336,6 +321,7 @@ void loop() {
     }
       
   } else {
+    timerDelay = 10000;
     if ((millis() - lastTime) > timerDelay) {
       String sensorReadings = getSensorReadings();
       Serial.print(sensorReadings);

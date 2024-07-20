@@ -27,7 +27,7 @@ def detect_events_with_meter(csv_file_path, vtt_file_path, threshold=99000, numB
             scaleMax = maxPa
             scaleRange = scaleMax - scaleMin
 
-            pa = max(scaleMin, min(pa, scaleMax))
+            pa = max(scaleMin, min(pa, scaleMax)) # ensure pa is between upper and lower bound, set to closest otherwise
 
             filledBoxes = int((pa - scaleMin) / scaleRange * numBoxes)
             meter = "■" * filledBoxes + "□" * (numBoxes - filledBoxes)
