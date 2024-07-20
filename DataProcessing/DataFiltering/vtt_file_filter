@@ -1,13 +1,13 @@
 import csv
 
-def detect_events_with_meter(csv_file_path, vtt_file_path, threshold=99000, numBoxes=15, offset=2000):
+def detect_events_with_meter(csv_file_path, vtt_file_path, threshold=99000, numBoxes=12, offset=2000):
     maxPa = float('-inf')
     with open(csv_file_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             pa = float(row['Pa'])
             if pa > maxPa:
-                maxPa = pa
+                maxPa = pan
 
     with open(csv_file_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -17,32 +17,41 @@ def detect_events_with_meter(csv_file_path, vtt_file_path, threshold=99000, numB
         vttfile.write("WEBVTT\n")
         vttfile.write("Kind: captions\n")
         vttfile.write("Language: en\n\n")
+
+        prevVal = None
+        prevStartTime = None
+        prevEndTime = None
         
         for row in rows:
-            time = int(row['Time'])
+            time = float(row['Time'])
             pa = float(row['Pa'])
             kpa = pa / 1000 
+            # time = time*1000 #comment this line out depending of the format of time, in if the time is in seconds
 
             scaleMin = threshold - offset
             scaleMax = maxPa
             scaleRange = scaleMax - scaleMin
 
-            pa = max(scaleMin, min(pa, scaleMax)) # ensure pa is between upper and lower bound, set to closest otherwise
+            pa = max(scaleMin, min(pa, scaleMax))
 
             filledBoxes = int((pa - scaleMin) / scaleRange * numBoxes)
             meter = "■" * filledBoxes + "□" * (numBoxes - filledBoxes)
 
-            startTime = formatTime(time / 1000)
-            endTime = formatTime2((time + 1) / 1000)
+            # startTime = formatTime(time / 1000)
+            # endTime = formatTime2((time + 1) / 1000)
+            startTime = formatTime(time)
+            endTime = formatTime(time + 310)
 
             val = filledBoxes
-
+            vttfile.write(f"NextSound : {val}\n")
+            vttfile.write(f"NextVibrationSpeed : {val}\n")
+            vttfile.write(f"NextLightInten : {val}\n\n")
             vttfile.write(f"{startTime} --> {endTime} align:start position:0%\n")
-            vttfile.write(f"{meter}")
-            vttfile.write(f"  {kpa:.2f} kPa\n")
+            # vttfile.write(f"{meter}")
+            # vttfile.write(f"  {kpa:.2f} kPa\n")
             vttfile.write(f"Sound : {val}\n")
             vttfile.write(f"LightInten : {val}\n")
-            vttfile.write(f"VibrationSpeed : {val}\n\n")
+            vttfile.write(f"VibrationSpeed : {val}\n")
 
         #     startTime = event['start'] / 1000
         #     endTime = event['end'] / 1000
@@ -67,21 +76,22 @@ def detect_events_with_meter(csv_file_path, vtt_file_path, threshold=99000, numB
         #     vttfile.write(f"{start} --> {end} align:start position:0%\n")
         #     vttfile.write(f"{progress}{progress_bar[len(progress):]}\n\n")
 
-def formatTime(seconds):
+def formatTime(mseconds):
+    seconds = mseconds / 1000
     hours = int(seconds // 3600)
     minutes = int((seconds % 3600) // 60)
     seconds = int(seconds % 60)
-    milliseconds = int((seconds - int(seconds)) * 1000)
-    return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:03}"
+    mseconds = int(mseconds % 1000)
+    return f"{hours:02}:{minutes:02}:{seconds:02}.{mseconds:03}"
 
 def formatTime2(seconds):
     hours = int(seconds // 3600)
     minutes = int((seconds % 3600) // 60)
     seconds = int(seconds % 60)
-    milliseconds = int((seconds - int(seconds)) * 1000) + 999
-    return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:03}"
+    mseconds = int((seconds - int(seconds)) * 1000) + 999
+    return f"{hours:02}:{minutes:02}:{seconds:02}.{mseconds:03}"
 
 # Ex
 csv_file_path = 'MadL_bend2.csv'
-vtt_file_path = 'MadL_bend2.vtt'
+vtt_file_path = 'MadL_bend1v2.vtt'
 detect_events_with_meter(csv_file_path, vtt_file_path)
