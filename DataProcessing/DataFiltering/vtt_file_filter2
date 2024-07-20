@@ -1,0 +1,84 @@
+import csv
+
+def detect_events_with_meter(csv_file_path, vtt_file_path, threshold=99000, numBoxes=12, offset=2000):
+    maxPa = float('-inf')
+    with open(csv_file_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            pa = float(row['Pa'])
+            if pa > maxPa:
+                maxPa = pa
+
+    with open(csv_file_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        rows = list(reader)
+
+    with open(vtt_file_path, 'w') as vttfile:
+        vttfile.write("WEBVTT\n")
+        vttfile.write("Kind: captions\n")
+        vttfile.write("Language: en\n\n")
+
+        previous_val = None
+        previous_start_time = None
+        previous_end_time = None
+        
+        for row in rows:
+            time = float(row['Time'])
+            pa = float(row['Pa'])
+            kpa = pa / 1000
+            # time = time*1000 #comment this line out depending of the format of time, in if the time is in seconds
+
+            scaleMin = threshold - offset
+            scaleMax = maxPa
+            scaleRange = scaleMax - scaleMin
+
+            pa = max(scaleMin, min(pa, scaleMax))
+
+            filledBoxes = int((pa - scaleMin) / scaleRange * numBoxes)
+            val = filledBoxes
+
+            if previous_val is not None and val == previous_val:
+                previous_end_time = time + 310
+            else:
+                if previous_val is not None:
+                    startTime = formatTime(previous_start_time)
+                    endTime = formatTime(previous_end_time)
+                    vttfile.write(f"NextSound : {previous_val}\n")
+                    vttfile.write(f"NextVibrationSpeed : {previous_val}\n")
+                    vttfile.write(f"NextLightInten : {previous_val}\n\n")
+                    vttfile.write(f"{startTime} --> {endTime} align:start position:0%\n")
+                    vttfile.write(f"Sound : {previous_val}\n")
+                    vttfile.write(f"LightInten : {previous_val}\n")
+                    vttfile.write(f"VibrationSpeed : {previous_val}\n")
+                    vttfile.write(f"Duration : {previous_end_time - previous_start_time}\n")
+
+                previous_val = val
+                previous_start_time = time
+                previous_end_time = time + 310
+
+        # Write the last event
+        if previous_val is not None:
+            startTime = formatTime(previous_start_time)
+            endTime = formatTime(previous_end_time)
+            vttfile.write(f"NextSound : {previous_val}\n")
+            vttfile.write(f"NextVibrationSpeed : {previous_val}\n")
+            vttfile.write(f"NextLightInten : {previous_val}\n\n")
+            vttfile.write(f"{startTime} --> {endTime} align:start position:0%\n")
+            vttfile.write(f"Sound : {previous_val}\n")
+            vttfile.write(f"LightInten : {previous_val}\n")
+            vttfile.write(f"VibrationSpeed : {previous_val}")
+            vttfile.write(f"Duration : {previous_end_time - previous_start_time}\n")
+            
+
+def formatTime(mseconds):
+    seconds = mseconds / 1000
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    seconds = int(seconds % 60)
+    mseconds = int(mseconds % 1000)
+    return f"{hours:02}:{minutes:02}:{seconds:02}.{mseconds:03}"
+
+# Ex
+csv_file_path = 'MadL_bend2.csv'
+vtt_file_path = 'MadL_bend1v3.vtt'
+detect_events_with_meter(csv_file_path, vtt_file_path)
