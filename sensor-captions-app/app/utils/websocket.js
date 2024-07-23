@@ -1,11 +1,15 @@
 // utils/websocket.js
 
 const jsonObject = {
-    device: "",
+    device: {
+        
+    },
     version: "1.0",
     playbackSpeed: 1.0,
     api: {
-        command: "",
+        command: {
+            
+        },
         params: {
             
         }
@@ -44,6 +48,12 @@ export const initWebSocket = () => {
     return websocket; // Return websocket instance
 };
 
+export const command = (jsonObj) => {
+    const jsonString = JSON.stringify(jsonObj);
+    websocket.send(jsonString);
+    console.log(jsonString);
+}
+
 
 export const vibrate = (value) => {
     if (websocket && websocket.readyState === WebSocket.OPEN) {
@@ -76,7 +86,7 @@ export const light = (curr, next, dur) => {
 
 export const getReadings = () => {
     if (websocket && websocket.readyState === WebSocket.OPEN) {
-        jsonObject.device = "Pressure Sensor";
+        jsonObject.device["Pressure Sensor"] = 1;
         jsonObject.api.command = "getReadings";
         const jsonString = JSON.stringify(jsonObject);
         websocket.send(jsonString);
@@ -88,7 +98,7 @@ export const getReadings = () => {
 
 export const collectData = () => {
     if (websocket && websocket.readyState === WebSocket.OPEN) {
-        jsonObject.device = "Pressure Sensor";
+        jsonObject.device["Pressure Sensor"] = 1;
         jsonObject.api.command = "collect";
         const jsonString = JSON.stringify(jsonObject);
         websocket.send(jsonString);

@@ -13,6 +13,7 @@
 // #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
 #include <string.h>
+#include "Adafruit_DRV2605.h"
 
 /** NeoPixel Light Strip **/
 #define LED_PIN    14
@@ -22,6 +23,10 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 /** MicroPressusre **/
 #include <SparkFun_MicroPressure.h>
 SparkFun_MicroPressure mpr;
+
+
+/** vibration driver **/
+Adafruit_DRV2605 drv;
 
 // Replace with your network credentials
 // const char* ssid = "RohitaK";
@@ -41,7 +46,7 @@ StaticJsonDocument<200> jsonDoc;
 
 // Timer variables
 unsigned long lastTime = 0;
-unsigned long timerDelay = 30000;
+unsigned long timerDelay = 500;
 
 int intensity = 0;
 #define MAX_INTENSITY 12
@@ -49,6 +54,9 @@ double playbackSpeed = 1.0;
 int prevReading = 1;
 
 int lastIntensity = 0;
+
+bool drv_connected = false;
+int wait = -1;
 
 // Get Sensor Readings and return JSON object
 String getSensorReadings(){
@@ -197,7 +205,12 @@ void colorWipe(uint32_t color, int wait) {
 }
 
 void vibrate(int value) {
-
+  wait = (500 * playbackSpeed)/value;
+  timerDelay = wait;
+  int effect = 17; // "17 − Strong Click 1 - 100%"
+  drv.setWaveform(0, effect);  // play effect 
+  drv.setWaveform(1, 0);       // end waveform
+  // drv.go();
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -214,14 +227,27 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         Serial.println(error.f_str());
         return;
     }
-    String device = jsonDoc["device"]; //haptic, LED, Pressure Sensor
+    //String device = jsonDoc["device"]; //haptic, LED, Pressure Sensor
     String command = jsonDoc["api"]["command"];
-    if (device.equals("haptic")){
-      if (command.equals("vibrate")) {
-        vibrate(jsonDoc["api"]["params"]["intensity"]);
+    int haptic = jsonDoc["device"]["haptic"];
+    int LED = jsonDoc["device"]["LED"];
+    int pSensor = jsonDoc["device"]["Pressure Sensor"];
+    //Serial.println(device);
+    //Serial.println(jsonDoc["device"]["light"]);
+    if (haptic){
+      if (jsonDoc["api"]["command"]["vibrate"] == 1) {
+        if(!drv_connected) {
+          Serial.println("Cannot vibrate, DRV not connected");
+        } else {
+          vibrate(jsonDoc["api"]["params"]["intensity"]);
+        }
       }
-    } else if (device.equals("LED")) {
-      if (command.equals("light")) {
+    } else {
+      //Serial.println("haptic not triggered");
+      wait = -1;
+    }
+    if (LED) {
+      if (jsonDoc["api"]["command"]["light"] == 1) {
         int curr = jsonDoc["api"]["params"]["curr_intensity"];
         int next = jsonDoc["api"]["params"]["next_intensity"];
         int duration = jsonDoc["api"]["params"]["duration"];
@@ -229,12 +255,14 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
           hueShift(curr, next, duration);
         }
       }
-    } else if (device.equals("Pressure Sensor")) {
+    } 
+    if (pSensor) {
       if (command.equals("getReadings")) {
         String sensorReadings = getSensorReadings();
         Serial.print(sensorReadings);
         notifyClients(sensorReadings);
       } else if (command.equals("collect")) {
+        
         collectMode = !collectMode;
       }
     }
@@ -298,6 +326,21 @@ void setup() {
               // Turn OFF all pixels ASAP
   strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
   colorWipe(strip.Color(255,   0,   0), 50);
+
+  
+  drv_connected = drv.begin();
+  if (!drv_connected) {
+    Serial.println("Could not find DRV2605");
+    // while (1) delay(10);
+  } else {
+    drv.selectLibrary(1);
+    drv.setMode(DRV2605_MODE_INTTRIG); 
+  }
+  
+  // I2C trigger by sending 'go' command 
+  // default, internal trigger when sending GO command
+  
+
   strip.show();
 }
 
@@ -321,11 +364,20 @@ void loop() {
     }
       
   } else {
-    timerDelay = 10000;
+    //timerDelay = 10000;
+    //Serial.printf("wait = %d", wait);
     if ((millis() - lastTime) > timerDelay) {
-      String sensorReadings = getSensorReadings();
-      Serial.print(sensorReadings);
-      notifyClients(sensorReadings);
+      if (wait > 0) {
+        timerDelay = wait;
+        drv.go();
+      } else {
+        timerDelay = 1000;
+        String sensorReadings = getSensorReadings();
+        Serial.print(sensorReadings);
+        notifyClients(sensorReadings);
+      }
+      
+      
       lastTime = millis();
     }
   }
