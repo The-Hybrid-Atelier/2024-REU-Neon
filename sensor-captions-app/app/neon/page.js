@@ -7,6 +7,8 @@ import HowlerPlayer from './HowlerPlayer';
 import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
 import next from 'next';
 
+/** A few comments to commit haha */
+
 const jsonObject = {
   device: {
       
