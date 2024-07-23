@@ -4,7 +4,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import VideoJS from './VideoJS';
 import "videojs-youtube";
 import HowlerPlayer from './HowlerPlayer';
-import { initWebSocket, getReadings, vibrate, light, collectData } from '../utils/websocket';
+import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
+import next from 'next';
+
+/** A few comments to commit haha */
+
+const jsonObject = {
+  device: {
+      
+  },
+  version: "1.0",
+  playbackSpeed: 1.0,
+  api: {
+      command: {
+
+      },
+      params: {
+          
+      }
+  }
+};
 
 const App = () => {
   const howlPlayerRef = useRef(null);
