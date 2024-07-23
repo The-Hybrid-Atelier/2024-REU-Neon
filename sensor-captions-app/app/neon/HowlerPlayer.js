@@ -1,47 +1,47 @@
-// components/HowlerPlayer.js
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Howl } from 'howler';
-import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 
-const HowlerPlayer = forwardRef(({ src }, ref) => {
-//const HowlerPlayer = ({ src }) => {
-  const soundRef = useRef(null);
+const HowlerPlayer = forwardRef((props, ref) => {
+  const sounds = useRef({
+    lightBoiling: new Howl({ src: ['/sounds/light_boiling.wav'], loop: false }),
+    bubbling: new Howl({ src: ['/sounds/bubbling.wav'], loop: false }),
+    bubblingIntense: new Howl({ src: ['/sounds/bubbling_intense.wav'], loop: false }),
+    deepFry: new Howl({ src: ['/sounds/deep_fry.wav'], loop: false }),
+    stoveOn: new Howl({ src: ['/sounds/stove_on.mp3'], loop: false }),
+    bell: new Howl({ src: ['/sounds/bell.wav'], loop: false }),
+  });
 
-  useEffect(() => {
-    soundRef.current = new Howl({
-      src: [src],
-      onload: () => console.log("Audio loaded"),
-      onloaderror: (id, err) => console.error("Error loading audio", err),
-    });
-
-    return () => {
-      soundRef.current.unload();
-    };
-  }, [src]);
+  const currentlyPlaying = useRef(null);
 
   useImperativeHandle(ref, () => ({
-    playAudio: () => {
-      console.log(src);
-      soundRef.current.play();
+    play: (label) => {
+      // stop playing sound if ther is any any
+      if (currentlyPlaying.current) {
+        currentlyPlaying.current.stop();
+      }
+
+      const sound = sounds.current[label];
+      if (sound) {
+        sound.play();
+        currentlyPlaying.current = sound;
+      }
     },
+    loop: (label) => {
+      // Stop currently playing sound if any
+      if (currentlyPlaying.current) {
+        currentlyPlaying.current.stop();
+      }
+
+      const sound = sounds.current[label];
+      if (sound) {
+        sound.loop(true);
+        sound.play();
+        currentlyPlaying.current = sound;
+      }
+    }
   }));
 
-  // const playAudio = () => {
-  //   console.log(src);
-  //   soundRef.current.play();
-  // };
-
-  // const pauseAudio = () => {
-  //   soundRef.current.pause();
-  // };
-
   return null;
-
-  // return (
-  //   <div>
-  //     <button onClick={playAudio}>Play</button>
-  //     <button onClick={pauseAudio}>Pause</button>
-  //   </div>
-  // );
 });
 
 export default HowlerPlayer;
