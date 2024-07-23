@@ -16,8 +16,8 @@
 #include "Adafruit_DRV2605.h"
 
 /** NeoPixel Light Strip **/
-#define LED_PIN    14
-#define LED_COUNT 12 //5 for prototype1, 
+#define LED_PIN    32
+#define LED_COUNT 4 //4 for prototype 2 w/ full goggles
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 /** MicroPressusre **/
@@ -205,12 +205,16 @@ void colorWipe(uint32_t color, int wait) {
 }
 
 void vibrate(int value) {
-  wait = (500 * playbackSpeed)/value;
-  timerDelay = wait;
-  int effect = 17; // "17 − Strong Click 1 - 100%"
-  drv.setWaveform(0, effect);  // play effect 
-  drv.setWaveform(1, 0);       // end waveform
-  // drv.go();
+  if (value < 1) {
+    wait = -1;
+  } else {
+    wait = (500 * playbackSpeed)/value;
+    timerDelay = wait;
+    int effect = 17; // "17 − Strong Click 1 - 100%"
+    drv.setWaveform(0, effect);  // play effect 
+    drv.setWaveform(1, 0);       // end waveform
+    // drv.go();
+  }
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -266,6 +270,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         collectMode = !collectMode;
       }
     }
+    if(jsonDoc["api"]["command"]["stop"] == 1) {
+      vibrate(0);
+    }
   }
 }
 
@@ -305,7 +312,7 @@ void setup() {
   Wire.setClock(400000);
   if(!mpr.begin()) {
     Serial.println("Can't connect to MicroPressure Sensor");
-    while(1);
+    
   } else {
     Serial.println("MicroPressure Sensor Connected");
   }
@@ -324,15 +331,16 @@ void setup() {
   strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
   //colorWipe(strip.Color(255,   255,   255), 50); // White
               // Turn OFF all pixels ASAP
-  strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
+  strip.setBrightness(200); // Set BRIGHTNESS to about 1/5 (max = 255)
   colorWipe(strip.Color(255,   0,   0), 50);
-
+  strip.show();
   
   drv_connected = drv.begin();
   if (!drv_connected) {
     Serial.println("Could not find DRV2605");
     // while (1) delay(10);
   } else {
+    Serial.println("DRV2605L Connected");
     drv.selectLibrary(1);
     drv.setMode(DRV2605_MODE_INTTRIG); 
   }
@@ -373,8 +381,8 @@ void loop() {
       } else {
         timerDelay = 1000;
         String sensorReadings = getSensorReadings();
-        Serial.print(sensorReadings);
-        notifyClients(sensorReadings);
+        // Serial.print(sensorReadings);
+        // notifyClients(sensorReadings);
       }
       
       

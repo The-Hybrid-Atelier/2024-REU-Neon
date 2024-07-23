@@ -5,9 +5,8 @@ import VideoJS from './VideoJS';
 import "videojs-youtube";
 import HowlerPlayer from './HowlerPlayer';
 import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
-import next from 'next';
 
-/** A few comments to commit haha */
+/** A few comments to commit */
 
 const jsonObject = {
   device: {
@@ -29,16 +28,16 @@ const App = () => {
   const howlPlayerRef = useRef(null);
   const [isCollecting, setIsCollecting] = useState(false);
 
-  useEffect(() => {
-    const websocket = initWebSocket();
-    getReadings();
+  // useEffect(() => {
+  //   const websocket = initWebSocket();
+  //   getReadings();
     
-    return () => {
-        // if (websocket) {
-        //     websocket.close();
-        // }
-    };
-  }, []);
+  //   return () => {
+  //       // if (websocket) {
+  //       //     websocket.close();
+  //       // }
+  //   };
+  // }, []);
 
   const videoJsOptions = {
     techOrder: ["youtube"],
@@ -46,7 +45,7 @@ const App = () => {
     controls: true,
     responsive: true,
     fluid: true,
-    playbackRates: [0.1, 0.25, 0.5, 1, 1.5, 2],
+    playbackRates: [0.25, 0.5, 1, 1.5, 2],
     sources: [
       {
         src: "https://www.youtube.com/watch?v=wvIOqabJv4k",
@@ -59,7 +58,7 @@ const App = () => {
     kind: 'captions',
     srclang: 'en',
     label: 'English',
-    src: '/subtitles/MadL_bendCap.vtt'  // path to the captions
+    src: 'MadL_bend1v3.vtt' //'/subtitles/MadL_bendCap.vtt'  // path to the captions
   };
 
   const handleClick = () => {
