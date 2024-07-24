@@ -58,7 +58,7 @@ const VideoJS = (props) => {
 
         if (audioLabel) {
           // see if the sound should loop or not
-          if (label === '0' || label === '2' || label === '3' || label === '4' || label === '5' || label === '6') {
+          if (label === '0' || label === '1' || label === '2' || label === '3' || label === '4' || label === '5' || label === '6') {
             howlPlayerRef.current.loop(audioLabel);
           } else {
             howlPlayerRef.current.play(audioLabel);
