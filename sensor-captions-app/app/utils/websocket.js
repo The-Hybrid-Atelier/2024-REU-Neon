@@ -19,8 +19,8 @@ const jsonObject = {
 let websocket;
 
 export const initWebSocket = () => {
-    const gateway = `ws://192.168.1.79/ws`; // atelier
-    //const gateway = 'ws://192.168.25.1/ws'; // RohitaK
+    //const gateway = `ws://192.168.1.79/ws`; // atelier
+    const gateway = 'ws://192.168.221.1/ws'; // RohitaK
 
     websocket = new WebSocket(gateway);
     console.log('Trying to open a WebSocket connection…');
