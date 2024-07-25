@@ -5,7 +5,6 @@ import VideoJS from './VideoJS';
 import "videojs-youtube";
 import HowlerPlayer from './HowlerPlayer';
 import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
-
 /** A few comments to commit */
 
 const jsonObject = {
@@ -58,7 +57,7 @@ const App = () => {
     kind: 'captions',
     srclang: 'en',
     label: 'English',
-    src: '/subtitles/MadL_bendCap.vtt' //'/subtitles/MadL_bendCap.vtt'  // path to the captions
+    src: 'MadL_bend1v3.vtt' //'/subtitles/MadL_bendCap.vtt'  // path to the captions
   };
 
   const handleClick = () => {
@@ -68,6 +67,7 @@ const App = () => {
 
   const handlePlayerReady = (player) => {
     player.addRemoteTextTrack(captionOption);
+    
   };
 
   return (
@@ -83,6 +83,7 @@ const App = () => {
       <button onClick={handleClick}>
         {isCollecting ? 'Stop Collecting Data' : 'Start Collecting Data'}
       </button>
+      
     </>
   );
 }
