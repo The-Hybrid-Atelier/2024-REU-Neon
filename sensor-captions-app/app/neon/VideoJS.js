@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useSyncExternalStore, useContext} from 'react';
+import React, { useEffect, useRef, useContext, useState} from 'react';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
@@ -64,6 +64,17 @@ const VideoJS = (props) => {
   const playerRef = useRef(null);
   const { options, onReady, howlPlayerRef } = props;
   const { config, handleCheckboxChange } = useContext(ConfigContext);
+  const [isCollecting, setIsCollecting] = useState(false);
+
+  const handleClick = () => {
+    setIsCollecting(prevState => !prevState);
+    console.log("localConfig.useLight: " + localConfig.useLight);
+    collectData(localConfig.useLight, localConfig.useVibrate);
+    if(isCollecting) {
+      synthManager.stop();
+    }
+  };
+
   const handleCueChange = () => {
     if (howlPlayerRef.current) {
       console.log('playAudio from cuechange triggered');
@@ -91,24 +102,22 @@ const VideoJS = (props) => {
           console.log('Audio label not found or not loaded');
         }
         // Define the regular expression to match "VibrationSpeed" followed by a colon, optional whitespace, and a number
-        const vibrationRegex = /VibrationSpeed\s*:\s*(\d+)/;
+        
         const lightRegex = /LightInten\s*:\s*(\d+)/;
         const nextLightRegex = /NextLightInten\s*:\s*(\d+)/;
         const durationRegex = /Duration\s*:\s*(\d+)/;
         // Use the match method to extract the number
-        const vibration = capText.match(vibrationRegex);
+       
         const lightMatch = capText.match(lightRegex);
         const nextLightMatch = capText.match(nextLightRegex);
         const durationMatch = capText.match(durationRegex);
-        if (vibration && localConfig.useVibrate) {
+        if (localConfig.useVibrate) {
           jsonObject.device["haptic"] = 1;
           jsonObject.api.command["vibrate"] = 1;
           const vibrationSpeed = vibration[1];
-          jsonObject.api.params["intensity"] = Number(vibrationSpeed);
-          console.log(`VibrationSpeed: ${vibrationSpeed}`);
-        } else {
-          console.log('VibrationSpeed not found');
-        } 
+          jsonObject.api.params["intensity"] = Number(lightMatch[1]);
+          console.log(`VibrationSpeed: ${lightMatch[1]}`);
+        }
         if (lightMatch && localConfig.useSynth) {
           const lightIntensity = lightMatch[1];
           synthManager.playSynth(lightIntensity);
@@ -124,9 +133,6 @@ const VideoJS = (props) => {
           jsonObject.api.params["curr_intensity"] = Number(lightIntensity);
           jsonObject.api.params["next_intensity"] = Number(nextLightIntensity);
           jsonObject.api.params["duration"] = Number(duration);
-          
-          
-          
         } else {
           console.log('light or NextLight intensity not found');
         } 
@@ -203,7 +209,19 @@ const VideoJS = (props) => {
       player.src(options.sources);
     }
     const websocket = initWebSocket();
+    websocket.onmessage = (event) => {
+      console.log(isCollecting);
+      if(!isCollecting) {
+        const msg = JSON.parse(event.data);
+        if (localConfig.useSynth) {
+          console.log("trying to play synth with live data");
+          synthManager.playSynth(msg["val"]);
+        }
+      }
+    };
     getReadings();
+
+    
 
     return () => {
       const player = playerRef.current;
@@ -226,6 +244,12 @@ const VideoJS = (props) => {
     localConfig = config;
     console.log(localConfig);
   },[config]);
+
+  // useEffect (() => {
+  //   if(isCollecting) {
+
+  //   }
+  // }, [isCollecting]);
 
   return (
     <div>
@@ -255,6 +279,13 @@ const VideoJS = (props) => {
       </div>
       <div data-vjs-player>
         <div ref={videoRef} />
+      </div>
+      <div>
+        <button onClick={vibrate}>Toggle Vibrate</button>
+        <br/>
+        <button onClick={handleClick}>
+          {isCollecting ? 'Stop Collecting Data' : 'Start Collecting Data'}
+        </button>
       </div>
     </div>
     

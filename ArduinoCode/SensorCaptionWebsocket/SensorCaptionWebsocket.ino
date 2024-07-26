@@ -34,6 +34,8 @@ Adafruit_DRV2605 drv;
 const char* ssid = "atelier";
 const char* password = "ERB281282";
 bool collectMode = 0;
+bool gogglesOn = 0;
+bool vibrateOn = 0; 
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -43,6 +45,7 @@ AsyncWebSocket ws("/ws");
 
 // Json Variable to Hold Sensor Readings
 StaticJsonDocument<200> jsonDoc;
+
 
 // Timer variables
 unsigned long lastTime = 0;
@@ -127,15 +130,10 @@ double* getRGB(double lightVal) {
   double b = 0;
   static double rgb[3];
   
-  Serial.print("LightVal = ");
-  Serial.println(lightVal);
+  
   if(lightVal <= 6) {
     r = (255 - (255.0/5)*(lightVal-1)); // e.g. 255 - (255/4)*(lightval-1) 
-    Serial.print("r = ");
-    Serial.println(r);
     g = ((lightVal-1) * (255.0/5)); // 255 - (255/lightVal)
-    Serial.print("g = ");
-    Serial.println(g);
     b = 0;
   } else if (lightVal >= 6) {
     if (lightVal > MAX_INTENSITY) {
@@ -144,11 +142,9 @@ double* getRGB(double lightVal) {
     lightVal = MAX_INTENSITY+1-lightVal;
     r = 0;
     g = ((lightVal-1) * (255.0/5)); // 255 - (255/lightVal)
-    Serial.print("g = ");
-    Serial.println(g);
+    
     b = (255 - (255.0/5)*(lightVal-1)); // e.g. 255 - (255/4)*(lightval-1) 
-    Serial.print("b = ");
-    Serial.println(b);
+    
   } 
   rgb[0] = r;
   rgb[1] = g;
@@ -162,32 +158,32 @@ void hueShift(int lightVal, int nextVal, int duration) {
   static double currColor[3];
   static double nextColor[3];
   static double colorIncrement[3];
-  Serial.println(lightVal);
+  // Serial.println(lightVal);
   memcpy(currColor,getRGB((double)lightVal),sizeof(currColor));
   memcpy(nextColor,getRGB((double)nextVal),sizeof(nextColor));
   
-  for(int i = 0; i < 3; i++) {
-    Serial.println(nextColor[i]);
-  }
+  // for(int i = 0; i < 3; i++) {
+  //   Serial.println(nextColor[i]);
+  // }
   if (lightVal != nextVal) {
     colorWipe(strip.Color((int)currColor[0],(int)currColor[1],(int)currColor[2]), 0);
     for (int i = 0; i < 3; i++) {
       colorIncrement[i] = (nextColor[i] - currColor[i])/(duration/20);
     }
-    Serial.println("colorIncrement:");
-    for(int i = 0; i < 3; i++) {
-      Serial.println(colorIncrement[i]);
-    }
+    // Serial.println("colorIncrement:");
+    // for(int i = 0; i < 3; i++) {
+    //   Serial.println(colorIncrement[i]);
+    // }
     unsigned long start = millis();
     
     while (millis() - start < (duration * playbackSpeed)) {
 
       if ((millis() - start) % 20 == 0 && (millis() - start) > 19) {
-        Serial.println("currColor: ");
+        
         for(int i = 0; i < 3; i++) {
           currColor[i] += colorIncrement[i];
-          Serial.println(colorIncrement[i]);
-          Serial.println(currColor[i]);
+          // Serial.println(colorIncrement[i]);
+          // Serial.println(currColor[i]);
         }
         colorWipe(strip.Color((int)currColor[0],(int)currColor[1],(int)currColor[2]), 0);
       }
@@ -215,6 +211,25 @@ void vibrate(int value) {
     drv.setWaveform(1, 0);       // end waveform
     // drv.go();
   }
+}
+
+void countDown () {
+  colorWipe(strip.Color(0,0,0),0);
+  strip.show();
+  strip.setPixelColor(0, strip.Color(255,255,255));
+  strip.show();
+  unsigned long start = millis();
+  uint8_t pixCount = 1;
+  while (pixCount < 4) {
+    if ((millis() - start) == 1000) {
+      start = millis();
+      strip.setPixelColor(pixCount, strip.Color(255,255,255));
+      pixCount++;
+      Serial.println(pixCount);
+      strip.show();
+    }
+  }
+  colorWipe(strip.Color(255,0,0), 0);
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -260,13 +275,28 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         }
       }
     } 
+    if(jsonDoc["api"]["params"]["gogglesOn"]) {
+      gogglesOn = 1;
+    } else {
+      gogglesOn = 0;
+    }
+    if(jsonDoc["api"]["params"]["vibrateOn"]) {
+      vibrateOn = 1;
+    } else {
+      vibrateOn = 0;
+    }
     if (pSensor) {
+      Serial.println("Made it here");
       if (command.equals("getReadings")) {
+        
         String sensorReadings = getSensorReadings();
         Serial.print(sensorReadings);
         notifyClients(sensorReadings);
       } else if (command.equals("collect")) {
-        
+        // if (collectMode) {
+        //   vibrateOn = 0;
+        //   gogglesOn = 0;
+        // }
         collectMode = !collectMode;
       }
     }
@@ -283,6 +313,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
       break;
     case WS_EVT_DISCONNECT:
       Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      collectMode = 0;
       break;
     case WS_EVT_DATA:
       handleWebSocketMessage(arg, data, len);
@@ -331,7 +362,7 @@ void setup() {
   strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
   //colorWipe(strip.Color(255,   255,   255), 50); // White
               // Turn OFF all pixels ASAP
-  strip.setBrightness(200); // Set BRIGHTNESS to about 1/5 (max = 255)
+  strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
   colorWipe(strip.Color(255,   0,   0), 50);
   strip.show();
   
@@ -350,11 +381,25 @@ void setup() {
   
 
   strip.show();
+  countDown();
+}
+
+void sendVal (int val) {
+  StaticJsonDocument<200> doc;
+  doc["val"] = val;
+
+  // Serialize JSON to a string
+  String jsonString;
+  serializeJson(doc, jsonString);
+
+  // Send JSON string over WebSocket
+  ws.textAll(jsonString);
+  Serial.println("Sent JSON: " + jsonString);
 }
 
 void loop() {
   if (collectMode) {
-    timerDelay = 200;
+    timerDelay = 10;
     double max = 107777.0;
     double min = 98000.0;
     double scaleRange = max - min;
@@ -365,15 +410,20 @@ void loop() {
       // double* colors = getRGB(val);
       // uint32_t color = strip.Color(colors[0],colors[1],colors[2]);
       if( val != lastIntensity ) {
-        
-        hueShift(lastIntensity, val, 200);
+        if (gogglesOn) {
+          hueShift(lastIntensity, val, 200);
+        }
+        if (vibrateOn) {
+          vibrate(val);
+        }
         lastIntensity = val;
+        sendVal(val);
       }
+      lastTime = millis();
+      
     }
       
   } else {
-    //timerDelay = 10000;
-    //Serial.printf("wait = %d", wait);
     if ((millis() - lastTime) > timerDelay) {
       if (wait > 0) {
         timerDelay = wait;
@@ -381,8 +431,6 @@ void loop() {
       } else {
         timerDelay = 1000;
         String sensorReadings = getSensorReadings();
-        // Serial.print(sensorReadings);
-        // notifyClients(sensorReadings);
       }
       
       

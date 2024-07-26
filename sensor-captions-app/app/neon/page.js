@@ -26,7 +26,7 @@ const jsonObject = {
 
 const App = () => {
   const howlPlayerRef = useRef(null);
-  const [isCollecting, setIsCollecting] = useState(false);
+  
 
 
   // useEffect(() => {
@@ -62,10 +62,7 @@ const App = () => {
     src: 'MadL_bend1v3.vtt' //'/subtitles/MadL_bendCap.vtt'  // path to the captions
   };
 
-  const handleClick = () => {
-    setIsCollecting(prevState => !prevState);
-    collectData();
-  };
+ 
 
   const handlePlayerReady = (player) => {
     player.addRemoteTextTrack(captionOption);
@@ -80,13 +77,7 @@ const App = () => {
         <VideoJS options={videoJsOptions} onReady={handlePlayerReady} howlPlayerRef={howlPlayerRef} />
         <HowlerPlayer ref={howlPlayerRef} />
       </ConfigProvider>
-      <div>
-        <button onClick={vibrate}>Toggle Vibrate</button>
-        <br/>
-        <button onClick={handleClick}>
-          {isCollecting ? 'Stop Collecting Data' : 'Start Collecting Data'}
-        </button>
-      </div>
+      
     </>
   );
 }

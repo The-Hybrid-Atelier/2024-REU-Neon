@@ -19,8 +19,8 @@ const jsonObject = {
 let websocket;
 
 export const initWebSocket = () => {
-    //const gateway = `ws://192.168.1.79/ws`; // atelier
-    const gateway = 'ws://192.168.221.1/ws'; // RohitaK
+    const gateway = `ws://192.168.1.79/ws`; // atelier
+    // const gateway = 'ws://192.168.221.1/ws'; // RohitaK
     websocket = new WebSocket(gateway);
     console.log('Trying to open a WebSocket connection…');
 
@@ -95,10 +95,21 @@ export const getReadings = () => {
     }
 };
 
-export const collectData = () => {
+export const collectData = (gogglesOn, vibrateOn) => {
     if (websocket && websocket.readyState === WebSocket.OPEN) {
         jsonObject.device["Pressure Sensor"] = 1;
         jsonObject.api.command = "collect";
+        if (gogglesOn) {
+            jsonObject.api.params["gogglesOn"] = gogglesOn;
+        } else {
+            jsonObject.api.params["gogglesOn"] = 0;
+        }
+        if (vibrateOn) {
+            jsonObject.api.params["vibrateOn"] = vibrateOn;
+        } else {
+            jsonObject.api.params["vibrateOn"] = 0;
+        }
+        
         const jsonString = JSON.stringify(jsonObject);
         websocket.send(jsonString);
         console.log(jsonString);
