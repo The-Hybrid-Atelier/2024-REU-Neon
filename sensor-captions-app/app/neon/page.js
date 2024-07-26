@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import VideoJS from './VideoJS';
 import "videojs-youtube";
 import HowlerPlayer from './HowlerPlayer';
 import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
-
+import { ConfigProvider } from '../utils/Configs';
 /** A few comments to commit */
 
 const jsonObject = {
@@ -27,6 +27,7 @@ const jsonObject = {
 const App = () => {
   const howlPlayerRef = useRef(null);
   const [isCollecting, setIsCollecting] = useState(false);
+
 
   // useEffect(() => {
   //   const websocket = initWebSocket();
@@ -58,7 +59,7 @@ const App = () => {
     kind: 'captions',
     srclang: 'en',
     label: 'English',
-    src: '/subtitles/MadL_bendCap.vtt' //'/subtitles/MadL_bendCap.vtt'  // path to the captions
+    src: 'MadL_bend1v3.vtt' //'/subtitles/MadL_bendCap.vtt'  // path to the captions
   };
 
   const handleClick = () => {
@@ -68,21 +69,24 @@ const App = () => {
 
   const handlePlayerReady = (player) => {
     player.addRemoteTextTrack(captionOption);
+    
   };
+
+  
 
   return (
     <>
-      <div>Rest of app here</div>
-
-      <VideoJS options={videoJsOptions} onReady={handlePlayerReady} howlPlayerRef={howlPlayerRef} />
-      <HowlerPlayer ref={howlPlayerRef} />
-
-      <div>Rest of app here</div>
-      <button onClick={vibrate}>Toggle Vibrate</button>
-      <br/>
-      <button onClick={handleClick}>
-        {isCollecting ? 'Stop Collecting Data' : 'Start Collecting Data'}
-      </button>
+      <ConfigProvider>
+        <VideoJS options={videoJsOptions} onReady={handlePlayerReady} howlPlayerRef={howlPlayerRef} />
+        <HowlerPlayer ref={howlPlayerRef} />
+      </ConfigProvider>
+      <div>
+        <button onClick={vibrate}>Toggle Vibrate</button>
+        <br/>
+        <button onClick={handleClick}>
+          {isCollecting ? 'Stop Collecting Data' : 'Start Collecting Data'}
+        </button>
+      </div>
     </>
   );
 }
