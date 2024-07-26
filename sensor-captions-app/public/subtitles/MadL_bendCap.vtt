@@ -2,69 +2,89 @@ WEBVTT
 Kind: captions
 Language: en
 
-00:00:00.000 --> 00:00:01.000 align:start position:0%
-Sound: stoveOn
-
+00:03:16.767 --> 00:03:17.767 align:start position:0%
+Sound: -1
+Duration: 0
+NextSound : 1
 00:03:17.767 --> 00:03:21.225 align:start position:0%
-Boxes: 0
-
+Sound : 1
+Duration : 3458.0
+NextSound : 3
 00:03:21.229 --> 00:03:21.539 align:start position:0%
-Boxes: 3
-
+Sound : 3
+Duration : 310.0
+NextSound : 9
 00:03:21.547 --> 00:03:22.171 align:start position:0%
-Boxes: 9
-
+Sound : 9
+Duration : 624.0
+NextSound : 6
 00:03:22.175 --> 00:03:22.485 align:start position:0%
-Boxes: 6
-
+Sound : 6
+Duration : 310.0
+NextSound : 1
 00:03:22.489 --> 00:03:55.269 align:start position:0%
-Boxes: 0
-
+Sound : 1
+Duration : 32780.0
+NextSound : 2
 00:03:55.273 --> 00:03:56.215 align:start position:0%
-Boxes: 2
-
+Sound : 2
+Duration : 942.0
+NextSound : 3
 00:03:56.219 --> 00:03:56.843 align:start position:0%
-Boxes: 3
-
+Sound : 3
+Duration : 624.0
+NextSound : 4
 00:03:56.851 --> 00:03:57.161 align:start position:0%
-Boxes: 4
-
+Sound : 4
+Duration : 310.0
+NextSound : 7
 00:03:57.165 --> 00:03:57.475 align:start position:0%
-Boxes: 7
-
+Sound : 7
+Duration : 310.0
+NextSound : 9
 00:03:57.479 --> 00:03:57.789 align:start position:0%
-Boxes: 9
-
+Sound : 9
+Duration : 310.0
+NextSound : 5
 00:03:57.793 --> 00:03:58.103 align:start position:0%
-Boxes: 5
-
+Sound : 5
+Duration : 310.0
+NextSound : 4
 00:03:58.111 --> 00:03:58.421 align:start position:0%
-Boxes: 4
-
+Sound : 4
+Duration : 310.0
+NextSound : 1
 00:03:58.425 --> 00:04:00.307 align:start position:0%
-Boxes: 0
-
+Sound : 1
+Duration : 1882.0
+NextSound : 2
 00:04:00.315 --> 00:04:00.625 align:start position:0%
-Boxes: 2
-
+Sound : 2
+Duration : 310.0
+NextSound : 3
 00:04:00.627 --> 00:04:00.937 align:start position:0%
-Boxes: 3
-
+Sound : 3
+Duration : 310.0
+NextSound : 12
 00:04:00.941 --> 00:04:01.251 align:start position:0%
-Boxes: 12
-
+Sound : 12
+Duration : 310.0
+NextSound : 11
 00:04:01.255 --> 00:04:01.565 align:start position:0%
-Boxes: 11
-
+Sound : 11
+Duration : 310.0
+NextSound : 9
 00:04:01.574 --> 00:04:01.884 align:start position:0%
-Boxes: 9
-
+Sound : 9
+Duration : 310.0
+NextSound : 4
 00:04:01.888 --> 00:04:02.198 align:start position:0%
-Boxes: 4
-
+Sound : 4
+Duration : 310.0
+NextSound : 1
 00:04:02.202 --> 00:04:09.125 align:start position:0%
-Boxes: 0
-
+Sound : 1
+Duration : 6923.0
 00:04:09.815 --> 00:04:10.815 align:start position:0%
-Sound: bell
+Sound: -2
 

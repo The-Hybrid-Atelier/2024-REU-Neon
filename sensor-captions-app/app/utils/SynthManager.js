@@ -17,6 +17,9 @@ class SynthManager {
   }
 
   playSynth = (value) => {
+    if (value < 0) {
+        return;
+    }
     const notes = ["F5", "D4", "F4", "A4", "C5", "E5", "G5"]; 
     let desiredNotes = [];
     if (value > 6) {
