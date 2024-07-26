@@ -4,6 +4,7 @@ import 'video.js/dist/video-js.css';
 import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
 import { synthManager } from '../utils/SynthManager';
 import { ConfigContext } from '../utils/Configs'
+import { Howl, Howler } from 'howler';  // Ensure Howler is imported
 
 const soundMapping = {
   '-1': 'stoveOn',
@@ -24,38 +25,28 @@ const soundMapping = {
 };
 
 var jsonObject = {
-  device: {
-      
-  },
+  device: {},
   version: "1.0",
   playbackSpeed: 1.0,
   api: {
-      command: {
-          
-      },
-      params: {
-          
-      }
+    command: {},
+    params: {}
   }
 };
+
 var paused = false;
+
 const initJsonObject = () => {
   return {
-    device: {
-        
-    },
+    device: {},
     version: "1.0",
     playbackSpeed: 1.0,
     api: {
-        command: {
-            
-        },
-        params: {
-            
-        }
+      command: {},
+      params: {}
     }
   };
-}
+};
 
 let localConfig;
 
@@ -65,6 +56,7 @@ const VideoJS = (props) => {
   const { options, onReady, howlPlayerRef } = props;
   const { config, handleCheckboxChange } = useContext(ConfigContext);
   const [isCollecting, setIsCollecting] = useState(false);
+  const currentSound = useRef(null);  // To keep track of the currently playing sound
 
   const handleClick = () => {
     setIsCollecting(prevState => !prevState);
@@ -85,7 +77,7 @@ const VideoJS = (props) => {
     } else {
       howlPlayerRef.current.play(audioLabel);
     }
-  }
+  };
 
   const handleCueChange = () => {
     if (howlPlayerRef.current) {
@@ -93,28 +85,22 @@ const VideoJS = (props) => {
       const player = playerRef.current;
       const tracks = player.remoteTextTracks();
       const track = tracks[0];
-      //onst { config, handleCheckboxChange } = useContext(ConfigContext);
       
       if (track && track.activeCues && track.activeCues[0]) {
         const capText = track.activeCues[0].text;
         const label = capText.trim().split(': ')[1];
-       
         
         console.log(localConfig);
         // Define the regular expression to match "VibrationSpeed" followed by a colon, optional whitespace, and a number
         const soundRegex = /Sound\s*:\s*(\d+)/;
         const nextSoundRegex = /NextSound\s*:\s*(\d+)/;
-        // const lightRegex = /LightInten\s*:\s*(\d+)/;
-        // const nextLightRegex = /NextLightInten\s*:\s*(\d+)/;
         const durationRegex = /Duration\s*:\s*(\d+)/;
+        
         // Use the match method to extract the number
-       
         const soundMatch = capText.match(soundRegex);
         const nextSoundMatch = capText.match(nextSoundRegex);
-        // const lightMatch = capText.match(lightRegex);
-        // const nextLightMatch = capText.match(nextLightRegex);
         const durationMatch = capText.match(durationRegex);
-        var value = soundMatch[1];
+        var value = soundMatch ? soundMatch[1] : null;
         if (nextSoundMatch) {
           var nextValue = nextSoundMatch[1];
         }
@@ -134,12 +120,9 @@ const VideoJS = (props) => {
           console.log(`VibrationSpeed: ${value}`);
         }
         if (localConfig.useSynth) {
-          //const lightIntensity = soundMatch[1];
           synthManager.playSynth(value);
         }
         if (durationMatch && nextSoundMatch && localConfig.useLight) {
-          // const lightIntensity = lightMatch[1];
-          // const nextLightIntensity = nextLightMatch[1];
           const duration = durationMatch[1];
           console.log(`lightIntensity: ${value}`);
           console.log(`nextLightIntensity: ${nextValue}`);
@@ -152,7 +135,6 @@ const VideoJS = (props) => {
           console.log('light or NextLight intensity not found');
         } 
         command(jsonObject);
-
       }
       
     } else {
@@ -168,7 +150,6 @@ const VideoJS = (props) => {
 
       console.log("config state:" + config);
       
-
       const player = playerRef.current = videojs(videoElement, options, () => {
         videojs.log('player is ready');
         onReady && onReady(player);
@@ -176,7 +157,6 @@ const VideoJS = (props) => {
         const tracks = player.remoteTextTracks();
         const track = tracks[0];
         if (tracks.length > 0) {
-          
           track.mode = 'showing';
           track.addEventListener('cuechange', handleCueChange);
         }
@@ -190,7 +170,6 @@ const VideoJS = (props) => {
           }
           
           command(jsonObject);
-          
         });
         player.on("play", function () {
           jsonObject.api.command["stop"] = Number(0);
@@ -199,7 +178,6 @@ const VideoJS = (props) => {
           }
           
           command(jsonObject);
-          
         });
         player.on("seeked", function () {
           console.log(track.activeCues);
@@ -207,18 +185,16 @@ const VideoJS = (props) => {
           if (localConfig.useSynth) {
             if (player.paused()) {
               synthManager.pause();
-            } else if (track.activeCues === undefined || track.activeCues.length == 0) {
+            } else if (track.activeCues === undefined || track.activeCues.length === 0) {
               synthManager.stop();
             }
           }
           
-          if(track.activeCues === undefined || track.activeCues.length == 0) {
+          if (track.activeCues === undefined || track.activeCues.length === 0) {
             console.log("Video seek, no caption cue active! Pausing all feedback");
             jsonObject = initJsonObject();
             command(jsonObject);
-             
           }
-          
         });
       });
     } else {
@@ -239,8 +215,6 @@ const VideoJS = (props) => {
     };
     getReadings();
 
-    
-
     return () => {
       const player = playerRef.current;
       if (player) {
@@ -257,59 +231,56 @@ const VideoJS = (props) => {
     };
   }, [options, videoRef]);
 
-  useEffect (() => {
+  useEffect(() => {
     console.log("Use effect with config dependency triggered");
     localConfig = config;
     console.log(localConfig);
-  },[config]);
-
-  // useEffect (() => {
-  //   if(isCollecting) {
-
-  //   }
-  // }, [isCollecting]);
+  }, [config]);
 
   return (
     <div>
       <div>
         <label>
-          <input type ="checkbox" name="useSynth" checked={config.useSynth} onChange={handleCheckboxChange}/>
+          <input type="checkbox" name="useSynth" checked={config.useSynth} onChange={handleCheckboxChange} />
           Synth
         </label>
       </div>
       <div>
         <label>
-          <input type ="checkbox" name="useLight" checked={config.useLight} onChange={handleCheckboxChange}/>
+          <input type="checkbox" name="useLight" checked={config.useLight} onChange={handleCheckboxChange} />
           Light Goggles
         </label>
       </div>
       <div>
         <label>
-          <input type ="checkbox" name="useVibrate" checked={config.useVibrate} onChange={handleCheckboxChange}/>
+          <input type="checkbox" name="useVibrate" checked={config.useVibrate} onChange={handleCheckboxChange} />
           Vibration
         </label>
       </div>
       <div>
         <label>
-          <input type ="checkbox" name="useKitchen" checked={config.useKitchen} onChange={handleCheckboxChange}/>
+          <input type="checkbox" name="useKitchen" checked={config.useKitchen} onChange={handleCheckboxChange} />
           Kitchen Sounds
         </label>
       </div>
+     
       <div data-vjs-player>
         <div ref={videoRef} />
       </div>
       <div>
         <button onClick={vibrate}>Toggle Vibrate</button>
-        <br/>
+        <br />
         <button onClick={handleClick}>
           {isCollecting ? 'Stop Collecting Data' : 'Start Collecting Data'}
         </button>
+        <div style={{ marginTop: '15px', textAlign: 'left' }}>
+          <h3>Expert Graph</h3>
+          <img src="bend1expert.png" alt="Expert Graph" style={{ maxWidth: '75%', height: 'auto' }} />
+        </div>
       </div>
     </div>
-    
-    
-    
   );
 };
 
 export default VideoJS;
+
