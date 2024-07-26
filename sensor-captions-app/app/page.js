@@ -189,7 +189,7 @@ const handleSeek = (time) => {
       </div>
       {chartImage && (
         <div className="chart-container">
-          <img src={chartImage} className="chart-image" alt="Pressure over Time Plot" />
+          <img src={chartImage} className="bend1expert.png" alt="Pressure over Time Plot" />
         </div>
       )}
     </div>

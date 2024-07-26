@@ -275,7 +275,7 @@ const VideoJS = (props) => {
         </button>
         <div style={{ marginTop: '15px', textAlign: 'left' }}>
           <h3>Expert Graph</h3>
-          <img src="Frame 63.png" alt="Expert Graph" style={{ maxWidth: '75%', height: 'auto' }} />
+          <img src="bend1expert.png" alt="Expert Graph" style={{ maxWidth: '75%', height: 'auto' }} />
         </div>
       </div>
     </div>
