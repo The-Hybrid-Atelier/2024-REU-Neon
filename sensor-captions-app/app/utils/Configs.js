@@ -19,14 +19,15 @@ export const ConfigProvider = ({ children }) => {
 //   });
 
  const handleCheckboxChange = (event) => {
-    console.log(event);
+    // console.log(event);
     const {name, checked} = event.target;
-    console.log(checked);
+    // console.log(checked);
     setConfig( prevState => ({
       ...prevState,
       [name]: checked,
     }));
-    console.log("After: "+ checked);
+    // console.log("After: "+ checked);
+    
   }; 
 
   return (
