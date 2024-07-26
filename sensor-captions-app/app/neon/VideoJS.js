@@ -6,7 +6,7 @@ import { synthManager } from '../utils/SynthManager';
 import { ConfigContext } from '../utils/Configs'
 
 const soundMapping = {
-  'stoveOn': 'stoveOn',
+  '-1': 'stoveOn',
   '0': 'lightBoiling',
   '1': 'bubbling',
   '2': 'bubbling',
@@ -20,7 +20,7 @@ const soundMapping = {
   '10': 'deepFry',
   '11': 'deepFry',
   '12': 'deepFry',
-  'bell': 'bell'
+  '-2': 'bell'
 };
 
 var jsonObject = {
@@ -75,6 +75,18 @@ const VideoJS = (props) => {
     }
   };
 
+  const playKitchen = (label) => {
+    // see if the sound should loop or not
+    console.log('Cue label:', label);
+    const audioLabel = soundMapping[label];
+    console.log('Playing sound:', audioLabel);
+    if (label === '0' || label === '1' || label === '2' || label === '3' || label === '4' || label === '5' || label === '6') {
+      howlPlayerRef.current.loop(audioLabel);
+    } else {
+      howlPlayerRef.current.play(audioLabel);
+    }
+  }
+
   const handleCueChange = () => {
     if (howlPlayerRef.current) {
       console.log('playAudio from cuechange triggered');
@@ -82,56 +94,59 @@ const VideoJS = (props) => {
       const tracks = player.remoteTextTracks();
       const track = tracks[0];
       //onst { config, handleCheckboxChange } = useContext(ConfigContext);
-
+      
       if (track && track.activeCues && track.activeCues[0]) {
         const capText = track.activeCues[0].text;
         const label = capText.trim().split(': ')[1];
-        console.log('Cue label:', label);
-        const audioLabel = soundMapping[label];
-        console.log('Playing sound:', audioLabel);
-        console.log(localConfig);
-
-        if (audioLabel && localConfig.useKitchen) {
-          // see if the sound should loop or not
-          if (label === '0' || label === '1' || label === '2' || label === '3' || label === '4' || label === '5' || label === '6') {
-            howlPlayerRef.current.loop(audioLabel);
-          } else {
-            howlPlayerRef.current.play(audioLabel);
-          }
-        } else {
-          console.log('Audio label not found or not loaded');
-        }
-        // Define the regular expression to match "VibrationSpeed" followed by a colon, optional whitespace, and a number
+       
         
-        const lightRegex = /LightInten\s*:\s*(\d+)/;
-        const nextLightRegex = /NextLightInten\s*:\s*(\d+)/;
+        console.log(localConfig);
+        // Define the regular expression to match "VibrationSpeed" followed by a colon, optional whitespace, and a number
+        const soundRegex = /Sound\s*:\s*(\d+)/;
+        const nextSoundRegex = /NextSound\s*:\s*(\d+)/;
+        // const lightRegex = /LightInten\s*:\s*(\d+)/;
+        // const nextLightRegex = /NextLightInten\s*:\s*(\d+)/;
         const durationRegex = /Duration\s*:\s*(\d+)/;
         // Use the match method to extract the number
        
-        const lightMatch = capText.match(lightRegex);
-        const nextLightMatch = capText.match(nextLightRegex);
+        const soundMatch = capText.match(soundRegex);
+        const nextSoundMatch = capText.match(nextSoundRegex);
+        // const lightMatch = capText.match(lightRegex);
+        // const nextLightMatch = capText.match(nextLightRegex);
         const durationMatch = capText.match(durationRegex);
+        var value = soundMatch[1];
+        if (nextSoundMatch) {
+          var nextValue = nextSoundMatch[1];
+        }
+        if (localConfig.useKitchen) {
+          playKitchen(label);
+        } else {
+          console.log('Audio label not found or not loaded');
+        }
+        if (value < 0) {
+          value = 0;
+        }
         if (localConfig.useVibrate) {
           jsonObject.device["haptic"] = 1;
           jsonObject.api.command["vibrate"] = 1;
         
-          jsonObject.api.params["intensity"] = Number(lightMatch[1]);
-          console.log(`VibrationSpeed: ${lightMatch[1]}`);
+          jsonObject.api.params["intensity"] = Number(value);
+          console.log(`VibrationSpeed: ${value}`);
         }
-        if (lightMatch && localConfig.useSynth) {
-          const lightIntensity = lightMatch[1];
-          synthManager.playSynth(lightIntensity);
+        if (localConfig.useSynth) {
+          //const lightIntensity = soundMatch[1];
+          synthManager.playSynth(value);
         }
-        if (lightMatch && nextLightMatch && durationMatch && localConfig.useLight) {
-          const lightIntensity = lightMatch[1];
-          const nextLightIntensity = nextLightMatch[1];
+        if (durationMatch && nextSoundMatch && localConfig.useLight) {
+          // const lightIntensity = lightMatch[1];
+          // const nextLightIntensity = nextLightMatch[1];
           const duration = durationMatch[1];
-          console.log(`lightIntensity: ${lightIntensity}`);
-          console.log(`nextLightIntensity: ${nextLightIntensity}`);
+          console.log(`lightIntensity: ${value}`);
+          console.log(`nextLightIntensity: ${nextValue}`);
           jsonObject.device["LED"] = 1;
           jsonObject.api.command["light"] = 1;
-          jsonObject.api.params["curr_intensity"] = Number(lightIntensity);
-          jsonObject.api.params["next_intensity"] = Number(nextLightIntensity);
+          jsonObject.api.params["curr_intensity"] = value;
+          jsonObject.api.params["next_intensity"] = nextValue;
           jsonObject.api.params["duration"] = Number(duration);
         } else {
           console.log('light or NextLight intensity not found');
@@ -171,7 +186,7 @@ const VideoJS = (props) => {
             synthManager.pause();
           }
           if (localConfig.useKitchen) {
-            howlPlayerRef.current.stop();
+            Howler.stop();
           }
           
           command(jsonObject);
