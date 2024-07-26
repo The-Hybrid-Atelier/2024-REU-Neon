@@ -69,10 +69,17 @@ class SynthManager {
   };
 
   dispose = () => {
-    this.synth.dispose();
+    if (!this.synth.disposed) {
+      this.synth.dispose();
+    }
   };
-  initSynth = () => {
-    this.currentNotes = new Set();
+  initSynth = (currNotes) => {
+    if(currNotes !== null) {
+      this.currentNotes = currNotes;
+    } else {
+      this.currentNotes = new Set();
+    }
+    
     const gainNode = new Tone.Gain(0.25).toDestination();
     this.synth = new Tone.PolySynth(Tone.Synth,{
         // envelope: {
@@ -85,14 +92,19 @@ class SynthManager {
     console.log("Synth loaded");
   }
   pause = () => {
+
     this.currentNotes.forEach(oldNote => {
         this.releaseNote(oldNote, true);
     });
+    
+    this.dispose();
   }
   resume = () => {
+    this.initSynth(this.currentNotes);
     this.currentNotes.forEach(oldNote => {
         this.triggerNote(oldNote, true);
     });
+    
   }
   stop = () => {
     console.log("Synth Stopping");
