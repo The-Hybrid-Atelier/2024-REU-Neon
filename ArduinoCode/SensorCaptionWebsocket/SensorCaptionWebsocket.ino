@@ -59,7 +59,7 @@ int prevReading = 1;
 int lastIntensity = 0;
 
 bool drv_connected = false;
-int wait = -1;
+
 
 // Get Sensor Readings and return JSON object
 String getSensorReadings(){
@@ -201,16 +201,22 @@ void colorWipe(uint32_t color, int wait) {
 }
 
 void vibrate(int value) {
-  if (value < 1) {
-    wait = -1;
-  } else {
-    wait = (500 * playbackSpeed)/value;
-    timerDelay = wait;
-    int effect = 17; // "17 − Strong Click 1 - 100%"
-    drv.setWaveform(0, effect);  // play effect 
-    drv.setWaveform(1, 0);       // end waveform
-    // drv.go();
+  uint8_t rtv = (127/16) * value + 20;
+  if (value <= 1) {
+    rtv = 0;
   }
+  drv.setRealtimeValue(rtv);
+  drv.go();
+  // if (value < 1) {
+  //   wait = -1;
+  // } else {
+  //   // wait = (500 * playbackSpeed)/value;
+    // timerDelay = wait;
+    // int effect = 17; // "17 − Strong Click 1 - 100%"
+    // drv.setWaveform(0, effect);  // play effect 
+    // drv.setWaveform(1, 0);       // end waveform
+    // // drv.go();
+  
 }
 
 void countDown () {
@@ -263,7 +269,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       }
     } else {
       //Serial.println("haptic not triggered");
-      wait = -1;
+      vibrate(0);
     }
     if (LED) {
       if (jsonDoc["api"]["command"]["light"] == 1) {
@@ -373,7 +379,8 @@ void setup() {
   } else {
     Serial.println("DRV2605L Connected");
     drv.selectLibrary(1);
-    drv.setMode(DRV2605_MODE_INTTRIG); 
+    drv.setMode(DRV2605_MODE_REALTIME); 
+    //drv.setMode(DRV2605_MODE_INTTRIG); 
   }
   
   // I2C trigger by sending 'go' command 
@@ -399,7 +406,7 @@ void sendVal (int val) {
 
 void loop() {
   if (collectMode) {
-    timerDelay = 10;
+    timerDelay = 10; 
     double max = 107777.0;
     double min = 98000.0;
     double scaleRange = max - min;
@@ -425,15 +432,13 @@ void loop() {
       
   } else {
     if ((millis() - lastTime) > timerDelay) {
-      if (wait > 0) {
-        timerDelay = wait;
-        drv.go();
-      } else {
-        timerDelay = 1000;
-        String sensorReadings = getSensorReadings();
-      }
-      
-      
+    
+    
+      timerDelay = 1000;
+      String sensorReadings = getSensorReadings();
+    
+    
+    
       lastTime = millis();
     }
   }

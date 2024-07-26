@@ -114,7 +114,7 @@ const VideoJS = (props) => {
         if (localConfig.useVibrate) {
           jsonObject.device["haptic"] = 1;
           jsonObject.api.command["vibrate"] = 1;
-          const vibrationSpeed = vibration[1];
+        
           jsonObject.api.params["intensity"] = Number(lightMatch[1]);
           console.log(`VibrationSpeed: ${lightMatch[1]}`);
         }
@@ -169,6 +169,9 @@ const VideoJS = (props) => {
           jsonObject.api.command["stop"] = Number(1);
           if (localConfig.useSynth) {
             synthManager.pause();
+          }
+          if (localConfig.useKitchen) {
+            howlPlayerRef.current.stop();
           }
           
           command(jsonObject);
