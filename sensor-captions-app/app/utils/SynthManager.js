@@ -2,15 +2,16 @@ import * as Tone from 'tone';
 
 class SynthManager {
   constructor() {
+    //this.mode = 1; // 0 = off, 1 = on, 2 = live data mode
     this.currentNotes = new Set();
     const gainNode = new Tone.Gain(0.5).toDestination();
     this.synth = new Tone.PolySynth(Tone.Synth,{
-        envelope: {
-        attack: 0.1, // Time for the attack phase
-        decay: 0.2, // Time for the decay phase
-        sustain: 0.9, // Sustain level
-        release: 0.5 // Time for the release phase (fade out)
-        }
+        // envelope: {
+        // attack: 0.1, // Time for the attack phase
+        // decay: 0.2, // Time for the decay phase
+        // sustain: 0.9, // Sustain level
+        // release: 0.5 // Time for the release phase (fade out)
+        // }
     }).connect(gainNode);
     console.log("Synth loaded");
   }
@@ -25,7 +26,7 @@ class SynthManager {
           desiredNotes = notes.slice(-(value-5));
         }
     } else {
-        desiredNotes = [] + notes[value];
+        desiredNotes = [notes[value]];
     }
     console.log("desiredNotes: " + desiredNotes);
     const notesToStop = Array.from(this.currentNotes).filter(item => !desiredNotes.includes(item));
@@ -38,16 +39,20 @@ class SynthManager {
         this.triggerNote(newNote);
     });
   };
-  triggerNote = (note) => {
+  triggerNote = (note, keep) => {
     this.synth.triggerAttack(note);
-    this.currentNotes.add(note);
+    if (!keep) {
+        this.currentNotes.add(note);
+    }
     console.log(`Playing: ${note}`);
     this.logCurrentNotes();
   }
 
-  releaseNote = (note) => {
+  releaseNote = (note, keep) => {
     this.synth.triggerRelease(note);
-    this.currentNotes.delete(note);
+    if (!keep) {
+        this.currentNotes.delete(note);
+    }
     console.log(`Released: ${note}`);
     this.logCurrentNotes();
   };
@@ -63,6 +68,36 @@ class SynthManager {
   dispose = () => {
     this.synth.dispose();
   };
+  initSynth = () => {
+    this.currentNotes = new Set();
+    const gainNode = new Tone.Gain(0.25).toDestination();
+    this.synth = new Tone.PolySynth(Tone.Synth,{
+        // envelope: {
+        // attack: 0.1, // Time for the attack phase
+        // decay: 0.2, // Time for the decay phase
+        // sustain: 0.9, // Sustain level
+        // release: 0.5 // Time for the release phase (fade out)
+        // }
+    }).connect(gainNode);
+    console.log("Synth loaded");
+  }
+  pause = () => {
+    this.currentNotes.forEach(oldNote => {
+        this.releaseNote(oldNote, true);
+    });
+  }
+  resume = () => {
+    this.currentNotes.forEach(oldNote => {
+        this.triggerNote(oldNote, true);
+    });
+  }
+  stop = () => {
+    console.log("Synth Stopping");
+    this.currentNotes.forEach(oldNote => {
+        this.releaseNote(oldNote);
+    });
+    
+  }
 }
 
 const synthManager = new SynthManager();
