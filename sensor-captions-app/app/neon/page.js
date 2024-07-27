@@ -6,6 +6,7 @@ import "videojs-youtube";
 import HowlerPlayer from './HowlerPlayer';
 import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
 import { ConfigProvider } from '../utils/Configs';
+import './neon.css';
 /** A few comments to commit */
 
 const jsonObject = {
