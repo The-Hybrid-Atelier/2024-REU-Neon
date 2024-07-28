@@ -3,3 +3,8 @@
     justify-content: center;
     align-items: center;
 }
+
+.vjs-text-track-cue.move-off-screen {
+    position: absolute;
+    left: -999999px;
+}
