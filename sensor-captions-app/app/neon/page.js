@@ -59,7 +59,7 @@ const App = () => {
     kind: 'captions',
     srclang: 'en',
     label: 'English',
-    src: '/subtitles/MadL_bend1Meta.vtt'//'MadL_bend1v3.vtt'   // path to the captions
+    src: '/subtitles/MadL_bendMeta.vtt'//'MadL_bend1v3.vtt'   // path to the captions
   };
 
  

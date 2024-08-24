@@ -19,8 +19,9 @@ const jsonObject = {
 let websocket;
 
 export const initWebSocket = () => {
-    const gateway = `ws://192.168.1.79/ws`; // atelier
+    // const gateway = `ws://192.168.1.79/ws`; // atelier
     // const gateway = 'ws://192.168.221.1/ws'; // RohitaK
+    const gateway = 'ws://192.168.0.155/ws';
     websocket = new WebSocket(gateway);
     console.log('Trying to open a WebSocket connection…');
 
@@ -49,8 +50,13 @@ export const initWebSocket = () => {
 
 export const command = (jsonObj) => {
     const jsonString = JSON.stringify(jsonObj);
-    websocket.send(jsonString);
-    console.log(jsonString);
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.send(jsonString);
+        console.log(jsonString);
+    } else {
+        console.error('WebSocket is not open');
+    }
+    
 }
 
 
