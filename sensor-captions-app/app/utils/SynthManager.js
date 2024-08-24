@@ -14,6 +14,7 @@ class SynthManager {
         // }
     }).connect(gainNode);
     console.log("Synth loaded");
+    this.isPlaying = false;
   }
 
   playSynth = (value) => {
@@ -49,6 +50,7 @@ class SynthManager {
     }
     console.log(`Playing: ${note}`);
     this.logCurrentNotes();
+    this.isPlaying = true;
   }
 
   releaseNote = (note, keep) => {
@@ -72,6 +74,7 @@ class SynthManager {
     if (!this.synth.disposed) {
       this.synth.dispose();
     }
+    this.isPlaying = false;
   };
   initSynth = (currNotes) => {
     if(currNotes !== null) {
@@ -79,7 +82,7 @@ class SynthManager {
     } else {
       this.currentNotes = new Set();
     }
-    
+    this.isPlaying = false;
     const gainNode = new Tone.Gain(0.25).toDestination();
     this.synth = new Tone.PolySynth(Tone.Synth,{
         // envelope: {
@@ -92,26 +95,31 @@ class SynthManager {
     console.log("Synth loaded");
   }
   pause = () => {
-
+    this.isPlaying = false;
     this.currentNotes.forEach(oldNote => {
         this.releaseNote(oldNote, true);
     });
     
-    this.dispose();
+    //this.dispose();
   }
   resume = () => {
-    this.initSynth(this.currentNotes);
+    //this.initSynth(this.currentNotes);
     this.currentNotes.forEach(oldNote => {
         this.triggerNote(oldNote, true);
     });
+    this.isPlaying = true;
     
   }
   stop = () => {
+    this.isPlaying = false;
     console.log("Synth Stopping");
     this.currentNotes.forEach(oldNote => {
         this.releaseNote(oldNote);
     });
     
+  }
+  getIsPlaying = ()  => {
+    return this.isPlaying;
   }
 }
 

@@ -1,6 +1,8 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+### README by Roy
+
+## To run:
+**To run localhost.../neon** where the websocket and 90% of the work is, you must **run locally** otherwise github Codespaces won't let you open it since it doesn't use a secure websocket. (Run locally as in clone the repo, use command line etc.)
 
 First, run the development server:
 
@@ -16,21 +18,34 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Code Explanation
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### /sensor-captions-app/app/neon
+Is where all of the websocket work is. Everything on the home page is deprecated and doesn't have any connection to the hardware prototypes, captions, feedback etc. Everything in just /app is pretty much not used. 
 
-## Learn More
+  ### Current setup:
+  **page.js** holds the page elements itself. It holds custom elements **ConfigProvider** from utils/Config.js, **VideoJS** from ./VideoJs.js, **HowlerPlayer** from ./HowlerPlayer.js. 
 
-To learn more about Next.js, take a look at the following resources:
+  **ConfigProvider** enables the checkboxes and allows the states of the boxes to be passed between objects. 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  **VideoJS** is sadly where most of the logic lies. If someone has time, we should rewrite and move everything back to be OOP designed again. VideoJS parses the caption in handleCueChange(), handles checkbox state changes, handles the button to begin live data collection & live feedback (practice mode), holds and handles the video itself & settings, calls HowlerPlayer for kitchen feedback, and more. 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+  **HowlerPlayer** plays the Kitchen feedback sounds (and any .mp3 or audio files). Controlled by VideoJS.js. 
 
-## Deploy on Vercel
+  
+### /sensor-captions-app/app/utils
+  **SynthManager.js** Generates and plays synth sounds. Controlled by VideoJS.js. I tried to store which notes are active so when users pause and replay, the correct notes continue playing, but it's buggy. (Otherwise notes only get activated on cuechange). 
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+  Current Issue:
+  - Sometimes a SynthManager instance is created more than once, and the old one can't be accessed or turned off. Requires a page refresh, very annoying. Especially bad when video buffers. 
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+  **websocket.js** passes a JSON containing all settings and commands for the physical sensory feedback devices connected to the ESP32 over hotspot. Requires the ESP32 to be flashed with SensorCaptionWebsocket.ino. 
+
+  **Configs.js** facilitates passing checkbox state between objects. 
+
+### /sensor-captions-app/app/public 
+Place any files that need to be accessed on the page here. E.g. images, caption .vtt files, sounds used by HowlerPlayer
+
+### /sensor-captions-app/app/pages
+Not used  
+

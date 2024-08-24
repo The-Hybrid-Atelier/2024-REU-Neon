@@ -34,7 +34,7 @@ var jsonObject = {
   }
 };
 
-var paused = false;
+var value = -1;
 
 const initJsonObject = () => {
   return {
@@ -67,6 +67,13 @@ const VideoJS = (props) => {
     }
   };
 
+  const stopHowler = () => {
+    Howler.stop();
+  }
+  const stopSynth = () => {
+    synthManager.stop();
+  }
+
   const playKitchen = (label) => {
     // see if the sound should loop or not
     console.log('Cue label:', label);
@@ -78,6 +85,44 @@ const VideoJS = (props) => {
       howlPlayerRef.current.play(audioLabel);
     }
   };
+
+  const feedback = (val, nextValue, duration) => {
+    
+    if (localConfig.useKitchen) {
+      playKitchen(value);
+    } else {
+      stopHowler();
+    }
+    
+    if (localConfig.useVibrate) {
+      jsonObject.device["haptic"] = 1;
+      jsonObject.api.command["vibrate"] = 1;
+    
+      jsonObject.api.params["intensity"] = Number(value);
+      console.log(`VibrationSpeed: ${value}`);
+      command(jsonObject);
+    } else {
+      jsonObject.device["haptic"] = 0;
+      jsonObject.api.command["vibrate"] = 0;
+      command(jsonObject);
+    }
+    if (localConfig.useSynth) {
+      synthManager.playSynth(value);
+    } else {
+      synthManager.stop();
+    }
+    if (duration > 0 && nextValue > 0 && localConfig.useLight) {
+      console.log(`lightIntensity: ${value}`);
+      console.log(`nextLightIntensity: ${nextValue}`);
+      jsonObject.device["LED"] = 1;
+      jsonObject.api.command["light"] = 1;
+      jsonObject.api.params["curr_intensity"] = value;
+      jsonObject.api.params["next_intensity"] = nextValue;
+      jsonObject.api.params["duration"] = Number(duration);
+      command(jsonObject);
+    }
+    
+  }
 
   const handleCueChange = () => {
     if (howlPlayerRef.current) {
@@ -92,49 +137,29 @@ const VideoJS = (props) => {
         
         console.log(localConfig);
         // Define the regular expression to match "VibrationSpeed" followed by a colon, optional whitespace, and a number
-        const soundRegex = /Sound\s*:\s*(\d+)/;
-        const nextSoundRegex = /NextSound\s*:\s*(\d+)/;
+        const soundRegex = /Sound\s*:\s*(-?\d+)/;
+
+        const nextSoundRegex = /NextSound\s*:\s*(-?\d+)/;
         const durationRegex = /Duration\s*:\s*(\d+)/;
         
         // Use the match method to extract the number
         const soundMatch = capText.match(soundRegex);
         const nextSoundMatch = capText.match(nextSoundRegex);
         const durationMatch = capText.match(durationRegex);
-        var value = soundMatch ? soundMatch[1] : null;
+        value = soundMatch ? soundMatch[1] : null;
+        // if (value < 0) {
+        //   value = 0;
+        // }
         if (nextSoundMatch) {
           var nextValue = nextSoundMatch[1];
         }
-        if (localConfig.useKitchen) {
-          playKitchen(label);
-        } else {
-          console.log('Audio label not found or not loaded');
-        }
-        if (value < 0) {
-          value = 0;
-        }
-        if (localConfig.useVibrate) {
-          jsonObject.device["haptic"] = 1;
-          jsonObject.api.command["vibrate"] = 1;
-        
-          jsonObject.api.params["intensity"] = Number(value);
-          console.log(`VibrationSpeed: ${value}`);
-        }
-        if (localConfig.useSynth) {
-          synthManager.playSynth(value);
-        }
-        if (durationMatch && nextSoundMatch && localConfig.useLight) {
+        if (durationMatch) {
           const duration = durationMatch[1];
-          console.log(`lightIntensity: ${value}`);
-          console.log(`nextLightIntensity: ${nextValue}`);
-          jsonObject.device["LED"] = 1;
-          jsonObject.api.command["light"] = 1;
-          jsonObject.api.params["curr_intensity"] = value;
-          jsonObject.api.params["next_intensity"] = nextValue;
-          jsonObject.api.params["duration"] = Number(duration);
+          feedback(value, nextValue, duration);
         } else {
-          console.log('light or NextLight intensity not found');
-        } 
-        command(jsonObject);
+          feedback(value);
+        }
+        
       }
       
     } else {
@@ -161,6 +186,7 @@ const VideoJS = (props) => {
           track.addEventListener('cuechange', handleCueChange);
         }
         player.on("pause", function () {
+          jsonObject = initJsonObject();
           jsonObject.api.command["stop"] = Number(1);
           if (localConfig.useSynth) {
             synthManager.pause();
@@ -172,9 +198,14 @@ const VideoJS = (props) => {
           command(jsonObject);
         });
         player.on("play", function () {
+          jsonObject = initJsonObject();
           jsonObject.api.command["stop"] = Number(0);
-          if (localConfig.useSynth) {
+          jsonObject.api.playbackSpeed = player.playbackRate();
+          if (localConfig.useSynth && synthManager.getIsPlaying()) {
             synthManager.resume();
+          }
+          if (localConfig.useKitchen) {
+            playKitchen(value); 
           }
           
           command(jsonObject);
@@ -206,6 +237,7 @@ const VideoJS = (props) => {
     websocket.onmessage = (event) => {
       console.log(isCollecting);
       if(!isCollecting) {
+        
         const msg = JSON.parse(event.data);
         if (localConfig.useSynth) {
           console.log("trying to play synth with live data");
@@ -235,6 +267,8 @@ const VideoJS = (props) => {
     console.log("Use effect with config dependency triggered");
     localConfig = config;
     console.log(localConfig);
+    feedback(value);
+
   }, [config]);
 
   return (
@@ -263,7 +297,11 @@ const VideoJS = (props) => {
           Kitchen Sounds
         </label>
       </div>
-     
+      <div>
+        <h2>DEBUG AREA</h2>
+        <button onClick={stopHowler}>Stop Howler</button>
+        <button onClick={stopSynth}>Stop Synth</button>
+      </div>
       <div data-vjs-player>
         <div ref={videoRef} />
       </div>
@@ -278,6 +316,7 @@ const VideoJS = (props) => {
           <img src="bend1expert.png" alt="Expert Graph" style={{ maxWidth: '75%', height: 'auto' }} />
         </div>
       </div>
+      
     </div>
   );
 };
