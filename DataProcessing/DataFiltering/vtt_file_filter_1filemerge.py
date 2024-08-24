@@ -169,7 +169,7 @@ def formatTime(mseconds):
 
 # Ex
 #CSV input file path
-csv_file_path = 'MadL_bend2.csv'
+csv_file_path = 'Data/MadL_bend2.csv'
 
 #Output merged file path
 capVtt_file_path = 'MadL_bendMerge.vtt'
