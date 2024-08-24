@@ -23,7 +23,7 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 /** MicroPressusre **/
 #include <SparkFun_MicroPressure.h>
 SparkFun_MicroPressure mpr;
-
+ 
 
 /** vibration driver **/
 Adafruit_DRV2605 drv;
