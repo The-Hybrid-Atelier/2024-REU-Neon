@@ -17,7 +17,7 @@ Notes:
 import csv
 
 def detect_events_with_meter(csv_file_path, vtt_file_path, threshold=99000, numBoxes=12, offset=2000):
-    
+
     #Obtains the maximum value of the pressure
     maxPa = float('-inf')
     with open(csv_file_path, newline='') as csvfile:
@@ -103,7 +103,7 @@ def formatTime(mseconds):
     return f"{hours:02}:{minutes:02}:{seconds:02}.{mseconds:03}"
 
 #CSV file to be processed
-csv_file_path = 'MadL_bend2.csv'
+csv_file_path = 'Data/MadL_bend2.csv'
 
 #Output file
 vtt_file_path = 'MadL_bendCap.vtt'

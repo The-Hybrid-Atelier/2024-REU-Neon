@@ -178,7 +178,7 @@ def formatTime(mseconds):
     return f"{hours:02}:{minutes:02}:{seconds:02}.{mseconds:03}"
 
 # Ex
-csv_file_path = 'MadL_bend2.csv'
+csv_file_path = 'Data/MadL_bend2.csv'
 
 # Output files
 # Caption VTT file
