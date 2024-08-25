@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sensorcaptions",
+  "private_key_id": "c9920651d164a2564edca57a212f5a61e0950533",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDG+EWWBzBhyR23\nnSncg9MOnl0OqaqwFSgFfrm4yIm+Tn7ExjnXnX8k9QuwUN6ijU9+EoPSfbo9tkxy\nFD9Oot94BhI3iDsPUA0pP8tPuBmczSeIpPs7FfILnyRVIYX/GvJIOfB8WU5OUb18\ncYPubBQBgXylvpg90dQi6ajfln2ZN206YB1xJPBIC9v26KpgMMJWrkTslRulBvLw\nd7YcvAtByEjFXtT+7PTXgFpfcM/YsGrD3LPXsUhuw+k/YBQwO9WTePuer8I3ozrr\nj2TV0bCLt2sTWu478AcsOVj2YaD6haEhTzR5mAxbvdLiZsW/N03kGTJlIpIqaoY/\nCyE0L/EXAgMBAAECggEAXUTKUc6i5mPBU24PznfY+tRPaO0tvwbb0N+brbwLnbLs\nB8+oE6OXkzpvNUJjaq11IvMI6iXXpNAMu7k0B+efe4LVDUUF8mKjGL/3zTHOh8s/\nifVUc1kRMlNyU5m4V2JJSoQmcBPo+hulCG2p25y8MAyD4qoacXgnygngCJdh3uzh\n5k5f2qbJz0At9F0OLOst19KVh9qyZkkBGj0QwOHwU2X7VvtMNVWTpwOkFH/lUrOW\n+qHpMERcK0VOAMnwLOZeCIq2uH1dq4pvJzth9yQy84LjaUm6ByVMivGCbUWTXwb0\nXnw7Woyv7ElxaYvoMB5/mNv6xqQcaDxx2NRq66DWcQKBgQDiFOd47EIbpO7MpY5t\n9nwosFeu9oq2WqpCXIFaeXHeZYfqm/7070UPv9iFl8e4r9g77B+e2gl+eboxZjFG\nXn7+DbUYhFCFqISCkEu+slAKHIvwxd8E8bxupkRZzaKRMHuCB32ODl9/k00sNynW\nXmTI3HJ8OzS/ppUcQ8CseX6iSQKBgQDhTOJlbePI+pgWY1XMXeUCSbq2gaJY0OeB\ny00BVThITF7HAAuo5BnIcDvM8he4v9LYGh7ln83M+hEy72ycUFzDIdy5zXttDMgd\n/2VnkdfYt+bygXCEcbbV9f6eSgUt1U2ZbTHOfo2iiFBnlFHHPNWfNZpugs1SrtM9\nBb8jOSP4XwKBgDBAK+K38af6vGh60PoRCBCbCiuyPIqMsRe2rHjFwJKpcqeUoYZe\n5otk824Xpa16AhlP3LPHbw1KJ33RhKSzGEFaZZMU8iaEf7tp1nCdl82AqDE72cwx\nV3j6DU5pP8/i3Ak1VguSb7lHk8njAA/bV4Ey41A2Rpy8jchZgW6OA4PZAoGAKIDv\n+pgk6U7T5MJ6/ECtGRo0LPdlPl5gIF9yOpkdgzHnoBMMBZLsZ7J1rcSgKyChQSSB\nBXsTPpR+Xw/YEMoJwzLlQaoFVHeFyo7Npi78BQQayuImXkkrO4/79G0OPU0ppDmT\nSLJLuDqVaemqQg1XwkWau99cFk9Dvqa31BdDtjUCgYEAq/2FFuQNv/hivY2sgheq\nK3hs3MhEohI4t154oDO9U0S4j+X3khv/9He8YMFCKSF+8omqYrBTuozH/XYjk89u\nmM8KeIbxP8x/1NHoIzuHrJ4ndph04S4HkxvE10+J6H9nJ/hA2PnA5ogikQpiGzSK\n9XQ8m3vfetrzbmoUmVJjcXc=\n-----END PRIVATE KEY-----\n",
+  "client_email": "sensorcaptionsesp32@sensorcaptions.iam.gserviceaccount.com",
+  "client_id": "114617691400013588140",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sensorcaptionsesp32%40sensorcaptions.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
