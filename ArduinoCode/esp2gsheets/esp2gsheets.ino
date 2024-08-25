@@ -30,6 +30,11 @@ SparkFun_MicroPressure mpr;
 #define WIFI_SSID "atelier"
 #define WIFI_PASSWORD "ERB281282"
 
+// FOR HOTSPOT
+// #define WIFI_SSID "RohitaK"
+// #define WIFI_PASSWORD "apple123"
+
+
 #define PROJECT_ID "sensorcaptions"
 
 // Service Account's client email
