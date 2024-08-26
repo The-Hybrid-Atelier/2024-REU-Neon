@@ -22,6 +22,7 @@ int SensValue = 0;
 
 /** MicroPressusre **/
 #include <SparkFun_MicroPressure.h>
+#include<Wire.h>
 SparkFun_MicroPressure mpr;
 
 // For SD/SD_MMC mounting helper
@@ -46,8 +47,7 @@ char numberArray[20];
 
 // Service Account's private key
   
-const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDG+EWWBzBhyR23\nnSncg9MOnl0OqaqwFSgFfrm4yIm+Tn7ExjnXnX8k9QuwUN6ijU9+EoPSfbo9tkxy\nFD9Oot94BhI3iDsPUA0pP8tPuBmczSeIpPs7FfILnyRVIYX/GvJIOfB8WU5OUb18\ncYPubBQBgXylvpg90dQi6ajfln2ZN206YB1xJPBIC9v26KpgMMJWrkTslRulBvLw\nd7YcvAtByEjFXtT+7PTXgFpfcM/YsGrD3LPXsUhuw+k/YBQwO9WTePuer8I3ozrr\nj2TV0bCLt2sTWu478AcsOVj2YaD6haEhTzR5mAxbvdLiZsW/N03kGTJlIpIqaoY/\nCyE0L/EXAgMBAAECggEAXUTKUc6i5mPBU24PznfY+tRPaO0tvwbb0N+brbwLnbLs\nB8+oE6OXkzpvNUJjaq11IvMI6iXXpNAMu7k0B+efe4LVDUUF8mKjGL/3zTHOh8s/\nifVUc1kRMlNyU5m4V2JJSoQmcBPo+hulCG2p25y8MAyD4qoacXgnygngCJdh3uzh\n5k5f2qbJz0At9F0OLOst19KVh9qyZkkBGj0QwOHwU2X7VvtMNVWTpwOkFH/lUrOW\n+qHpMERcK0VOAMnwLOZeCIq2uH1dq4pvJzth9yQy84LjaUm6ByVMivGCbUWTXwb0\nXnw7Woyv7ElxaYvoMB5/mNv6xqQcaDxx2NRq66DWcQKBgQDiFOd47EIbpO7MpY5t\n9nwosFeu9oq2WqpCXIFaeXHeZYfqm/7070UPv9iFl8e4r9g77B+e2gl+eboxZjFG\nXn7+DbUYhFCFqISCkEu+slAKHIvwxd8E8bxupkRZzaKRMHuCB32ODl9/k00sNynW\nXmTI3HJ8OzS/ppUcQ8CseX6iSQKBgQDhTOJlbePI+pgWY1XMXeUCSbq2gaJY0OeB\ny00BVThITF7HAAuo5BnIcDvM8he4v9LYGh7ln83M+hEy72ycUFzDIdy5zXttDMgd\n/2VnkdfYt+bygXCEcbbV9f6eSgUt1U2ZbTHOfo2iiFBnlFHHPNWfNZpugs1SrtM9\nBb8jOSP4XwKBgDBAK+K38af6vGh60PoRCBCbCiuyPIqMsRe2rHjFwJKpcqeUoYZe\n5otk824Xpa16AhlP3LPHbw1KJ33RhKSzGEFaZZMU8iaEf7tp1nCdl82AqDE72cwx\nV3j6DU5pP8/i3Ak1VguSb7lHk8njAA/bV4Ey41A2Rpy8jchZgW6OA4PZAoGAKIDv\n+pgk6U7T5MJ6/ECtGRo0LPdlPl5gIF9yOpkdgzHnoBMMBZLsZ7J1rcSgKyChQSSB\nBXsTPpR+Xw/YEMoJwzLlQaoFVHeFyo7Npi78BQQayuImXkkrO4/79G0OPU0ppDmT\nSLJLuDqVaemqQg1XwkWau99cFk9Dvqa31BdDtjUCgYEAq/2FFuQNv/hivY2sgheq\nK3hs3MhEohI4t154oDO9U0S4j+X3khv/9He8YMFCKSF+8omqYrBTuozH/XYjk89u\nmM8KeIbxP8x/1NHoIzuHrJ4ndph04S4HkxvE10+J6H9nJ/hA2PnA5ogikQpiGzSK\n9XQ8m3vfetrzbmoUmVJjcXc=\n-----END PRIVATE KEY-----\n";
-
+const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDQy8+SeshmKdBR\nPwvxFCiG2G2HpuwCjlZxUWTYl0nujXqcAnxwXaLhEk3og+YXgPfc6vnfJw6ZiMJ8\nRNCdWm/1niBI8RIQtKAnJYKImrQRlzNPM1ND8+5nzgW3xpZgAXs/7oC1yq0hjTFc\nfGdQuyMeYAI5hkVg7iTZyQMaG3CbYtrqH2zTBAoz4oQJ+KnVeyhYwYhollvnduo8\nTTnegQeZejdC+vXu0D1cGpdjGsc64vC5/pGhMKg+J0Akb3zt7xAJ45LYcrArHzfW\n8L1+cNIxG69O3ThF5hn8IrjRViasBl4Be5cCFyQoolqAs2VUAonlIi/e1dNFXri2\npB6VOWzXAgMBAAECggEAXBmy/6WKdUo3ekcpsNdYAxc/xUkTrRL1PXoOVl3xvjkJ\nHv0XwAcFvGszE3/vBGoeq4O44b7cOUxyoZdHQEmuvjTYf+RauCS8ylfI6xH2oRXF\ni8eTkJNuk7p0mjqOhV3R7IL7onT7BqQ95FJ5zkol9RWblZ1NSDLz7V82L5NwChH2\nWr3k7OIhEjqXqlFz5qZW+jPdU8FOzIdjF1ntGjgvnkqAQSrNIdH6+G7KTf75CpOZ\nzI2wsTZOlzXeZdwI7ykn32DRcGAc92GA+xSrEYDzatLgP9mN/StAYCgcWQvAXSH8\nwkrahy9PhkGDpRBuBSscqt9sB8/d99WX1Fdiyy88iQKBgQDx7kDEXfU02IhAEs+L\nhbOME39QBEGUy4Rkd1DEOxLC1RtObyB4EQbpD0ooi7zXceIPb/HQk40kNhU0rJJH\nSy43Hp9vOjobODoI9zVIaVd5IPxP/obbRLRL/8c5F1CFA45bqOvctbnylX7S/6sP\n1WaaFMqpnUYj5oL2LoGnrd0K+QKBgQDc8EROAkWprsHGNXwaAulgHDJuPKTYM6gI\ngGL9PeZJ/NP+D8YfDbdK3YG7V3WtkUmiO2urfs/3woPeTG/rvTQ3g3E5Z8W4/ajO\nrhdeF4nd7uzNXAUACZC44kTnbYt3QkOYIVnEpmrVb9Tab3MBw8LBpUtcuv9+EMvi\niUZrz8PaTwKBgEiek6Jd8bSjKoLRIqtmvrZVQ+no3Sak0GC3z+6XLNJ+1Wt9v+lK\ncyCSDliNWWnyLUElARjysXMlKMhe5Kmxz3WMI59ngvmYrxLx4XSS6kbZt+LrK9+1\nh8koRczFSs4ieyDYW7QseFxws1jylY5zKBEoHI09QEiWcMkkvJZwgeFBAoGAbqZO\nLxtoNCD3nwLuUkCfDKlSgG8Sx8ynHQrfiKDVkrxyl0zjFm5SG8Zv0JlusCyRShSk\nSdFK6nSaglyZuOCbJCpKLEvSdGFlh40c2tzDCUk9g2PQhUJFHrMDezwbmvCu1aPu\nR1RpMNe/LF6gpIOcKEtWQOzORB65XY0OnbQCDHUCgYEAjt2bn9YHGEucs0OFTBak\nDtkKb5T5X/0Bma+fClohEK7zdEx7vVNA4w5eyTF0x5iQvtTBV/KdpRhWV7vsnzrI\niwdB6YiFVHT9Uss7gcf7uqIpjFsMJkLxrZ2GQzPWaHthbQvHJFDlIaKlwDBfIe/L\n7rAeedxbIafTc2NUQ2cD2BQ=\n-----END PRIVATE KEY-----\n";
 bool taskComplete = false;
 
 #if defined(ARDUINO_RASPBERRY_PI_PICO_W)
@@ -59,6 +59,7 @@ void tokenStatusCallback(TokenInfo info);
 void setup() {
 
   Serial.begin(115200);
+  Wire.begin();
   Serial.println();
   Serial.println();
 
@@ -218,3 +219,7 @@ void tokenStatusCallback(TokenInfo info) {
     Serial.printf("Token info: type = %s, status = %s\n", GSheet.getTokenType(info).c_str(), GSheet.getTokenStatus(info).c_str());
   }
 }
+
+
+
+
