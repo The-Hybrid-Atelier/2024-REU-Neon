@@ -81,7 +81,7 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path, metaVtt_file_path,
             start_time_str = formatTime(first_time - 1000)
             end_time_str = formatTime(first_time)
             capVttfile.write(f"{start_time_str} --> {end_time_str} align:start position:0%\n")
-            capVttfile.write("Sound: stoveOn\n")
+            capVttfile.write("Sound: -1\n")
         
         # Initialize variables for tracking event changes
         previous_val = None
@@ -150,7 +150,7 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path, metaVtt_file_path,
         end_time_plus_1_str = formatTime(end_time + 1000)
 
         capVttfile.write(f"{end_time_str} --> {end_time_plus_1_str} align:start position:0%\n")
-        capVttfile.write("Sound: bell\n\n")
+        capVttfile.write("Sound: -2\n\n")
         
 #Helper function to format time in milliseconds to HH:MM:SS.mmm format
 def formatTime(mseconds):
