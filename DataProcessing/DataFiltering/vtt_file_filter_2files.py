@@ -117,15 +117,7 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path, metaVtt_file_path,
                 if previous_val is not None:
                     startTime = formatTime(previous_start_time)
                     endTime = formatTime(previous_end_time)
-                    # vttfile.write(f"NextSound : {previous_val}\n")
-                    # vttfile.write(f"NextVibrationSpeed : {previous_val}\n")
-                    # vttfile.write(f"NextLightInten : {previous_val}\n\n")
-                    # vttfile.write(f"{startTime} --> {endTime} align:start position:0%\n")
-                    # vttfile.write(f"Sound : {previous_val}\n")
-                    # vttfile.write(f"LightInten : {previous_val}\n")
-                    # vttfile.write(f"VibrationSpeed : {previous_val}\n")
-                    # vttfile.write(f"Duration : {previous_end_time - previous_start_time}\n")
-
+                    
                     capVttfile.write(f"NextSound : {previous_val}\n")
                     capVttfile.write(f"{startTime} --> {endTime} align:start position:0%\n")
                     capVttfile.write(f"Sound : {previous_val}\n")
@@ -143,14 +135,6 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path, metaVtt_file_path,
         if previous_val is not None:
             startTime = formatTime(previous_start_time)
             endTime = formatTime(previous_end_time)
-            # vttfile.write(f"NextSound : {previous_val}\n")
-            # vttfile.write(f"NextVibrationSpeed : {previous_val}\n")
-            # vttfile.write(f"NextLightInten : {previous_val}\n\n")
-            # vttfile.write(f"{startTime} --> {endTime} align:start position:0%\n")
-            # vttfile.write(f"Sound : {previous_val}\n")
-            # vttfile.write(f"LightInten : {previous_val}\n")
-            # vttfile.write(f"VibrationSpeed : {previous_val}")
-            # vttfile.write(f"Duration : {previous_end_time - previous_start_time}\n")
 
             capVttfile.write(f"NextSound : {previous_val}\n")
             capVttfile.write(f"{startTime} --> {endTime} align:start position:0%\n")
