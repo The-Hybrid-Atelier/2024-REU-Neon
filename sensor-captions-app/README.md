@@ -1,6 +1,11 @@
 
 ### README by Roy
 
+## To install libraries:
+```bash
+npm install
+```
+
 ## To run:
 **To run localhost.../neon** where the websocket and 90% of the work is, you must **run locally** otherwise github Codespaces won't let you open it since it doesn't use a secure websocket. (Run locally as in clone the repo, use command line etc.)
 
