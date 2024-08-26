@@ -1,6 +1,6 @@
 
 /****************************************************************
- * Sensor_Pipeline.ino
+ * SDCardDataCollection.ino
  * Part of the Hybrid Atelier 2024 REU
  * Authors: Lejun Liao & Rohita Konjeti
  * Adapted From: Owen Lyke @ SparkFun Electronics
