@@ -184,7 +184,7 @@ const handleSeek = (time) => {
         ))}
       </div>
       <div className="player-container">
-        <h1>Some text</h1>
+        <a href="/caption/vibration">Vibration Prototype</a>
         <HowlerPlayer src="./dj-airhorn-sound-39405.mp3" />
       </div>
       {chartImage && (

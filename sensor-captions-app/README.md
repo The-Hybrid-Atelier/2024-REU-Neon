@@ -54,3 +54,8 @@ Place any files that need to be accessed on the page here. E.g. images, caption 
 ### /sensor-captions-app/app/pages
 Not used  
 
+## /caption/vibration
+Has a Vibration implementation prototype. To use, set the port to Public (via Codespaces) -- open up the URL on your phone with a Android device.
+It will not work with a iPhone.
+
+Make sure your phone is not on silent. 
