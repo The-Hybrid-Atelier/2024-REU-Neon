@@ -21,7 +21,7 @@ let websocket;
 export const initWebSocket = () => {
     // const gateway = `ws://192.168.1.79/ws`; // atelier
     // const gateway = 'ws://192.168.221.1/ws'; // RohitaK
-    const gateway = 'ws://192.168.0.155/ws';
+    const gateway = 'wss://192.168.0.155/ws'; //To allow websocket to work
     websocket = new WebSocket(gateway);
     console.log('Trying to open a WebSocket connection…');
 
