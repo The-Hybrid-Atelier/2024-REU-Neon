@@ -1,3 +1,5 @@
+//Deals with video
+
 'use client';
 
 import React, { useEffect, useRef, useState, useContext } from 'react';

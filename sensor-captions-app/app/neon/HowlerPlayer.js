@@ -1,5 +1,8 @@
+//File related to sound feedback
+
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Howl } from 'howler';
+
 
 const HowlerPlayer = forwardRef((props, ref) => {
   const sounds = useRef({

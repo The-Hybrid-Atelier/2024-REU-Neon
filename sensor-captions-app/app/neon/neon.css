@@ -3,3 +3,21 @@
     justify-content: center;
     align-items: center;
 }
+
+
+.background-styling {
+    background-color: #ffffff;
+}
+
+.heading-1{
+    font-family: 'Arial';
+    color: #000;
+    font-size: 50pt;
+    font-weight: bold;
+}
+
+.heading-2{
+    font-family: 'Arial';
+    color: #000;
+    font-size: 30pt;
+}

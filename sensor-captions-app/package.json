@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "chart.js": "^4.4.3",
+    "chart.js": "^4.4.4",
     "chartjs-plugin-annotation": "^3.0.1",
     "howler": "^2.2.4",
     "next": "^14.2.5",
