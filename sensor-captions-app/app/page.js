@@ -1,10 +1,8 @@
 // Video.js
-
 "use client"; // This marks the component as client-side in Next.js
-
+import './globals.css';
 import React, { useState, useEffect, useRef } from 'react';
 import YouTube from 'react-youtube';
-import './globals.css';
 import HowlerPlayer from './HowlerPlayer';
 
 const helloFlask = 'https://shiny-chainsaw-rqxjgrqrp9pfpq9w-5000.app.github.dev/';
