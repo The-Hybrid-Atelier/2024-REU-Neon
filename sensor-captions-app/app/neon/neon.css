@@ -1,23 +1,132 @@
-.video-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  /* color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb)); */
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* centered column */
+.cc{ 
+  display: flex;
+  flex-wrap: nowrap;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
 }
 
 
-.background-styling {
-    background-color: #ffffff;
+.container {
+  display: flex;
+  height: 100vh;
+  position: relative;
+  padding: 20px;
 }
 
-.heading-1{
-    font-family: 'Arial';
-    color: #000;
-    font-size: 50pt;
-    font-weight: bold;
+.blue-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 40%; 
+  background-color: #dff2ff; 
+  z-index: -2; 
 }
 
-.heading-2{
-    font-family: 'Arial';
-    color: #000;
-    font-size: 30pt;
+.left-panel {
+  width: 20%;
+  padding: 25px;
+  /* border-right: 1px solid #ccc; */
+  background-color: #000; 
+  border-radius: 30px; 
+  color: #fff; 
+}
+
+.right-panel {
+  width: 80%;
+  padding-left: 20px;
+  position: relative;
+  /* background-color: #fff; */
+}
+
+.select-label {
+  color: #000000; 
+  margin-bottom: 10px;
+  display: block;
+  /*font: ;*/
+}
+
+.select-dropdown {
+  width: 200px;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333; 
+}
+
+.youtube-container {
+  margin-top: 20px;
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+.button {
+  background-color: #3498db; 
+  color: #fff; 
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.button:hover {
+  background-color: #2980b9; 
+}
+
+.player-container {
+  margin-top: 20px;
+}
+
+.chart-container {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.chart-image {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }

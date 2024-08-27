@@ -3,7 +3,7 @@
 import './globals.css';
 import React, { useState, useEffect, useRef } from 'react';
 import YouTube from 'react-youtube';
-import HowlerPlayer from './HowlerPlayer';
+import HowlerPlayer from './archive/HowlerPlayer';
 
 const helloFlask = 'https://shiny-chainsaw-rqxjgrqrp9pfpq9w-5000.app.github.dev/';
 

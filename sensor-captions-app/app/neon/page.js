@@ -5,42 +5,16 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import VideoJS from './VideoJS';
 import "videojs-youtube";
-import HowlerPlayer from './HowlerPlayer';
+import "./neon.css";
+import KitchenSoundPlayer from '../caption/sound/KitchenSoundPlayer';
+import VibrationPlayer from '../caption/vibration/VibrationPlayer';
 import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
 import { ConfigProvider } from '../utils/Configs';
+import { Button } from 'semantic-ui-react';
 /** A few comments to commit */
 
-const jsonObject = {
-  device: {
-      
-  },
-  version: "1.0",
-  playbackSpeed: 1.0,
-  api: {
-      command: {
-
-      },
-      params: {
-          
-      }
-  }
-};
-
-const App = () => {
+const TacitCaptionPlayer = () => {
   const howlPlayerRef = useRef(null);
-  
-
-
-  // useEffect(() => {
-  //   const websocket = initWebSocket();
-  //   getReadings();
-    
-  //   return () => {
-  //       // if (websocket) {
-  //       //     websocket.close();
-  //       // }
-  //   };
-  // }, []);
 
   const videoJsOptions = {
     techOrder: ["youtube"],
@@ -64,24 +38,18 @@ const App = () => {
     src: '/subtitles/MadL_bendMeta.vtt'//'MadL_bend1v3.vtt'   // path to the captions
   };
 
- 
-
   const handlePlayerReady = (player) => {
     player.addRemoteTextTrack(captionOption);
-    
   };
-
-  
 
   return (
     <>
       <ConfigProvider>
         <VideoJS options={videoJsOptions} onReady={handlePlayerReady} howlPlayerRef={howlPlayerRef} />
-        <HowlerPlayer ref={howlPlayerRef} />
+        <KitchenSoundPlayer ref={howlPlayerRef} />
       </ConfigProvider>
-      
     </>
   );
 }
 
-export default App;
+export default TacitCaptionPlayer;

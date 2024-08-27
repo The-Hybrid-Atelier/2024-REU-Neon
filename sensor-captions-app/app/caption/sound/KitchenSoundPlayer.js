@@ -4,7 +4,7 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Howl } from 'howler';
 
 
-const HowlerPlayer = forwardRef((props, ref) => {
+const KitchenSoundPlayer = forwardRef((props, ref) => {
   const sounds = useRef({
     lightBoiling: new Howl({ src: ['/sounds/light_boiling.wav'], loop: false }),
     bubbling: new Howl({ src: ['/sounds/bubbling.wav'], loop: false }),
@@ -18,7 +18,7 @@ const HowlerPlayer = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     play: (label) => {
-      // stop playing sound if ther is any any
+      // stop playing sound if there is any currently playing
       if (currentlyPlaying.current) {
         currentlyPlaying.current.stop();
       }
@@ -47,4 +47,4 @@ const HowlerPlayer = forwardRef((props, ref) => {
   return null;
 });
 
-export default HowlerPlayer;
+export default KitchenSoundPlayer;

@@ -10,11 +10,10 @@ import React, { useState, useEffect } from 'react';
 import { Button, Container, Header, Message, Segment } from 'semantic-ui-react';
 import { Remote } from '../../websocket/Remote';
 import { VIBRATION_PATTERNS } from '@/AppConfig';
-import VibrationPlayer from './VibrationPlayer';
 
 
 
-const VibrationComponent = () => {
+const VibrationPlayer = () => {
     const [vibrationSupported, setVibrationSupported] = useState(false);
     const [message, setMessage] = useState('');
 
@@ -38,14 +37,34 @@ const VibrationComponent = () => {
     };
 
     return (
-        <Container style={{ marginTop: '20px' }}>
-            <Header as='h2' textAlign='center'>
-                Vibration Component
-            </Header>
-            <VibrationPlayer/>         
-        </Container>
+            <Segment padded>
+                {vibrationSupported ? (
+                    <Button.Group vertical fluid>
+                        {VIBRATION_PATTERNS.map(({ command, label, pattern }) => (
+                            <Button
+                                key={command}
+                                onClick={() => handleVibrate(pattern)}
+                                primary={command !== 'stop'}
+                                secondary={command === 'stop'}
+                            >
+                                {label}
+                            </Button>
+                        ))}
+                    </Button.Group>
+                ) : (
+                    <Message negative>
+                        <Message.Header>Vibration Not Supported</Message.Header>
+                        <p>{message}</p>
+                    </Message>
+                )}
+                {message && (
+                    <Message info style={{ marginTop: '20px' }}>
+                        <p>{message}</p>
+                    </Message>
+                )}
+            </Segment>           
     );
 };
 
-export default VibrationComponent;
+export default VibrationPlayer;
 

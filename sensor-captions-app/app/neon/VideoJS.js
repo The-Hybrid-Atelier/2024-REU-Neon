@@ -5,7 +5,7 @@ import { initWebSocket, getReadings, vibrate, light, collectData, command } from
 import { synthManager } from '../utils/SynthManager';
 import { ConfigContext } from '../utils/Configs'
 import { Howl, Howler } from 'howler';  // Ensure Howler is imported
-
+import {Button} from 'semantic-ui-react';
 const soundMapping = {
   '-1': 'stoveOn',
   '0': 'lightBoiling',
@@ -299,18 +299,18 @@ const VideoJS = (props) => {
       </div>
       <div>
         <h2>DEBUG AREA</h2>
-        <button onClick={stopHowler}>Stop Howler</button>
-        <button onClick={stopSynth}>Stop Synth</button>
+        <Button onClick={stopHowler}>Stop Howler</Button>
+        <Button onClick={stopSynth}>Stop Synth</Button>
       </div>
       <div data-vjs-player>
         <div ref={videoRef} />
       </div>
       <div>
-        <button onClick={vibrate}>Toggle Vibrate</button>
+        <Button onClick={vibrate}>Toggle Vibrate</Button>
         <br />
-        <button onClick={handleClick}>
-          {isCollecting ? 'Stop Collecting Data' : 'Start Collecting Data'}
-        </button>
+        <Button onClick={handleClick}>
+          {isCollecting ? 'STOP LIVE' : 'START LIVE'}
+        </Button>
         <div style={{ marginTop: '15px', textAlign: 'left' }}>
           <h3>Expert Graph</h3>
           <img src="bend1expert.png" alt="Expert Graph" style={{ maxWidth: '75%', height: 'auto' }} />
