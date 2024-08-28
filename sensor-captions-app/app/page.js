@@ -6,6 +6,14 @@ import YouTube from 'react-youtube';
 import HowlerPlayer from './archive/HowlerPlayer';
 
 const helloFlask = 'https://shiny-chainsaw-rqxjgrqrp9pfpq9w-5000.app.github.dev/';
+import { Icon, Button, Divider } from 'semantic-ui-react';
+
+/* Import custom button icons */
+/*import Light from './app/icons/Lightbulb.svg';
+import Bloom from './icons/Bloom.svg';
+import Kitchen from './icons/Kitchen.svg';
+import Vibrate from './icons/Vibrate.svg';
+import CC from './icons/CC.svg';*/
 
 // Python Flask Connect Message
 const fetchHelloMessage = async () => {
@@ -129,6 +137,17 @@ const handleSeek = (time) => {
   }
 };
 
+
+
+
+
+
+
+
+
+
+
+
   // signals the values of checkboxes
   const handleCheckboxChange = (index) => (event) => {
     const newCheckboxes = [...checkboxes];
@@ -136,13 +155,32 @@ const handleSeek = (time) => {
     setCheckboxes(newCheckboxes);
   };
 
-  // checkbox names
-  const checkboxLabels = ["Sound", "Volume", "Intensity", "Vibration", "name 5"];
+
+// checkbox names
+const checkboxLabels = ["Sound", "Volume", "Intensity", "Vibration", "name 5"];
+
+
+
+
+
+const buttonLabelsLeft = ["Light", "Synth", "Kitchen", "Vibration", "CC"];
+const buttonLabelsRight = ["Rewind5", "Forward5"];
+
+const [buttons, setButtons] = useState([false, false, false, false, false]);
+
+// Handle button clicks
+const handleButtonClick = (index) => () => {
+  const newButtons = [...buttons];
+  newButtons[index] = !newButtons[index];
+  setButtons(newButtons);
+};
+
+
+
 
  // Formatting
  return (
   <div className="container">
-    <div className="blue-background"></div>
     <div className="left-panel">
       {checkboxLabels.map((label, index) => (
         <div key={index}>
@@ -155,12 +193,18 @@ const handleSeek = (time) => {
           <label htmlFor={`checkbox-${index}`}>{label}</label>
         </div>
       ))}
+
+      {buttonLabelsLeft.map((label, index) => (
+        <Button circular icon='settings' />
+      ))}
     </div>
-    <div className="right-panel">
-      <div style={{ position: 'absolute', top: '10px', right: '10px', color: 'red' }}>
-        {helloMessage} {/* Display the fetched hello message */}
-      </div>
-      <h1>Glass Bending Visual</h1>
+    <div className="middle-panel">
+      {/*<div style={{ position: 'absolute', top: '2%', right: '10px', color: 'red' }}>
+        {helloMessage} 
+      </div>*/} {/* Display the fetched hello message */}
+      <div className="heading-1">
+        Glass Bending Visual
+      </div>  
       <div>
         <label htmlFor="videoSelect" className="select-label">Select A Video:</label>
         <select id="videoSelect" className="select-dropdown" onChange={doVidChange} value={selectedVideo}>
@@ -190,6 +234,9 @@ const handleSeek = (time) => {
           <img src={chartImage} className="bend1expert.png" alt="Pressure over Time Plot" />
         </div>
       )}
+    </div>
+    <div className="right-panel">
+
     </div>
   </div>
 );
