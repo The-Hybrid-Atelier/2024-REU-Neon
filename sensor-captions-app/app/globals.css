@@ -65,7 +65,7 @@ body {
 .left-panel {
   width: 20%;
   padding: 25px;
-  padding-top: 8%;
+  padding-top: 6.5%;
   /* border-right: 1px solid #ccc; */
   background-color: #ffd66f; 
   /*border-radius: 30px; */
@@ -107,7 +107,7 @@ body {
 }
 
 .youtube-container {
-  margin-top: 2%;
+  margin-top: 6.5%;
 }
 
 .button-container {
@@ -142,6 +142,49 @@ body {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
+
+.custom-button {
+  display: flex;
+  justify-content: center; /* Center the icon and text */
+  align-items: center;
+  width: 60px; /* Set a fixed width */
+  height: 60px; /* Set the same height as width to make it circular */
+  padding: 0; /* Remove padding to maintain the circular shape */
+  border: none;
+  background-color: #bcbcbc; /* Default background color */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 50%; /* Make the button circular */
+  margin-bottom: 10px;
+}
+
+.custom-button .icon {
+  margin-right: 8px; /* Space between icon and label */
+}
+
+.custom-button .icon svg {
+  width: 24px;
+  height: 24px;
+  fill: #000; /* Default icon color */
+}
+
+.custom-button .label {
+  font-size: 14px;
+  color: #333; /* Text color */
+}
+
+.custom-button:hover {
+  background-color: #8d9ff9; /* Background on hover */
+}
+
+.custom-button.active {
+  background-color: #1856F6; /* Active background color */
+}
+
+.custom-button.active .icon svg {
+  fill: #000; /* Icon color when active */
+}
+
 
 .heading-1 {
   font-family: 'Arial';
