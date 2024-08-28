@@ -13,6 +13,7 @@
     "chartjs-plugin-annotation": "^3.0.1",
     "howler": "^2.2.4",
     "next": "^14.2.5",
+    "rc-slider": "^11.1.5",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
