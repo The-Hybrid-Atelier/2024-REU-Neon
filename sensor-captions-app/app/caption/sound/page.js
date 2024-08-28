@@ -7,17 +7,14 @@ import { Button, Container, Header } from 'semantic-ui-react';
 const SoundController = () => {
   const kitchenSoundPlayerRef = useRef();
 
-  const triggerSound = (id) => {
-    if (kitchenSoundPlayerRef.current) {
-        kitchenSoundPlayerRef.current.playSoundById(id);
-    }
-  };
+  const triggerSoundByID = (id) => { if (kitchenSoundPlayerRef.current) { kitchenSoundPlayerRef.current.playSoundById(id);} };
+  const triggerSoundByName = (name) => { if (kitchenSoundPlayerRef.current) { kitchenSoundPlayerRef.current.playSoundByName(name);} };
 
   return (
     <Container>
       <Header>Sound Controller</Header>
-      <Button onClick={() => triggerSound(1)}>Play Sound 1</Button>
-      <Button onClick={() => triggerSound(2)}>Play Sound 2</Button>
+      <Button onClick={() => triggerSoundByID(1)}>Play Sound 1</Button>
+      <Button onClick={() => triggerSoundByName('bell')}>Play bell</Button>
       <SoundPlayer ref={kitchenSoundPlayerRef} sounds={KITCHEN_SOUND_EFFECTS} />
     </Container>
   );

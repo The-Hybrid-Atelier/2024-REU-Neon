@@ -54,6 +54,12 @@ const SoundPlayer = forwardRef(({ sounds }, ref) => {
         handlePlaySound(soundToPlay.sound, soundToPlay.label);
       }
     },
+    playSoundByName: (name) => {
+      const soundToPlay = sounds.find((soundEffect) => soundEffect.command === name);
+      if (soundToPlay) {
+        handlePlaySound(soundToPlay.sound, soundToPlay.label);
+      }
+    },
   }));
 
   return (
