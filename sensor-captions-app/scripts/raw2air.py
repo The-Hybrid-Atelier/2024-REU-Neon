@@ -98,7 +98,8 @@ def dataSpike(df, column=" Pa"):
     spikes = remove_consect(spikes)
     return spikes
 
-#Get the indexes of the spikes, and remove consecutive indexes
+
+# Get the indexes of the spikes, and remove consecutive indexes
 def remove_consect(spike_idxs):
     revised_idxs = []
 
@@ -109,6 +110,7 @@ def remove_consect(spike_idxs):
     add_last = spike_idxs.index(revised_idxs[-1]) + 1
     revised_idxs.append(spike_idxs[add_last])
     return revised_idxs
+
 
 # Extract the data from the end of the first spike (beginning clap) to the end of the beginning of the last spike (end clap)
 def extract_data(df, spike_idxs):
@@ -151,7 +153,7 @@ def extract_data(df, spike_idxs):
     return extracted_df
 
 
-#Get the spikes and extract the data in between the spikes (beginning and end claps)
+# Get the spikes and extract the data in between the spikes (beginning and end claps)
 spikes = dataSpike(selected_columns, " Pa")
 extracted_df = extract_data(selected_columns, spikes)
 
