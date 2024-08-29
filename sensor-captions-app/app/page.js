@@ -8,12 +8,6 @@ import HowlerPlayer from './archive/HowlerPlayer';
 const helloFlask = 'https://shiny-chainsaw-rqxjgrqrp9pfpq9w-5000.app.github.dev/';
 import { Icon, Button, Divider } from 'semantic-ui-react';
 
-/* Import custom button icons */
-/*import Light from './app/icons/Lightbulb.svg';
-import Bloom from './icons/Bloom.svg';
-import Kitchen from './icons/Kitchen.svg';
-import Vibrate from './icons/Vibrate.svg';
-import CC from './icons/CC.svg';*/
 
 // Python Flask Connect Message
 const fetchHelloMessage = async () => {
@@ -54,10 +48,12 @@ const videoData = {
 const Video = () => {
   const [selectedVideo, setSelectedVideo] = useState('madLBend');
   const [player, setPlayer] = useState(null);
-  const [currentTime, setCurrentTime] = useState(0);
   const [chartImage, setChartImage] = useState(null);  // Ensure chartImage state is defined
   const [helloMessage, setHelloMessage] = useState(""); // State for storing the hello message
   const intervalRef = useRef(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  //const [duration, setDuration] = useState(0); // Added state for duration
+  const [videoDuration, setVideoDuration] = useState(0);
 
   const [checkboxes, setCheckboxes] = useState(Array(4).fill(false)); // Adjusted for 4 checkboxes
 
@@ -87,9 +83,20 @@ const Video = () => {
 useEffect(() => {
   if (player) {
     
+    //get the current time the video is in (float)
     intervalRef.current = setInterval(() => {
       setCurrentTime(player.getCurrentTime());
     }, 100);
+
+    console.log(`Current Duration from Player: ${currentTime}`)
+
+    //get the total duration of the video (float)
+    const duration = player.getDuration();
+      
+      // Update the state with the video duration
+      setVideoDuration(duration);
+
+      console.log(`Video Duration from Player: ${duration}`)
     return () => clearInterval(intervalRef.current);
   }
 }, [player]);
@@ -136,17 +143,6 @@ const handleSeek = (time) => {
     player.seekTo(time, true);
   }
 };
-
-
-
-
-
-
-
-
-
-
-
 
   // signals the values of checkboxes
   const handleCheckboxChange = (index) => (event) => {
@@ -204,10 +200,31 @@ const svgIconsLeft = [
 
 //code to handle the buttons in the right panel
 
+const handleRewindOrForward = (seconds) => {
+  if (player) {
+    // Calculate the new time by adding/subtracting seconds
+    const newTime = player.getCurrentTime() + seconds;
+    // Seek to the new time immediately
+    player.seekTo(newTime, true);
+
+    // Update the currentTime state to reflect the new time for the progress bar
+    setCurrentTime(currentTime - seconds);
+  }
+};
+
 const handleButtonClickRight = (index) => () => {
   const newButtonsRight = [...buttonsRight];
   newButtonsRight[index] = !newButtonsRight[index];
   setButtonsLeft(newButtonsRight);
+
+  // Check if player instance exists
+  if (index === 0) {
+    // Rewind 5 seconds
+    handleRewindOrForward(-5);
+  } else if (index === 1) {
+    // Forward 5 seconds
+    handleRewindOrForward(5);
+  }
 };
 
 const [buttonsRight, setButtonsRight] = useState([false, false]); // State for managing button active states
@@ -224,10 +241,58 @@ const svgIconsRight = [
     </svg>
 ];
 
+/*Progress Bar */
+//currentTime returns current time in video and videoDuration gets the total time in video
+//this is the ratio the progress bar should be at using current time / videoDuration
+//const progress = videoDuration ? (currentTime / videoDuration) * 100 : 0;
+const progress = (currentTime / videoDuration) * 100;
 
 
+// Function to format time from seconds to minutes:seconds
+const formatTime = (time) => {
+  console.log(time);
+  if (isNaN(time) || time < 0) return '0:00'; // Handle invalid time
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+  return `${minutes}:${seconds}`;
+};
+
+const ProgressBar = ({ progress, currentTime}) => {
+  const parentDivStyle = {
+    height: 20,
+    width: '100%',
+    backgroundColor: 'whitesmoke',
+    borderRadius: 40,
+    margin: 50
+  };
+
+  const childDivStyle = {
+    height: '100%',
+    width: `${progress}%`,
+    backgroundColor: 'lightblue',
+    borderRadius: 40,
+    textAlign: 'right'
+  };
+
+  const progressTextStyle = {
+    padding: 10,
+    color: 'black',
+    fontWeight: 900
+  };
+
+  return (
+    <div style={parentDivStyle}>
+      <div style={childDivStyle}>
+        <span style={progressTextStyle}>
+          {`${formatTime(currentTime)}`}
+        </span>
+      </div>
+    </div>
+  );
+};
 
 
+//{`${formatTime(currentTime)}`}
 
  // Formatting
  return (
@@ -262,41 +327,25 @@ const svgIconsRight = [
           onReady={onReady}
         />
       </div>
-      <div className="button-container">
-        {videoData[selectedVideo].events.map((event, index) => (
-          <button key={index} className="button" onClick={() => handleSeek(event.time)}>
-            {event.label}
-          </button>
-        ))}
-      </div>
+
       <div className="player-container">
-        <a href="/caption/vibration">Vibration Prototype</a>
+        {/*<a href="/caption/vibration">Vibration Prototype</a>*/}
         <HowlerPlayer src="./dj-airhorn-sound-39405.mp3" />
-      </div>
-      {chartImage && (
-        <div className="chart-container">
-          <svg
-            width="2710"
-            height="1423"
-            viewBox="0 0 2710 1423"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g clipPath="url(#clip0)">
-              <rect width="2710" height="1423" fill="white" />
-              <rect width="2710" height="1423" fill="url(#pattern0)" />
-            </g>
-            <defs>
-              <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
-                <image id="image0" width="1038" height="545" />
-              </pattern>
-              <clipPath id="clip0">
-                <rect width="2710" height="1423" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
         </div>
-      )}
+        <img
+          src="bend1expert.png"
+          alt="Pressure Chart for Expert 1 L-Bend"
+          width="76%"  // Adjust as needed
+          height="20%" // Adjust as needed
+        />
+        
+        {/* Progress bar */}
+        <ProgressBar progress={progress} currentTime={currentTime} videoDuration={videoDuration}/>
+
+        {/*{chartImage && (
+          <div className="chart-container">
+          </div>
+        )}*/}
     </div>
     <div className="right-panel">
       {buttonLabelsRight.map((label, index) => (
