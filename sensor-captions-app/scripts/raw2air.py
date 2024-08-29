@@ -155,10 +155,12 @@ def extract_data(df, spike_idxs):
 spikes = dataSpike(selected_columns, " Pa")
 extracted_df = extract_data(selected_columns, spikes)
 
-# Output the extracted data to a new csv file
+
 # Extract the directory path from the input file
 input_dir = os.path.dirname(input_file)
 
 # Construct the output file path
 output_file = os.path.join(input_dir, "air.csv")
+
+# Output the extracted data to a new csv file
 extracted_df.to_csv(output_file, index=False)
