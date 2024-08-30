@@ -1,18 +1,24 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Container } from 'semantic-ui-react';
 import CaptionedVideoPlayer from './CaptionedVideoPlayer'; // Adjust path as necessary
-import { VTT_TYPES, VIDEO_DEFAULT } from '@/AppConfig.jsx'; // Import the VTT_TYPES array
+import { VIDEO_DEFAULT } from '@/AppConfig.jsx'; // Import the VIDEO_DEFAULT
+import {FolderStructureDropdowns} from './FolderStructureDropdowns'; // Adjust path as necessary
 
-const VideoPlayerPage = ({ videoToPlay = VIDEO_DEFAULT }) => {
+const VideoPlayerPage = () => {
+  const [videoToPlay, setVideoToPlay] = useState(VIDEO_DEFAULT);
 
+  const handleSelectionChange = ({ user, bend, trial }) => {
+    console.log('Selected:', { user, bend, trial });
+    // Update the videoToPlay state with the selected values
+    setVideoToPlay({ userId: user, bendType: bend, trial });
+  };
 
   return (
     <Container>
-      <CaptionedVideoPlayer
-        videoToPlay={videoToPlay}
-      />
+      <FolderStructureDropdowns defaultVideo={VIDEO_DEFAULT} onSelect={handleSelectionChange} />
+      <CaptionedVideoPlayer videoToPlay={videoToPlay} />
     </Container>
   );
 };

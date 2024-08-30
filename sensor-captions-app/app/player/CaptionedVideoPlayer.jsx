@@ -33,12 +33,18 @@ const CaptionedVideoPlayer = ({ videoToPlay = VIDEO_DEFAULT }) => {
             setVideoType(videoType);
           } else {
             console.error('Unexpected content type:', contentType);
+            setVideoUrl(null);
+            setVideoType(null);
           }
         } else {
           console.error('Error fetching video source:', response.statusText);
+          setVideoUrl(null);
+          setVideoType(null);
         }
       } catch (error) {
         console.error('Error during fetch:', error);
+        setVideoUrl(null);
+        setVideoType(null);
       }
     };
     
@@ -80,14 +86,17 @@ const CaptionedVideoPlayer = ({ videoToPlay = VIDEO_DEFAULT }) => {
   console.log('VideoJS Options:', videoJsOptions, JSON.stringify(videoJsOptions, null, 2));
 
   return (
-    <Container>
+    <Segment>
       <Segment>
         <Header as="h2">Video Metadata</Header>
         <p><strong>User:</strong> {userId}</p>
         <p><strong>Bend Type:</strong> {bendType}</p>
         <p><strong>Trial:</strong> {trial}</p>
         {videoUrl && (
-          <p><strong>Video URL:</strong> <a href={videoUrl} target="_blank" rel="noopener noreferrer">{videoUrl}</a></p>
+          <p><strong>Video URL:</strong> <a href={videoUrl} target="_blank" rel="noopener noreferrer">{videoUrl}</a> ({videoType})</p>
+        )}
+        {!videoUrl && (
+          <p><strong>Video URL:</strong> Video was not found</p>
         )}
       </Segment>
 
@@ -120,7 +129,7 @@ const CaptionedVideoPlayer = ({ videoToPlay = VIDEO_DEFAULT }) => {
       ) : (
         <p>Loading video...</p>
       )}
-    </Container>
+    </Segment>
   );
 };
 
