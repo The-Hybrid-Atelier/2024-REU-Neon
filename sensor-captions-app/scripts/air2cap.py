@@ -220,6 +220,7 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path):
 
             # Write the data to the vtt file
             write_to_file(capVttfile, start_time, end_time, current_pressure, meter)
+    return df
 
 
 # Helper function to format time in milliseconds to HH:MM:SS.mmm format
@@ -237,4 +238,6 @@ csv_file_path = sys.argv[1]
 input_dir = os.path.dirname(csv_file_path)
 capvtt_out_file = os.path.join(input_dir, "meter.vtt")
 
-detect_events_with_meter(csv_file_path, capvtt_out_file)
+# Detect events in the pressure data and write the caption data to a WebVTT file, then save the updated dataframe to the csv file
+df = detect_events_with_meter(csv_file_path, capvtt_out_file)
+df.to_csv(csv_file_path, index=False)
