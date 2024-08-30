@@ -99,9 +99,6 @@ import pandas as pd
 import sys
 import os
 
-time_column = "Time"
-pressure_column = "Pa"
-parameterized_pressure_column = "P1"
 
 # Function to find the maximum pressure value in the dataframe
 def find_max_pa(df):
@@ -115,10 +112,12 @@ def find_min_pa(df):
 
 # Function to normalize the pressure values between 0 and 1
 def parameterize_pressure(df, max_pressure, min_pressure):
-    df[parameterized_pressure_column] = ((df[pressure_column] - min_pressure) / (max_pressure - min_pressure)).round(2)
+    df[parameterized_pressure_column] = (
+        (df[pressure_column] - min_pressure) / (max_pressure - min_pressure)
+    ).round(2)
     return df
 
-
+#Function to create a pressure meter with filled and empty boxes based on the pressure parameterized value
 def create_meter(df, i, num_boxes=12):
     # Create the meter with filled and empty boxes based on the pressure parameterized value
     p1_value = df.iloc[i][parameterized_pressure_column]
@@ -132,10 +131,7 @@ def write_to_file(capvtt_file, start_time, end_time, pressure, meter):
     capvtt_file.write(f"{meter} {pressure} kPa\n\n")
 
 
-def detect_events_with_meter(csv_file_path, capVtt_file_path):
-
-    # Read the csv file containing the pressure data into a pandas dataframe
-    df = pd.read_csv(csv_file_path)
+def detect_events_with_meter(df, capVtt_file_path):
 
     # Find the maximum and minimum pressure values in the dataframe
     maxPa = find_max_pa(df)
@@ -157,7 +153,7 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path):
         event = False
         previous_pressure = 0
         last_event_line = 0
-        last_line = -1
+        last_line = len(df) - 1
 
         # Iterate through the rows of the dataframe
         for i in range(0, len(df)):
@@ -207,10 +203,9 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path):
             # If the P1 value is less than 0.03, indicating no event, mark the event as False
             else:
                 event = False
-        
+
         # Check if the last event is the same as the previous event, if not write the last pressure to ensure all time values are written
         if last_event_line != last_line and previous_pressure != current_pressure:
-
             # End time
             end_time = df.iloc[last_line][time_column]
             end_time = formatTime(end_time)
@@ -238,6 +233,14 @@ csv_file_path = sys.argv[1]
 input_dir = os.path.dirname(csv_file_path)
 capvtt_out_file = os.path.join(input_dir, "meter.vtt")
 
+# Define the column names for the time, pressure, and parameterized pressure values
+time_column = "Time"
+pressure_column = "Pa"
+parameterized_pressure_column = "P1"
+
+# Read the csv file containing the pressure data into a pandas dataframe
+raw_df = pd.read_csv(csv_file_path)
+
 # Detect events in the pressure data and write the caption data to a WebVTT file, then save the updated dataframe to the csv file
-df = detect_events_with_meter(csv_file_path, capvtt_out_file)
-df.to_csv(csv_file_path, index=False)
+air_df = detect_events_with_meter(raw_df, capvtt_out_file)
+air_df.to_csv(csv_file_path, index=False)
