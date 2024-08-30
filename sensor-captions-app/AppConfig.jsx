@@ -13,6 +13,13 @@ const API_COMMAND_TEMPLATE = {
     }
 };
 
+const VIDEO_DEFAULT = {
+    userId: 'p1',
+    bendType: 'l-bend',
+    trial: 't2'
+};
+
+const VTT_TYPES = ['light', 'synth', 'bloom', 'meter', 'vibration'];
 // LIBRARY OF VIBRATION PATTERNS
 const VIBRATION_PATTERNS = [
     { command: 'shortPulse', label: 'Vibrate: Short Pulse', pattern: [200, 100, 200] },
@@ -32,4 +39,4 @@ const KITCHEN_SOUND_EFFECTS = [
   ];
 
   
-export {WEBSOCKET_URL, API_COMMAND_TEMPLATE, VIBRATION_PATTERNS, KITCHEN_SOUND_EFFECTS};
+export {VIDEO_DEFAULT, VTT_TYPES, WEBSOCKET_URL, API_COMMAND_TEMPLATE, VIBRATION_PATTERNS, KITCHEN_SOUND_EFFECTS};
