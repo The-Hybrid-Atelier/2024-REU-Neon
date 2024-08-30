@@ -232,6 +232,6 @@ def formatTime(mseconds):
 # Get the path to the csv file containing the pressure data
 csv_file_path = sys.argv[1]
 input_dir = os.path.dirname(csv_file_path)
-capvtt_out_file = os.path.join(input_dir, "captions.vtt")
+capvtt_out_file = os.path.join(input_dir, "meter.vtt")
 
 detect_events_with_meter(csv_file_path, capvtt_out_file)
