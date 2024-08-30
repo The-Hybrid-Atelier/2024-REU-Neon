@@ -100,28 +100,26 @@ import sys
 import os
 
 
+# Function to find the maximum pressure value in the dataframe
 def find_max_pa(df):
     return df[" Pa"].max()
 
 
+# Function to find the minimum pressure value in the dataframe
 def find_min_pa(df):
     return df[" Pa"].min()
 
 
+# Function to normalize the pressure values between 0 and 1
 def parameterize_pressure(df, max_pressure, min_pressure):
-    p1 = []
-    for i in range(0, len(df)):
-        current_pressure = df.iloc[i][" Pa"]
-        p = round((current_pressure - min_pressure) / (max_pressure - min_pressure), 2)
-        p1.append(p)
-    df[" P1"] = p1
+    df[" P1"] = ((df[" Pa"] - min_pressure) / (max_pressure - min_pressure)).round(2)
     return df
 
 
 def create_meter(df, i, num_boxes=15):
-    # Create the meter with filled and empty boxes based on the pressure value
-    p2_value = df.iloc[i][" P1"]
-    filledBoxes = int(p2_value * num_boxes)
+    # Create the meter with filled and empty boxes based on the pressure parameterized value
+    p1_value = df.iloc[i][" P1"]
+    filledBoxes = int(p1_value * num_boxes)
     meter = "■" * filledBoxes + "□" * (num_boxes - filledBoxes)
     return meter
 
@@ -144,7 +142,7 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path):
     df = parameterize_pressure(df, maxPa, minPa)
 
     with open(capVtt_file_path, "w") as capVttfile:
-        # Write the WebVTT headers for captions and metadata files, respectively
+        # Write the WebVTT header to the file
         capVttfile.write("WEBVTT\n")
         capVttfile.write("Kind: captions\n")
         capVttfile.write("Language: en\n\n")
@@ -156,6 +154,7 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path):
         event = False
         previous_pressure = 0
         last_event_line = 0
+        last_line = -1
 
         # Iterate through the rows of the dataframe
         for i in range(0, len(df)):
@@ -205,22 +204,19 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path):
             # If the P1 value is less than 0.03, indicating no event, mark the event as False
             else:
                 event = False
-
+        
         # Check if the last event is the same as the previous event, if not write the last pressure to ensure all time values are written
-        if last_event_line != len(df) - 1:
+        if last_event_line != last_line:
 
             # End time
-            end_time = df.iloc[len(df) - 1]["Time"]
+            end_time = df.iloc[last_line]["Time"]
             end_time = formatTime(end_time)
 
-            # Get the pressure value at the end
-            pressure = df.iloc[len(df) - 1][" Pa"]
-
             # Create meter
-            meter = create_meter(df, len(df) - 1)
+            meter = create_meter(df, last_line)
 
             # Write the data to the vtt file
-            write_to_file(capVttfile, start_time, end_time, pressure, meter)
+            write_to_file(capVttfile, start_time, end_time, current_pressure, meter)
 
 
 # Helper function to format time in milliseconds to HH:MM:SS.mmm format
@@ -231,6 +227,7 @@ def formatTime(mseconds):
     seconds = int(seconds % 60)
     mseconds = int(mseconds % 1000)
     return f"{hours:02}:{minutes:02}:{seconds:02}.{mseconds:03}"
+
 
 # Get the path to the csv file containing the pressure data
 csv_file_path = sys.argv[1]
