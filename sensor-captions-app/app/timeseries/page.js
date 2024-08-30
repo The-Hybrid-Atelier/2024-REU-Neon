@@ -2,23 +2,30 @@
 
 import React, { useState } from 'react';
 import { Container } from 'semantic-ui-react';
-import CaptionedVideoPlayer from './CaptionedVideoPlayer'; // Adjust path as necessary
+import TimeSeriesViewer from './TimeSeriesViewer'; // Adjust path as necessary
 import { VIDEO_DEFAULT } from '@/AppConfig.jsx'; // Import the VIDEO_DEFAULT
 import {FolderStructureDropdowns} from '../utils/FolderStructureDropdowns'; // Adjust path as necessary
 
 const VideoPlayerPage = () => {
   const [videoToPlay, setVideoToPlay] = useState(VIDEO_DEFAULT);
+  const [timePosition, setTimePosition] = useState(null);
 
   const handleSelectionChange = ({ user, bend, trial }) => {
-    console.log('Selected:', { user, bend, trial });
-    // Update the videoToPlay state with the selected values
     setVideoToPlay({ userId: user, bendType: bend, trial });
+  };
+
+  const handleGraphClick = (time) => {
+    setTimePosition(time);
   };
 
   return (
     <Container>
-      <FolderStructureDropdowns defaultVideo={VIDEO_DEFAULT} onSelect={handleSelectionChange} />
-      <CaptionedVideoPlayer videoToPlay={videoToPlay} />
+      <FolderStructureDropdowns defaultVideo={videoToPlay} onSelect={handleSelectionChange} />
+      <TimeSeriesViewer 
+        videoToPlay={videoToPlay} 
+        timePosition={timePosition} 
+        onGraphClick={handleGraphClick} 
+      />
     </Container>
   );
 };
