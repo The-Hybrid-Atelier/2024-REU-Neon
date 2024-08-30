@@ -119,7 +119,7 @@ def parameterize_pressure(df, max_pressure, min_pressure):
     return df
 
 
-def create_meter(df, i, num_boxes=15):
+def create_meter(df, i, num_boxes=12):
     # Create the meter with filled and empty boxes based on the pressure parameterized value
     p1_value = df.iloc[i][parameterized_pressure_column]
     filledBoxes = int(p1_value * num_boxes)
