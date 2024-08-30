@@ -1,10 +1,103 @@
+"""
+Author: Joel Beauregard
+
+air2cap.py
+
+This script processes the extracted data from raw2air.py (air.csv) and creates a WebVTT file with captions for the data spikes.
+
+Function:
+---------
+1. find_max_pa(df):
+    - Finds the maximum pressure value in the dataframe.
+    Parameters:
+    -----------
+    - df: pandas.DataFrame
+        The dataframe containing the pressure data.
+    Returns:
+    --------
+    - The maximum pressure value in the dataframe.
+
+2. find_min_pa(df):
+    - Finds the minimum pressure value in the dataframe.
+    Parameters:
+    -----------
+    - df: pandas.DataFrame
+        The dataframe containing the pressure data.
+    Returns:
+    --------
+    - The minimum pressure value in the dataframe.
+
+3. parameterize_pressure(df, max_pressure, min_pressure):
+    - Normalizes the pressure data between 0 and 1.
+    Parameters:
+    -----------
+    - df: pandas.DataFrame
+        The dataframe containing the pressure data.
+    - max_pressure: float
+        The maximum pressure value in the dataframe.
+    - min_pressure: float
+        The minimum pressure value in the dataframe.
+    Returns:
+    --------
+    - The dataframe with a new column ' P1' containing the normalized pressure values.
+
+4. create_meter(df, i, num_boxes=15):
+    - Creates a meter with filled and empty boxes based on the normalized pressure value.
+    Parameters:
+    -----------
+    - df: pandas.DataFrame
+        The dataframe containing the pressure data.
+    - i: int
+        The index of the dataframe.
+    - num_boxes: int
+        The number of boxes to display in the meter.
+    Returns:
+    --------
+    - A string representing the meter with filled and empty boxes.
+
+5. write_to_file(capvtt_file, start_time, end_time, pressure, meter):
+    - Writes the caption data to the WebVTT file.
+    Parameters:
+    -----------
+    - capvtt_file: file
+        The file object to write the caption data.
+    - start_time: str
+        The start time of the caption.
+    - end_time: str
+        The end time of the caption.
+    - pressure: float
+        The pressure value.
+    - meter: str
+        The meter representation of the pressure value.
+
+6. detect_events_with_meter(csv_file_path, capVtt_file_path):
+    - Detects events in the pressure data and writes the caption data to a WebVTT file.
+    Parameters:
+    -----------
+    - csv_file_path: str
+        The path to the CSV file containing the pressure data.
+    - capVtt_file_path: str
+        The path to the output WebVTT file.
+
+7. formatTime(mseconds):
+    - Formats time in milliseconds to HH:MM:SS.mmm format.
+    Parameters:
+    -----------
+    - mseconds: int
+        The time in milliseconds.
+    Returns:
+    --------
+    - The formatted time in HH:MM:SS.mmm format.
+
+Notes:
+------
+- The script reads the extracted data from air.csv and processes the data to find events in the pressure data.
+- It normalizes the pressure data between 0 and 1 to creates a meter representation of the pressure value.
+"""
+
 import pandas as pd
 import sys
 import os
-
-
-def cacl_avg_pressure(df, num_lines=5):
-    return df[" Pa"].iloc[:num_lines].mean()
 
 
 def find_max_pa(df):
@@ -40,11 +133,14 @@ def write_to_file(capvtt_file, start_time, end_time, pressure, meter):
 
 def detect_events_with_meter(csv_file_path, capVtt_file_path):
 
+    # Read the csv file containing the pressure data into a pandas dataframe
     df = pd.read_csv(csv_file_path)
 
+    # Find the maximum and minimum pressure values in the dataframe
     maxPa = find_max_pa(df)
     minPa = find_min_pa(df)
 
+    # Normalize the pressure values between 0 and 1, add it to the dataframe
     df = parameterize_pressure(df, maxPa, minPa)
 
     with open(capVtt_file_path, "w") as capVttfile:
@@ -136,8 +232,7 @@ def formatTime(mseconds):
     mseconds = int(mseconds % 1000)
     return f"{hours:02}:{minutes:02}:{seconds:02}.{mseconds:03}"
 
-
-# Example usage
+# Get the path to the csv file containing the pressure data
 csv_file_path = sys.argv[1]
 input_dir = os.path.dirname(csv_file_path)
 capvtt_out_file = os.path.join(input_dir, "captions.vtt")
