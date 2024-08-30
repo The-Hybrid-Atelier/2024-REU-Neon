@@ -209,7 +209,7 @@ def detect_events_with_meter(csv_file_path, capVtt_file_path):
                 event = False
         
         # Check if the last event is the same as the previous event, if not write the last pressure to ensure all time values are written
-        if last_event_line != last_line:
+        if last_event_line != last_line and previous_pressure != current_pressure:
 
             # End time
             end_time = df.iloc[last_line][time_column]
