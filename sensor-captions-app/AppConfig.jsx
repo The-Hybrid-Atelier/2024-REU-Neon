@@ -16,10 +16,17 @@ const API_COMMAND_TEMPLATE = {
 const VIDEO_DEFAULT = {
     userId: 'p1',
     bendType: 'l-bend',
-    trial: 't2'
+    trial: 't2',
+    captions: [],
+    activated_captions: [],
+    source: {
+        url: null,
+        type: null
+    }
 };
 
 const VTT_TYPES = ['light', 'synth', 'bloom', 'meter', 'vibration'];
+
 // LIBRARY OF VIBRATION PATTERNS
 const VIBRATION_PATTERNS = [
     { command: 'shortPulse', label: 'Vibrate: Short Pulse', pattern: [200, 100, 200] },

@@ -1,47 +1,99 @@
 import React, { useEffect, useState } from 'react';
-import { Dropdown, Form, Segment } from 'semantic-ui-react';
-
-const FolderStructureDropdowns = ({ defaultVideo, onSelect }) => {
+import { Dropdown, Form, Segment, Header, List} from 'semantic-ui-react';
+import { VTT_TYPES } from '@/AppConfig.jsx'; // Import the VTT_TYPES array
+const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
     const [folderStructure, setFolderStructure] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(defaultVideo.userId);
-    const [selectedBend, setSelectedBend] = useState(defaultVideo.bendType);
-    const [selectedTrial, setSelectedTrial] = useState(defaultVideo.trial);
-    
-    useEffect(() => {
-        // Fetch the folder structure from the API
-        const fetchFolderStructure = async () => {
-            try {
-                const response = await fetch('/api/folder-structure');
-                if (response.ok) {
-                    const data = await response.json();
-                    setFolderStructure(data);
-                } else {
-                    console.error('Error fetching folder structure:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error fetching folder structure:', error);
-            }
-        };
 
-        fetchFolderStructure();
-    }, []);
+     // Fetch the video source from the API
+     const fetchVideoSource = async () => {
+        const { userId, bendType, trial } = selectedVideo;
+        try {
+            const response = await fetch(`/api/video/${userId}/${bendType}/${trial}`);
+            if (response.ok) {
+                const contentType = response.headers.get('Content-Type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    console.log('Video URL:', data.url);
+                    console.log('Video Type:', data.type);
+                    setSelectedVideo(prevState => ({ ...prevState, source: { url: data.url, type: data.type } })); // 'youtube', 'video/mp4', or 'video/quicktime'
+
+                } else if (contentType && (contentType.includes('video/mp4') || contentType.includes('video/quicktime'))) {
+                    // If a stream was returned, use the request URL as the video source
+                    const videoUrl = `/api/video/${userId}/${bendType}/${trial}`;
+                    const videoType = contentType;
+                    console.log('Video Stream URL:', videoUrl);
+                    console.log('Video Stream Type:', videoType);
+                    setSelectedVideo(prevState => ({ ...prevState, source: { url: videoUrl, type: videoType } }));
+                } else {
+                    console.error('Unexpected content type:', contentType);
+                    setSelectedVideo(prevState => ({ ...prevState, source: { url: null, type: null } }));
+                }
+            } else {
+                console.error('Error fetching video source:', response.statusText);
+                setSelectedVideo(prevState => ({ ...prevState, source: { url: null, type: null } }));
+            }
+        } catch (error) {
+            console.error('Error during fetch:', error);
+            setSelectedVideo(prevState => ({ ...prevState, source: { url: null, type: null } }));
+        }
+    };
+
+    // Dynamically check for each VTT file
+    const loadVttFiles = async () => {
+        const tracks = [];
+        const { userId, bendType, trial } = selectedVideo;
+        for (const type of VTT_TYPES) {
+            const response = await fetch(`/api/captions/${userId}/${bendType}/${trial}/${type}.vtt`);
+            if (response.ok) {
+                tracks.push({
+                    kind: 'subtitles',
+                    src: `/api/captions/${userId}/${bendType}/${trial}/${type}.vtt`,
+                    srclang: 'en', // Customize this based on the type or language
+                    label: type.charAt(0).toUpperCase() + type.slice(1), // Capitalize the first letter
+                    default: type === 'light', // Set the default track if applicable
+                });
+            }
+        }
+        setSelectedVideo(prevState => ({ ...prevState, captions: tracks, activated_captions: [] }));
+    };
+
+    // Fetch the folder structure from the API
+    const fetchFolderStructure = async () => {
+        try {
+            const response = await fetch('/api/folder-structure');
+            if (response.ok) {
+                const data = await response.json();
+                setFolderStructure(data);
+            } else {
+                console.error('Error fetching folder structure:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error fetching folder structure:', error);
+        }
+    };
+
+    useEffect(() => { fetchFolderStructure(); }, []);
+    // For debugging purposes
+    // useEffect(() => {
+    //     console.log('Selected Video Source Updated:', selectedVideo);
+    // }, [selectedVideo]);
+
+    useEffect(() => {
+        fetchVideoSource();
+        loadVttFiles();
+    }, [selectedVideo.userId, selectedVideo.bendType, selectedVideo.trial]);
 
     const handleUserChange = (e, { value }) => {
-        setSelectedUser(value);
-        setSelectedBend(null); // Reset bend and trial
-        setSelectedTrial(null);
-        onSelect({ user: value, bend: null, trial: null });
+        setSelectedVideo(prevState => ({ ...prevState, userId: value, bendType: null, trial: null }));
     };
 
     const handleBendChange = (e, { value }) => {
-        setSelectedBend(value);
-        setSelectedTrial(null); // Reset trial
-        onSelect({ user: selectedUser, bend: value, trial: null });
+        setSelectedVideo(prevState => ({ ...prevState, bendType: value, trial: null }));
     };
 
     const handleTrialChange = (e, { value }) => {
-        setSelectedTrial(value);
-        onSelect({ user: selectedUser, bend: selectedBend, trial: value });
+        setSelectedVideo(prevState => ({ ...prevState, trial: value }));
     };
 
     // Dropdown options for users
@@ -52,9 +104,9 @@ const FolderStructureDropdowns = ({ defaultVideo, onSelect }) => {
     }));
 
     // Dropdown options for bends based on the selected user
-    const bendOptions = selectedUser
+    const bendOptions = selectedVideo.userId
         ? folderStructure
-            .find(user => user.user === selectedUser)
+            .find(user => user.user === selectedVideo.userId)
             ?.bends.map(bend => ({
                 key: bend.bend,
                 text: bend.bend,
@@ -63,10 +115,10 @@ const FolderStructureDropdowns = ({ defaultVideo, onSelect }) => {
         : [];
 
     // Dropdown options for trials based on the selected bend
-    const trialOptions = selectedBend
+    const trialOptions = selectedVideo.bendType
         ? folderStructure
-            .find(user => user.user === selectedUser)
-            ?.bends.find(bend => bend.bend === selectedBend)
+            .find(user => user.user === selectedVideo.userId)
+            ?.bends.find(bend => bend.bend === selectedVideo.bendType)
             ?.trials.map(trial => ({
                 key: trial.trial,
                 text: trial.trial,
@@ -86,7 +138,7 @@ const FolderStructureDropdowns = ({ defaultVideo, onSelect }) => {
                             selection
                             options={userOptions}
                             onChange={handleUserChange}
-                            value={selectedUser}
+                            value={selectedVideo.userId}
                         />
                     </Form.Field>
 
@@ -98,8 +150,8 @@ const FolderStructureDropdowns = ({ defaultVideo, onSelect }) => {
                             selection
                             options={bendOptions}
                             onChange={handleBendChange}
-                            value={selectedBend}
-                            disabled={!selectedUser}
+                            value={selectedVideo.bendType}
+                            disabled={!selectedVideo.userId}
                         />
                     </Form.Field>
 
@@ -111,13 +163,40 @@ const FolderStructureDropdowns = ({ defaultVideo, onSelect }) => {
                             selection
                             options={trialOptions}
                             onChange={handleTrialChange}
-                            value={selectedTrial}
-                            disabled={!selectedBend}
+                            value={selectedVideo.trial}
+                            disabled={!selectedVideo.bendType}
                         />
                     </Form.Field>
                 </Form.Group>
 
             </Form>
+            <Segment>
+                <Header as="h2">Video Metadata</Header>
+                <p><strong>User:</strong> {selectedVideo?.userId}</p>
+                <p><strong>Bend Type:</strong> {selectedVideo?.bendType}</p>
+                <p><strong>Trial:</strong> {selectedVideo?.trial}</p>
+                {selectedVideo?.source?.url && (
+                <p><strong>Video URL:</strong> <a href={selectedVideo?.source?.url} target="_blank" rel="noopener noreferrer">{selectedVideo.source.url}</a> ({selectedVideo.source.type})</p>
+                )}
+                {!selectedVideo?.source?.url && (
+                <p><strong>Video URL:</strong> Video was not found</p>
+                )}
+            </Segment>
+            <Segment>
+                <Header as="h3">Available Captions</Header>
+                {selectedVideo?.captions?.length > 0 ? (
+                <List>
+                    {selectedVideo?.captions?.map((track, index) => (
+                    <List.Item key={index}>
+                        <List.Icon name="file text" />
+                        <List.Content>{track.label}</List.Content>
+                    </List.Item>
+                    ))}
+                </List>
+                ) : (
+                <p>No captions found.</p>
+                )}
+            </Segment>
         </Segment>
     );
 };

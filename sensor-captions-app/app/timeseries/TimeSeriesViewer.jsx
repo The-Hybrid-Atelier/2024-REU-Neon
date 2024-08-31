@@ -25,7 +25,7 @@ ChartJS.register(
     Legend
 );
 
-const TimeSeriesViewer = ({ videoToPlay, timePosition, onGraphClick }) => {
+const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
     const containerRef = useRef(null); // Initialize containerRef
     const [chartData, setChartData] = useState({
         labels: [],
@@ -46,7 +46,7 @@ const TimeSeriesViewer = ({ videoToPlay, timePosition, onGraphClick }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const { userId, bendType, trial } = videoToPlay;
+                const { userId, bendType, trial } = selectedVideo;
                 const response = await axios.get(`/api/airdata/${userId}/${bendType}/${trial}`);
                 const { t, kPa, videoTime } = response.data;
 
@@ -70,10 +70,10 @@ const TimeSeriesViewer = ({ videoToPlay, timePosition, onGraphClick }) => {
             }
         };
 
-        if (videoToPlay) {
+        if (selectedVideo) {
             fetchData();
         }
-    }, [videoToPlay]);
+    }, [selectedVideo]);
 
     const options = {
         responsive: true,
@@ -152,6 +152,7 @@ const TimeSeriesViewer = ({ videoToPlay, timePosition, onGraphClick }) => {
                 }}
                 options={options}
                 height={70}
+                className='bg-white p-3 rounded' 
             />
         </Container>
     );

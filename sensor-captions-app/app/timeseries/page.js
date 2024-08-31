@@ -7,12 +7,8 @@ import { VIDEO_DEFAULT } from '@/AppConfig.jsx'; // Import the VIDEO_DEFAULT
 import {FolderStructureDropdowns} from '../utils/FolderStructureDropdowns'; // Adjust path as necessary
 
 const VideoPlayerPage = () => {
-  const [videoToPlay, setVideoToPlay] = useState(VIDEO_DEFAULT);
+  const [selectedVideo, setSelectedVideo] = useState(VIDEO_DEFAULT);
   const [timePosition, setTimePosition] = useState(null);
-
-  const handleSelectionChange = ({ user, bend, trial }) => {
-    setVideoToPlay({ userId: user, bendType: bend, trial });
-  };
 
   const handleGraphClick = (time) => {
     setTimePosition(time);
@@ -20,9 +16,9 @@ const VideoPlayerPage = () => {
 
   return (
     <Container>
-      <FolderStructureDropdowns defaultVideo={videoToPlay} onSelect={handleSelectionChange} />
+      <FolderStructureDropdowns selectedVideo={selectedVideo} setSelectedVideo={setSelectedVideo} />
       <TimeSeriesViewer 
-        videoToPlay={videoToPlay} 
+        selectedVideo={selectedVideo} 
         timePosition={timePosition} 
         onGraphClick={handleGraphClick} 
       />

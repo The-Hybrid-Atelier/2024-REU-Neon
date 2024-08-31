@@ -7,18 +7,11 @@ import { VIDEO_DEFAULT } from '@/AppConfig.jsx'; // Import the VIDEO_DEFAULT
 import {FolderStructureDropdowns} from '../utils/FolderStructureDropdowns'; // Adjust path as necessary
 
 const VideoPlayerPage = () => {
-  const [videoToPlay, setVideoToPlay] = useState(VIDEO_DEFAULT);
-
-  const handleSelectionChange = ({ user, bend, trial }) => {
-    console.log('Selected:', { user, bend, trial });
-    // Update the videoToPlay state with the selected values
-    setVideoToPlay({ userId: user, bendType: bend, trial });
-  };
-
+  const [selectedVideo, setSelectedVideo] = useState(VIDEO_DEFAULT);
   return (
     <Container>
-      <FolderStructureDropdowns defaultVideo={VIDEO_DEFAULT} onSelect={handleSelectionChange} />
-      <CaptionedVideoPlayer videoToPlay={videoToPlay} />
+      <FolderStructureDropdowns selectedVideo={VIDEO_DEFAULT} setSelectedVideo={setSelectedVideo} />
+      <CaptionedVideoPlayer selectedVideo={selectedVideo} />
     </Container>
   );
 };
