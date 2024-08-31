@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown, Form, Segment, Header, List} from 'semantic-ui-react';
 import { VTT_TYPES } from '@/AppConfig.jsx'; // Import the VTT_TYPES array
+import axios from 'axios';
 const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
     const [folderStructure, setFolderStructure] = useState([]);
 
@@ -58,6 +59,21 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
         setSelectedVideo(prevState => ({ ...prevState, captions: tracks, activated_captions: [] }));
     };
 
+    const fetchAirData = async () => {
+        try {
+            const { userId, bendType, trial } = selectedVideo;
+
+            const response = await axios.get(`/api/airdata/${userId}/${bendType}/${trial}`);
+            const { t, kPa, videoTime } = response.data;
+            // Create the data for the chart
+            const labels = videoTime; //t.map(time => new Date(Date.now() + time * 1000).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' }));
+            const data = kPa;
+            setSelectedVideo(prevState => ({...prevState, airdata: { labels, data }}));
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+        
+    };
     // Fetch the folder structure from the API
     const fetchFolderStructure = async () => {
         try {
@@ -82,6 +98,7 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
     useEffect(() => {
         fetchVideoSource();
         loadVttFiles();
+        fetchAirData();
     }, [selectedVideo.userId, selectedVideo.bendType, selectedVideo.trial]);
 
     const handleUserChange = (e, { value }) => {
@@ -195,6 +212,20 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
                 </List>
                 ) : (
                 <p>No captions found.</p>
+                )}
+                <Header as="h3">Air Data</Header>
+                {selectedVideo?.airdata ? (
+                    <List>
+                        <List.Item>
+                        <List.Icon name="chart line" />
+                        <List.Content>
+                            <List.Header>Pressure (kPa)</List.Header>
+                            <List.Description>Available {selectedVideo?.airdata?.data?.length}</List.Description>
+                        </List.Content>
+                        </List.Item>
+                    </List>
+                ) : (
+                    <p>No air data found.</p>
                 )}
             </Segment>
         </Segment>

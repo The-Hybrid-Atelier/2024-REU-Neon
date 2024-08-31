@@ -22,7 +22,8 @@ const VIDEO_DEFAULT = {
     source: {
         url: null,
         type: null
-    }
+    }, 
+    airdata: null
 };
 
 const VTT_TYPES = ['light', 'synth', 'bloom', 'meter', 'vibration'];

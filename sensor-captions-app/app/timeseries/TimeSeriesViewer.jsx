@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Container } from 'semantic-ui-react';
 import { Line } from 'react-chartjs-2';
-import axios from 'axios';
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -44,36 +44,22 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
     });
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const { userId, bendType, trial } = selectedVideo;
-                const response = await axios.get(`/api/airdata/${userId}/${bendType}/${trial}`);
-                const { t, kPa, videoTime } = response.data;
-
-                // Create the data for the chart
-                const labels = videoTime; //t.map(time => new Date(Date.now() + time * 1000).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' }));
-                const data = kPa;
-                setChartData({
-                    labels,
-                    datasets: [
-                        {
-                            label: 'Pressure (kPa)',
-                            data,
-                            borderColor: 'steelblue',
-                            borderWidth: 2,
-                            fill: false,
-                        },
-                    ],
-                });
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        if (selectedVideo) {
-            fetchData();
+        if (selectedVideo?.airdata) {
+            console.log('Selected Video:', selectedVideo);
+            setChartData({
+                labels: selectedVideo.airdata.labels,
+                datasets: [
+                    {
+                        label: 'Pressure (kPa)',
+                        data: selectedVideo.airdata.data,
+                        borderColor: 'steelblue',
+                        borderWidth: 2,
+                        fill: false,
+                    },
+                ],
+            });
         }
-    }, [selectedVideo]);
+    }, [selectedVideo.airdata]);
 
     const options = {
         responsive: true,
@@ -152,7 +138,7 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
                 }}
                 options={options}
                 height={70}
-                className='bg-white p-3 rounded' 
+                className='bg-white p-3 rounded'
             />
         </Container>
     );
