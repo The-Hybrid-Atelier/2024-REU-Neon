@@ -19,7 +19,7 @@ Function:
     --------
     - The average pressure calculated from the first 'num_lines' of the dataframe.
 
-2. dataSpike(df, column=" Pa"):
+2. dataSpike(df, column=pressure_column):
     - Identifies data spikes in the pressure data based on a threshold, which is the average pressure plus 1500.
     Parameters:
     -----------
@@ -72,29 +72,18 @@ import pandas as pd
 import sys
 import os
 
-# Read the csv file into a pandas dataframe
-# input_file = "../data/p1/l-bend/t1/raw.csv"
-input_file = sys.argv[1]
-df = pd.read_csv(input_file)
-
-# Get columns that are needed
-time_column = "Time"
-pressure_column = " Pa"
-
-# Select only the 'time' and 'pa' columns
-selected_columns = df[[time_column, pressure_column]]
-
 
 # Calculate the average pressure from 3 lines
 def calculate_average_pressure(df, num_lines=3):
-    return df[" Pa"].iloc[:num_lines].mean()
+    return df[pressure_column].iloc[:num_lines].mean()
 
 
 # Calculate what constitutes as a "spike" uses the average pressure + 1500 as the threshold
-def dataSpike(df, column=" Pa"):
+# Could possibly use stadard deviation as the leway to add to the threshold?
+def dataSpike(df):
     average_pressure = calculate_average_pressure(df)
     pressure_threshold = average_pressure + 1500
-    spikes = df[(df[column] > pressure_threshold)].index.tolist()
+    spikes = df[(df[pressure_column] > pressure_threshold)].index.tolist()
     spikes = remove_consect(spikes)
     return spikes
 
@@ -122,10 +111,10 @@ def extract_data(df, spike_idxs):
     spikes = {}
 
     for i in spike_idxs:
-        value = df.iloc[i][" Pa"]
+        value = df.iloc[i][pressure_column]
         spikes.update({value: i + 2})
 
-    # Sort the dictionary by file lines, wit the end of the first spike/clap being the first dict entry, and the start of the last spike/clap being the last dict entry
+    # Sort the dictionary by file lines, with the end of the first spike/clap being the first dict entry, and the start of the last spike/clap being the last dict entry
     spikes = dict(sorted(spikes.items(), key=lambda item: item[1]))
 
     # Gets the beginning and ending claps/spikes
@@ -137,26 +126,37 @@ def extract_data(df, spike_idxs):
 
     # Get the line to start at & get the time to offset by after the beginning clap
     line_start = correct_spikes_order[0][1] - 1
-    time_offset = df.iloc[line_start]["Time"]
+    time_offset = df.iloc[line_start][time_column]
 
-    # Get the lind to end at
+    # Get the line to end at
     line_end = correct_spikes_order[1][1]
 
     # Subtract the time offset from the time, getting the new time value
     for i in range(line_start, line_end - 2):
-        current_time = df.iloc[i]["Time"]
+        current_time = df.iloc[i][time_column]
         new_time = current_time - time_offset
-        df.at[i, "Time"] = new_time
+        df.at[i, time_column] = new_time
 
     # Only write at the end of the start spike and the beginning of the end spike
     extracted_df = df.iloc[line_start : line_end - 2]
     return extracted_df
 
 
-# Get the spikes and extract the data in between the spikes (beginning and end claps)
-spikes = dataSpike(selected_columns, " Pa")
-extracted_df = extract_data(selected_columns, spikes)
+# Read the csv file into a pandas dataframe
+input_file = sys.argv[1]
+df = pd.read_csv(input_file)
+df = df.rename(columns={" Pa": "Pa"})
 
+# Get columns that are needed
+time_column = "Time"
+pressure_column = "Pa"
+
+# Select only the 'time' and 'pa' columns
+selected_columns = df[[time_column, pressure_column]]
+
+# Get the spikes and extract the data in between the spikes (beginning and end claps)
+spikes = dataSpike(selected_columns)
+extracted_df = extract_data(selected_columns, spikes)
 
 # Extract the directory path from the input file
 input_dir = os.path.dirname(input_file)
