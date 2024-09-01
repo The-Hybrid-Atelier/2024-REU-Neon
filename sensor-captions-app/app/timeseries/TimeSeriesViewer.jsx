@@ -127,20 +127,21 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '
 
 
     return (
-        <Container ref={containerRef} style={{ width, height }}>
+        <Container ref={containerRef} style={{ width, height, overflow: 'hidden' }}>
             <Line
                 data={{
-                    ...chartData,
-                    datasets: chartData.datasets.map(dataset => ({
-                        ...dataset,
-                        borderWidth: calculateBorderWidth(containerRef.current?.clientWidth || 400), // Adjust line thickness
-                    }))
+                ...chartData,
+                datasets: chartData.datasets.map(dataset => ({
+                    ...dataset,
+                    borderWidth: calculateBorderWidth(containerRef.current?.clientWidth || 400), // Adjust line thickness
+                }))
                 }}
                 options={options}
-                height={70}
+                height={height} // Make sure height is used properly
                 className='bg-white p-3 rounded'
             />
         </Container>
+
     );
 };
 
