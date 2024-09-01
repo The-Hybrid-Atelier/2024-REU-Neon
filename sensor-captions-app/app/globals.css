@@ -57,7 +57,11 @@ body {
 
 .panel{
   padding: 25px;
+  height: 100vh; /* Full viewport height */
+  overflow-y: auto; /* Vertical scrollbar */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
+
 .left-panel {
   width: 20%;
   background-color: #ffd66f; 
@@ -78,3 +82,17 @@ body {
   background-color: #9460fd; 
 }
 
+.mobile-top-panel {
+  height: 20%;
+  background-color: #ffd66f; 
+}
+
+.mobile-middle-panel {
+  height: 60%;
+  background-color: #5a8af4; 
+}
+
+.mobile-bottom-panel {
+  height: 20%;
+  background-color: #9460fd; 
+}

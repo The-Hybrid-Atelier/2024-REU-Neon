@@ -25,7 +25,7 @@ ChartJS.register(
     Legend
 );
 
-const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
+const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '100%', height = '100%' }) => {
     const containerRef = useRef(null); // Initialize containerRef
     const [chartData, setChartData] = useState({
         labels: [],
@@ -127,7 +127,7 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
 
 
     return (
-        <Container ref={containerRef}>
+        <Container ref={containerRef} style={{ width, height }}>
             <Line
                 data={{
                     ...chartData,

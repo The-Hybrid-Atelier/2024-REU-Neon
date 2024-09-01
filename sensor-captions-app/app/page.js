@@ -8,11 +8,13 @@ import TacitCaptionVideoPlayer from './player/TacitCaptionVideoPlayer';
 import VideoController from './player/VideoController';
 import { VIDEO_DEFAULT } from '@/AppConfig.jsx'; // Import the VIDEO_DEFAULT
 import {FolderStructureDropdowns} from './utils/FolderStructureDropdowns'; // Adjust path as necessary
+import TimeSeriesViewer from './timeseries/TimeSeriesViewer';
 
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_DEFAULT);
 
+   /*
   return (
     <div className="w-full h-full flex flex-row">
       <div className="panel left-panel">
@@ -23,10 +25,52 @@ function App() {
         <TacitCaptionVideoPlayer selectedVideo={selectedVideo} />
       </div>
       <div className="panel right-panel">
-        {/* <VideoController /> */}
       </div>
     </div>
   );
+
+   */
+
+
+  const [timePosition, setTimePosition] = useState(null);
+
+  const handleGraphClick = (time) => {
+    setTimePosition(time);
+  };
+
+
+  ///* 
+  // In your page.js
+  return (
+    <div className="w-full h-screen flex flex-col">
+      <div className="flex-none h-[20%] bg-[#ffd66f] overflow-hidden">
+        <div className="w-full h-full p-2"> 
+          <TimeSeriesViewer
+            selectedVideo={selectedVideo}
+            timePosition={timePosition}
+            onGraphClick={handleGraphClick}
+          />
+        </div>
+      </div>
+      <div className="flex-grow bg-[#5a8af4] overflow-auto">
+        <div className="grid grid-cols-2 gap-4">
+          <CaptionController 
+            selectedVideo={selectedVideo} 
+            setSelectedVideo={setSelectedVideo}
+            multipleSelection={true} 
+          />
+        </div>
+      </div>
+      <div className="flex-none h-[20%] bg-[#9460fd]">
+      </div>
+    </div>
+  );
+
+
+  
+  
+   //*/
+
 };
 
 export default App;

@@ -41,7 +41,7 @@ const CaptionController = ({ selectedVideo, setSelectedVideo, multipleSelection 
             key={caption.label}
             color="gray"
             onClick={() => handleClick(caption.label)}
-            className={`!flex flex-col justify-center items-center text-white rounded p-2 w-full ${isActive ? 'bg-[#0f68a9]' : '!bg-gray-400'}`}
+            className={`!flex flex-col justify-center items-center text-white rounded p-2 w-full ${isActive ? 'bg-[#0f68a9]' : 'bg-gray-400'} hover:bg-[#0276ab]`}
             circular
             >
             {icon}
