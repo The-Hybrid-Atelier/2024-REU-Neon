@@ -28,6 +28,8 @@ const TacitCaptionVideoPlayer = ({ selectedVideo }) => {
         selectedVideo={selectedVideo}
         timePosition={timePosition}
         onGraphClick={handleGraphClick}
+        width="100%"  // Adjust width as needed
+        height="100%"
       />
 
     </>

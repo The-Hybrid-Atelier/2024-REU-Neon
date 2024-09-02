@@ -25,7 +25,7 @@ ChartJS.register(
     Legend
 );
 
-const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
+const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '100%', height = '100%' }) => {
     const containerRef = useRef(null); // Initialize containerRef
     const [chartData, setChartData] = useState({
         labels: [],
@@ -137,7 +137,7 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
                     }))
                 }}
                 options={options}
-                height={70}
+                height={height} // Make sure height is used properly
                 className='bg-white p-3 rounded'
             />
         </div>
