@@ -24,11 +24,45 @@ export default function handler(req, res) {
           const youtubeUrl = fs.readFileSync(filePath, 'utf8').trim();
           return res.status(200).json({ url: youtubeUrl, type: 'video/youtube' });
         } else {
-          // If the file is a .mp4 or .mov, serve the file
-          const videoType = extension === 'mp4' ? 'video/mp4' : 'video/quicktime';
-          res.setHeader('Content-Type', videoType);
-          const stream = fs.createReadStream(filePath);
-          return stream.pipe(res);
+          // If the file is a .mp4 or .mov, serve the video file with range support
+          const stat = fs.statSync(filePath);
+          const fileSize = stat.size;
+          const range = req.headers.range;
+
+          if (range) {
+            // Extract the start and end bytes from the range header
+            const parts = range.replace(/bytes=/, '').split('-');
+            const start = parseInt(parts[0], 10);
+            const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+            if (start >= fileSize) {
+              res.status(416).send('Requested range not satisfiable\n' + start + ' >= ' + fileSize);
+              return;
+            }
+
+            const chunkSize = end - start + 1;
+            const videoType = extension === 'mp4' ? 'video/mp4' : 'video/quicktime';
+            const fileStream = fs.createReadStream(filePath, { start, end });
+
+            res.writeHead(206, {
+              'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+              'Accept-Ranges': 'bytes',
+              'Content-Length': chunkSize,
+              'Content-Type': videoType,
+            });
+
+            fileStream.pipe(res);
+          } else {
+            // If no range header, serve the whole video file
+            const videoType = extension === 'mp4' ? 'video/mp4' : 'video/quicktime';
+            res.writeHead(200, {
+              'Content-Length': fileSize,
+              'Content-Type': videoType,
+            });
+            fs.createReadStream(filePath).pipe(res);
+          }
+
+          return;
         }
       }
     }

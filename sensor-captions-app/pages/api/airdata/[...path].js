@@ -11,6 +11,7 @@ import fs from 'fs';
 import csv from 'csv-parser';
 
 export default function handler(req, res) {
+    
     const { path: filePathSegments } = req.query; // Captures the entire path
     const filePath = path.join(process.cwd(), 'data', ...filePathSegments, 'air.csv'); // Path to air.csv
     const jsonFilePath = path.join(process.cwd(), 'data', ...filePathSegments, 'air.json'); // Path to air.json (cache)

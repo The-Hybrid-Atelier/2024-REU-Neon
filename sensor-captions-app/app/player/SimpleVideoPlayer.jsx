@@ -1,24 +1,42 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react';
+import { Message } from 'semantic-ui-react';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import 'videojs-youtube'; // Ensure the YouTube plugin is imported
 
-const SimpleVideoPlayer = ({ options, onCueChange, onPlay, onPause, onStop }) => {
+const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange}, ref) => {
+  const { source, captions } = selectedVideo;
+  const options = {
+    techOrder: source.type === 'video/youtube' ? ['youtube'] : ['html5'],
+    autoplay: false,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    playbackRates: [0.25, 0.5, 1, 1.5, 2],
+    sources: source.url ? [{ src: source.url, type: source.type }] : [],
+    tracks: captions,
+    preload: 'auto',
+    inactivityTimeout: 0, // Disable fading out of controls
+  };
+
   const videoRef = useRef(null);
   const playerRef = useRef(null);
 
+  useImperativeHandle(ref, () => ({
+    getPlayer: () => playerRef.current,
+  }));
+
   useEffect(() => {
+    if (!videoRef.current) return;
+
     if (!playerRef.current) {
-      // Create the video.js player element
       const videoElement = document.createElement('video-js');
       videoElement.classList.add('vjs-big-play-centered');
       videoRef.current.appendChild(videoElement);
 
-      // Initialize the player
       const player = (playerRef.current = videojs(videoElement, options, () => {
         videojs.log('Player is ready');
 
-        // Handle text tracks (e.g., subtitles)
         const tracks = player.remoteTextTracks();
         if (tracks.length > 0) {
           const track = tracks[0];
@@ -26,21 +44,9 @@ const SimpleVideoPlayer = ({ options, onCueChange, onPlay, onPause, onStop }) =>
           track.addEventListener('cuechange', onCueChange);
         }
 
-        // Set up event listeners
-        player.on('play', () => {
-          onPlay && onPlay(player);
-        });
-
-        player.on('pause', () => {
-          onPause && onPause(player);
-        });
-
-        player.on('ended', () => {
-          onStop && onStop(player);
-        });
+        
       }));
     } else {
-      // If the player already exists, update the source and other options
       const player = playerRef.current;
       player.src(options.sources);
       player.autoplay(options.autoplay);
@@ -48,9 +54,10 @@ const SimpleVideoPlayer = ({ options, onCueChange, onPlay, onPause, onStop }) =>
         if (options.sources.length > 0) {
           player.src(options.sources);
         }
+
+       
       });
 
-      // Update text tracks
       const tracks = player.remoteTextTracks();
       if (tracks.length > 0) {
         const track = tracks[0];
@@ -60,7 +67,6 @@ const SimpleVideoPlayer = ({ options, onCueChange, onPlay, onPause, onStop }) =>
     }
 
     return () => {
-      // Cleanup on unmount
       const player = playerRef.current;
       if (player) {
         const tracks = player.remoteTextTracks();
@@ -74,13 +80,19 @@ const SimpleVideoPlayer = ({ options, onCueChange, onPlay, onPause, onStop }) =>
         playerRef.current = null;
       }
     };
-  }, [options, onCueChange, onPlay, onPause, onStop]);
+  }, [options, onCueChange]);
 
   return (
-    <div data-vjs-player>
-      <div ref={videoRef} />
-    </div>
+    <>
+      {selectedVideo?.source?.url ? (
+        <div data-vjs-player>
+          <div ref={videoRef} />
+        </div>
+      ) : (
+        <Message>No video source provided.</Message>
+      )}
+    </>
   );
-};
+});
 
 export default SimpleVideoPlayer;

@@ -55,7 +55,13 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '
                         borderColor: 'steelblue',
                         borderWidth: 2,
                         fill: false,
+                        display: true
                     },
+                    {
+                        label: 'Time (ms)',
+                        data: selectedVideo.airdata.t,
+                        display: false, // Add display: false to hide the dataset
+                    }
                 ],
             });
         }
@@ -115,7 +121,8 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '
             if (elements.length && onGraphClick) {
                 const elementIndex = elements[0].index;
                 const time = chartData.labels[elementIndex];
-                onGraphClick(time);
+                const sec = chartData.datasets[1].data[elementIndex];
+                onGraphClick(sec);
             }
         },
     };
@@ -127,18 +134,20 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '
 
 
     return (
-        <div ref={containerRef}>
+        <div ref={containerRef} className='w-full'>
             <Line
                 data={{
                     ...chartData,
-                    datasets: chartData.datasets.map(dataset => ({
-                        ...dataset,
-                        borderWidth: calculateBorderWidth(containerRef.current?.clientWidth || 600), // Adjust line thickness
-                    }))
+                    datasets: [
+                        {
+                            ...chartData.datasets[0],
+                            borderWidth: calculateBorderWidth(containerRef.current?.clientWidth || 600), // Adjust line thickness
+                        }
+                    ]
                 }}
                 options={options}
                 height={height} // Make sure height is used properly
-                className='bg-white p-3 rounded'
+                className='bg-white p-3 rounded w-full'
             />
         </div>
     );

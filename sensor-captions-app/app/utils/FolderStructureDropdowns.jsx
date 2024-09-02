@@ -69,7 +69,7 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
             // Create the data for the chart
             const labels = videoTime; //t.map(time => new Date(Date.now() + time * 1000).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' }));
             const data = kPa;
-            setSelectedVideo(prevState => ({ ...prevState, airdata: { labels, data } }));
+            setSelectedVideo(prevState => ({ ...prevState, airdata: { labels, data, t } }));
         } catch (error) {
             console.error('Error fetching data:', error);
         }
