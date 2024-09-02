@@ -1,93 +1,66 @@
-import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Message } from 'semantic-ui-react';
-import videojs from 'video.js';
-import 'video.js/dist/video-js.css';
-import 'videojs-youtube'; // Ensure the YouTube plugin is imported
 
-const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange}, ref) => {
+const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange }, ref) => {
   const { source, captions } = selectedVideo;
-  const options = {
-    techOrder: source.type === 'video/youtube' ? ['youtube'] : ['html5'],
-    autoplay: false,
-    controls: true,
-    responsive: true,
-    fluid: true,
-    playbackRates: [0.25, 0.5, 1, 1.5, 2],
-    sources: source.url ? [{ src: source.url, type: source.type }] : [],
-    tracks: captions,
-    preload: 'auto',
-    inactivityTimeout: 0, // Disable fading out of controls
-  };
 
   const videoRef = useRef(null);
-  const playerRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
-    getPlayer: () => playerRef.current,
+    getPlayer: () => videoRef.current,
   }));
 
   useEffect(() => {
-    if (!videoRef.current) return;
+    const videoElement = videoRef.current;
 
-    if (!playerRef.current) {
-      const videoElement = document.createElement('video-js');
-      videoElement.classList.add('vjs-big-play-centered');
-      videoRef.current.appendChild(videoElement);
+    if (!videoElement) return;
 
-      const player = (playerRef.current = videojs(videoElement, options, () => {
-        videojs.log('Player is ready');
-
-        const tracks = player.remoteTextTracks();
-        if (tracks.length > 0) {
-          const track = tracks[0];
-          track.mode = 'showing';
-          track.addEventListener('cuechange', onCueChange);
-        }
-
-        
-      }));
-    } else {
-      const player = playerRef.current;
-      player.src(options.sources);
-      player.autoplay(options.autoplay);
-      player.ready(() => {
-        if (options.sources.length > 0) {
-          player.src(options.sources);
-        }
-
-       
-      });
-
-      const tracks = player.remoteTextTracks();
-      if (tracks.length > 0) {
-        const track = tracks[0];
-        track.mode = 'showing';
-        track.addEventListener('cuechange', onCueChange);
+    const handleCueChange = (event) => {
+      const track = event.target;
+      if (track.activeCues.length > 0) {
+        onCueChange(track.activeCues[0]);
       }
+    };
+
+    const trackElements = videoElement.textTracks;
+    if (trackElements.length > 0) {
+      const track = trackElements[0];
+      track.mode = 'showing';
+      track.addEventListener('cuechange', handleCueChange);
     }
 
     return () => {
-      const player = playerRef.current;
-      if (player) {
-        const tracks = player.remoteTextTracks();
-        if (tracks.length > 0) {
-          const track = tracks[0];
-          if (track) {
-            track.removeEventListener('cuechange', onCueChange);
-          }
+      if (trackElements.length > 0) {
+        const track = trackElements[0];
+        if (track) {
+          track.removeEventListener('cuechange', handleCueChange);
         }
-        player.dispose();
-        playerRef.current = null;
       }
     };
-  }, [options, onCueChange]);
+  }, [onCueChange]);
 
   return (
     <>
       {selectedVideo?.source?.url ? (
-        <div data-vjs-player>
-          <div ref={videoRef} />
-        </div>
+        <video
+          ref={videoRef}
+          controls
+          preload="auto"
+          style={{ width: '100%', height: 'auto' }}
+        >
+          <source src={source.url} type={source.type} />
+          {captions.map((caption, index) => (
+            <track
+              key={index}
+              kind={caption.kind}
+              src={caption.src}
+              srcLang={caption.srclang}
+              label={caption.label}
+              default={caption.default}
+            />
+          ))}
+          Your browser does not support the video tag.
+        </video>
       ) : (
         <Message>No video source provided.</Message>
       )}

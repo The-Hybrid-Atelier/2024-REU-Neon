@@ -2,7 +2,7 @@
 "use client"; // This marks the component as client-side in Next.js
 import './globals.css';
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Icon, Button, Divider } from 'semantic-ui-react';
+import { Container, Segment, Icon, Button, Divider } from 'semantic-ui-react';
 import CaptionController from './player/CaptionController';
 import TimeSeriesViewer from './timeseries/TimeSeriesViewer';
 import VideoController from './player/VideoController';
@@ -16,7 +16,7 @@ function App() {
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_DEFAULT);
   const videoPlayerRef = useRef(null);
   const [clicked, setClicked] = useState("Start");
-
+  const [activeCue, setActiveCue] = useState(null);
   const handleSeek = (toTime) => {
     const player = videoPlayerRef.current.getPlayer();
     const currentT = player.currentTime();
@@ -34,7 +34,7 @@ function App() {
         <SimpleVideoPlayer
           ref={videoPlayerRef}
           selectedVideo={selectedVideo}
-          onCueChange={(evt) => console.log('Cue change', evt)}
+          onCueChange={(cue) => {console.log(cue); setActiveCue(cue)}}
         />
         <TimeSeriesViewer
           selectedVideo={selectedVideo}
@@ -43,6 +43,9 @@ function App() {
           width="100%"  // Adjust width as needed
           height="100%"
         />
+        <Segment className="flex flex-row justify-center !text-2xl">
+          {activeCue && activeCue.text}
+        </Segment>
 
       </div>
       <div className="panel right-panel">
