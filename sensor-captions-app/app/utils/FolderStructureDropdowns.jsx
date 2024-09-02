@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Dropdown, Form, Segment, Header, List} from 'semantic-ui-react';
+import { Dropdown, Form, Segment, Header, List } from 'semantic-ui-react';
 import { VTT_TYPES } from '@/AppConfig.jsx'; // Import the VTT_TYPES array
 import axios from 'axios';
+import CollapsibleSegment from './CollapsibleSegment';
 const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
     const [folderStructure, setFolderStructure] = useState([]);
 
-     // Fetch the video source from the API
-     const fetchVideoSource = async () => {
+    // Fetch the video source from the API
+    const fetchVideoSource = async () => {
         const { userId, bendType, trial } = selectedVideo;
         try {
             const response = await fetch(`/api/video/${userId}/${bendType}/${trial}`);
@@ -68,11 +69,11 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
             // Create the data for the chart
             const labels = videoTime; //t.map(time => new Date(Date.now() + time * 1000).toLocaleTimeString([], { minute: '2-digit', second: '2-digit' }));
             const data = kPa;
-            setSelectedVideo(prevState => ({...prevState, airdata: { labels, data }}));
+            setSelectedVideo(prevState => ({ ...prevState, airdata: { labels, data } }));
         } catch (error) {
             console.error('Error fetching data:', error);
         }
-        
+
     };
     // Fetch the folder structure from the API
     const fetchFolderStructure = async () => {
@@ -187,47 +188,45 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
                 </Form.Group>
 
             </Form>
-            <Segment>
-                <Header as="h2">Video Metadata</Header>
+            <CollapsibleSegment title="Video Metadata">
+                <Header as="h3">Video Metadata</Header>
                 <p><strong>User:</strong> {selectedVideo?.userId}</p>
                 <p><strong>Bend Type:</strong> {selectedVideo?.bendType}</p>
                 <p><strong>Trial:</strong> {selectedVideo?.trial}</p>
                 {selectedVideo?.source?.url && (
-                <p><strong>Video URL:</strong> <a href={selectedVideo?.source?.url} target="_blank" rel="noopener noreferrer">{selectedVideo.source.url}</a> ({selectedVideo.source.type})</p>
+                    <p><strong>Video URL:</strong> <a href={selectedVideo?.source?.url} target="_blank" rel="noopener noreferrer">{selectedVideo.source.url}</a> ({selectedVideo.source.type})</p>
                 )}
                 {!selectedVideo?.source?.url && (
-                <p><strong>Video URL:</strong> Video was not found</p>
+                    <p><strong>Video URL:</strong> Video was not found</p>
                 )}
-            </Segment>
-            <Segment>
                 <Header as="h3">Available Captions</Header>
                 {selectedVideo?.captions?.length > 0 ? (
-                <List>
-                    {selectedVideo?.captions?.map((track, index) => (
-                    <List.Item key={index}>
-                        <List.Icon name="file text" />
-                        <List.Content>{track.label}</List.Content>
-                    </List.Item>
-                    ))}
-                </List>
+                    <List>
+                        {selectedVideo?.captions?.map((track, index) => (
+                            <List.Item key={index}>
+                                <List.Icon name="file text" />
+                                <List.Content>{track.label}</List.Content>
+                            </List.Item>
+                        ))}
+                    </List>
                 ) : (
-                <p>No captions found.</p>
+                    <p>No captions found.</p>
                 )}
                 <Header as="h3">Air Data</Header>
                 {selectedVideo?.airdata ? (
                     <List>
                         <List.Item>
-                        <List.Icon name="chart line" />
-                        <List.Content>
-                            <List.Header>Pressure (kPa)</List.Header>
-                            <List.Description>Available {selectedVideo?.airdata?.data?.length}</List.Description>
-                        </List.Content>
+                            <List.Icon name="chart line" />
+                            <List.Content>
+                                <List.Header>Pressure (kPa)</List.Header>
+                                <List.Description>Available {selectedVideo?.airdata?.data?.length} datapoints</List.Description>
+                            </List.Content>
                         </List.Item>
                     </List>
                 ) : (
                     <p>No air data found.</p>
                 )}
-            </Segment>
+            </CollapsibleSegment>
         </Segment>
     );
 };

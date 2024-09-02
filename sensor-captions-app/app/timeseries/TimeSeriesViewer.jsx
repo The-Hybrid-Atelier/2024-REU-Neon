@@ -34,7 +34,7 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
                 label: 'Pressure (kPa)',
                 data: [],
                 borderColor: 'steelblue',
-                borderWidth: 20,  // Increase the width of the line
+                borderWidth: 5,  // Increase the width of the line
                 fill: false,
                 pointRadius: 0,  // Remove the data point markers
                 cubicInterpolationMode: 'monotone',  // Enable data smoothing
@@ -84,8 +84,8 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
             x: {
                 type: 'category',
                 ticks: {
-                    maxRotation: 45,
-                    minRotation: 45,
+                    // maxRotation: 45,
+                    // minRotation: 45,
                     maxTicksLimit: 5,  // Reduce to 5 labels on the x-axis
                 },
             },
@@ -122,25 +122,25 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick }) => {
 
     const calculateBorderWidth = (chartWidth) => {
         // Example: Adjust line thickness based on the chart's width
-        return Math.max(2, chartWidth / 100); // Adjust the divisor as needed
+        return Math.max(2, chartWidth / 100/2); // Adjust the divisor as needed
     };
 
 
     return (
-        <Container ref={containerRef}>
+        <div ref={containerRef}>
             <Line
                 data={{
                     ...chartData,
                     datasets: chartData.datasets.map(dataset => ({
                         ...dataset,
-                        borderWidth: calculateBorderWidth(containerRef.current?.clientWidth || 400), // Adjust line thickness
+                        borderWidth: calculateBorderWidth(containerRef.current?.clientWidth || 600), // Adjust line thickness
                     }))
                 }}
                 options={options}
                 height={70}
                 className='bg-white p-3 rounded'
             />
-        </Container>
+        </div>
     );
 };
 
