@@ -9,32 +9,45 @@ import VideoController from './player/VideoController';
 import { VIDEO_DEFAULT } from '@/AppConfig.jsx'; // Import the VIDEO_DEFAULT
 import {FolderStructureDropdowns} from './utils/FolderStructureDropdowns'; // Adjust path as necessary
 import SimpleVideoPlayer from './player/SimpleVideoPlayer';
+import { Remote } from './websocket/Remote';
 
 
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_DEFAULT);
   const videoPlayerRef = useRef(null);
+  const remoteRef = useRef(null);
   const [clicked, setClicked] = useState("Start");
   const [activeCue, setActiveCue] = useState(null);
+
   const handleSeek = (toTime) => {
     const player = videoPlayerRef.current.getPlayer();
-    const currentT = player.currentTime();
-    player.currentTime(toTime);
+    const currentT = player.currentTime;
+    player.currentTime = toTime;
     console.log("Seeking to:", toTime, "from:", currentT);
   };
+  
+  const handleCueChange = (cue) => {
+    setActiveCue(cue);
+    if (remoteRef.current) {
+      const { startTime, endTime, text } = cue;
+      const serializedCue = { startTime, endTime, text };
+      remoteRef.current.jsend({ event: 'text-cue', data: serializedCue });
+    }
+  }
 
   return (
     <div className="w-full h-full flex flex-row">
       <div className="panel left-panel">
         <CaptionController selectedVideo={selectedVideo} setSelectedVideo={setSelectedVideo}/>
+        <Remote name="sensor-recording-input" ref={remoteRef}/>
       </div>
       <div className="panel middle-panel">
         <FolderStructureDropdowns selectedVideo={selectedVideo} setSelectedVideo={setSelectedVideo}/>
         <SimpleVideoPlayer
           ref={videoPlayerRef}
           selectedVideo={selectedVideo}
-          onCueChange={(cue) => {console.log(cue); setActiveCue(cue)}}
+          onCueChange={handleCueChange}
         />
         <TimeSeriesViewer
           selectedVideo={selectedVideo}

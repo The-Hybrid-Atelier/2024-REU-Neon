@@ -188,7 +188,7 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
                 </Form.Group>
 
             </Form>
-            <CollapsibleSegment title="Video Metadata">
+            <CollapsibleSegment title="Video Metadata" icon="caret">
                 <Header as="h3">Video Metadata</Header>
                 <p><strong>User:</strong> {selectedVideo?.userId}</p>
                 <p><strong>Bend Type:</strong> {selectedVideo?.bendType}</p>

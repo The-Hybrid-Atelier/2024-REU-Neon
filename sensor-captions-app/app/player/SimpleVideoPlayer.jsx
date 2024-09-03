@@ -2,7 +2,7 @@ import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react
 import { Message } from 'semantic-ui-react';
 
 const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange }, ref) => {
-  const { source, captions } = selectedVideo;
+  const { source, captions, activated_captions } = selectedVideo;
 
   const videoRef = useRef(null);
 
@@ -23,21 +23,29 @@ const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange }, ref) => {
     };
 
     const trackElements = videoElement.textTracks;
+
     if (trackElements.length > 0) {
-      const track = trackElements[0];
-      track.mode = 'showing';
-      track.addEventListener('cuechange', handleCueChange);
+      for (let i = 0; i < trackElements.length; i++) {
+        const track = trackElements[i];
+        const captionLabel = track.label;
+        if (activated_captions.includes(captionLabel)) {
+          track.mode = 'showing';
+        } else {
+          track.mode = 'disabled';
+        }
+        track.addEventListener('cuechange', handleCueChange);
+      }
     }
 
     return () => {
       if (trackElements.length > 0) {
-        const track = trackElements[0];
-        if (track) {
+        for (let i = 0; i < trackElements.length; i++) {
+          const track = trackElements[i];
           track.removeEventListener('cuechange', handleCueChange);
         }
       }
     };
-  }, [onCueChange]);
+  }, [onCueChange, activated_captions]);
 
   return (
     <>

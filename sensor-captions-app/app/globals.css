@@ -63,7 +63,7 @@ body {
 }
 
 .left-panel {
-  width: 20%;
+  width: 30%;
   background-color: #ffd66f; 
   color: #000; 
 }
@@ -78,7 +78,7 @@ body {
 }
 
 .right-panel {
-  width: 20%;
+  width: 10%;
   background-color: #9460fd; 
 }
 
