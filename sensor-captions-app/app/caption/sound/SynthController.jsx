@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Container, Header, Segment, Button, Input, Label } from 'semantic-ui-react';
 import SynthManager from '@/app/utils/SynthManager';  // Adjust the import path as necessary
 
 
-const SynthController = () => {
-  const [intensity, setIntensity] = useState(0);
+const SynthController = ({intensity, setIntensity}) => {
+  // const [intensity, setIntensity] = useState(0);
   const [volume, setVolume] = useState(1.0);
   const synthManagerRef = useRef();
   const handlePlaySynth = (value) => synthManagerRef?.current.playSynth(value);
@@ -13,12 +13,17 @@ const SynthController = () => {
     setVolume(value);
     synthManagerRef?.current.setVolume(value);
   }
+
+  
   const handleIntensityChange = (e, { value }) => {
     setIntensity(value);
-    synthManagerRef?.current.playSynth(value);
+    
   }
   const handleStop = () => synthManagerRef?.current.stop()
   
+  useEffect(() => {
+    synthManagerRef?.current.playSynth(intensity);
+  }, [intensity]);
 return (
     <Container>
         <Header>Synth Controller</Header>
