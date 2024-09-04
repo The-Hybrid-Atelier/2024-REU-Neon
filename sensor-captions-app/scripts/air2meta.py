@@ -96,28 +96,42 @@ import os
 
 # Determine the range of feedback inten based on the meta_type parameter
 def determine_type():
-    meta_dict = {"sound":5, "light":6, "synth":100, "vibration":5}
+    meta_dict = {"sound": 5, "light": 6, "synth": 100, "vibration": 5}
     return meta_dict.get(meta_type)
 
- # Determine the itenisty of the feedback type based on the pressure parameterized value
+
+# Determine the itenisty of the feedback type based on the pressure parameterized value
 def determine_inten(df, i):
     p1_value = df.iloc[i][parameterized_pressure_column]
     inten = int(p1_value * inten_range)
 
-    #If the meta_type is light, convert the intensity to a hex color value
+    # If the meta_type is light, convert the intensity to a hex color value
     if meta_type == "light":
-        light_dict = {0:0xFF0000, 1:0xFF7F00, 2:0xFFFF00, 3:0x00FF00, 4:0x0000FF, 5:0x4B0082, 6:0x8B00FF}
+
+        light_dict = {
+            0: 0xFF0000,
+            1: 0xFF7F00,
+            2: 0xFFFF00,
+            3: 0x00FF00,
+            4: 0x0000FF,
+            5: 0x4B0082,
+            6: 0x8B00FF,
+        }
+
         inten = light_dict.get(inten)
-        
+
     return inten
+
 
 # Write the metadata to the WebVTT file
 def write_to_file(capvtt_file, start_time, end_time, inten):
     capvtt_file.write(f"{start_time} --> {end_time}\n")
-    if meta_type == "light" :
+
+    if meta_type == "light":
         capvtt_file.write(f"{meta_type.capitalize()} : {inten:#06X}\n\n")
-    else :
+    else:
         capvtt_file.write(f"{meta_type.capitalize()} : {inten}\n\n")
+
 
 # Detect the events in the pressure data and write the metadata to the WebVTT file
 def detect_events_with_inten(df, meta_out_file):
@@ -203,6 +217,7 @@ def formatTime(mseconds):
     mseconds = int(mseconds % 1000)
     return f"{hours:02}:{minutes:02}:{seconds:02}.{mseconds:03}"
 
+
 # Obtain the file path to the air.csv file and the type of feedback to create metadata for
 air_file = sys.argv[1]
 meta_type = sys.argv[2]
@@ -212,12 +227,12 @@ inten_range = determine_type()
 # Read the air.csv file into a pandas dataframe
 air_df = pd.read_csv(air_file)
 
-#Column names
+# Column names
 time_column = "Time"
 pressure_column = "Pa"
 parameterized_pressure_column = "P1"
 
-#Create the metadata output file path
+# Create the metadata output file path
 input_dir = os.path.dirname(air_file)
 meta_out_file = os.path.join(input_dir, meta_type + ".vtt")
 
