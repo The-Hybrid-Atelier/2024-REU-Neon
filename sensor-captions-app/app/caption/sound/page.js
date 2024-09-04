@@ -19,11 +19,15 @@ const SoundController = () => {
     console.log("data");
     setActiveCue(data?.data);
     // debugger;
-    if(data?.event === "kitchen-cue") {
-      triggerSoundByID(data?.data.id);
-    }else if(data?.event === "synth-cue") {
-      setSynthIntensity(data?.data.intensity);
+    if(data?.data){
+      const value = parseInt(data?.data.text);
+      if(data?.event === "kitchen-cue") {
+        triggerSoundByID(value);
+      }else if(data?.event === "synth-cue") {
+        setSynthIntensity(value);
+      }
     }
+    
   }
 
   return (
