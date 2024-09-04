@@ -4,7 +4,7 @@ import { Container, Checkbox, Segment, Header, Button, Label, Icon } from 'seman
 import { WEBSOCKET_URL, API_COMMAND_TEMPLATE } from '../../AppConfig';
 import CollapsibleSegment from '../utils/CollapsibleSegment';
 
-const Remote = forwardRef(({ name, apiCommands, websocketEventHandler = () => { } }, ref) => {
+const Remote = forwardRef(({ children, name, apiCommands, websocketEventHandler = () => { } }, ref) => {
     const [state, setState] = useState('disconnected');
     const [message, setMessage] = useState('');
 
@@ -124,6 +124,7 @@ const Remote = forwardRef(({ name, apiCommands, websocketEventHandler = () => { 
                     </Button>
                 ))}
             </Button.Group>
+            {children}
         </CollapsibleSegment>
     );
 });
