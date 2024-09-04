@@ -128,9 +128,9 @@ def write_to_file(capvtt_file, start_time, end_time, inten):
     capvtt_file.write(f"{start_time} --> {end_time}\n")
 
     if meta_type == "light":
-        capvtt_file.write(f"{meta_type.capitalize()} : {inten:#06X}\n\n")
+        capvtt_file.write(f"#{inten:06X}\n\n")
     else:
-        capvtt_file.write(f"{meta_type.capitalize()} : {inten}\n\n")
+        capvtt_file.write(f"{inten}\n\n")
 
 
 # Detect the events in the pressure data and write the metadata to the WebVTT file
