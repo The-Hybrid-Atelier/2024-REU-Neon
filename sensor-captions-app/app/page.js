@@ -32,7 +32,12 @@ function App() {
     if (remoteRef.current) {
       const { startTime, endTime, text } = cue;
       const serializedCue = { startTime, endTime, text };
-      remoteRef.current.jsend({ event: 'text-cue', data: serializedCue });
+
+      selectedVideo?.activated_captions.forEach(caption => {
+        const serializedCue = { startTime, endTime, text };
+        remoteRef.current.jsend({ event: `${caption.toLowerCase()}-cue`, data: serializedCue });
+      });
+      // remoteRef.current.jsend({ event: 'text-cue', data: serializedCue });
       // remoteRef.current.jsend({ event: 'kitchen-cue', data: {id: 1} });
       // remoteRef.current.jsend({ event: 'synth-cue', data: {intensity: Math.floor(Math.random() * 100) + 1} });
     }
