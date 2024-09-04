@@ -27,7 +27,7 @@ const VIDEO_DEFAULT = {
     live: false
 };
 
-const VTT_TYPES = ['light', 'synth', 'bloom', 'meter', 'vibration'];
+const VTT_TYPES = ['light', 'synth', 'sound', 'meter', 'vibration'];
 
 // LIBRARY OF VIBRATION PATTERNS
 const VIBRATION_PATTERNS = [
