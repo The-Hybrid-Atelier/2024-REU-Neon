@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import Ribbon from './Ribbon';
+import Collapsable from './Collapsable';
+import Slider from './Slider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNodes, faGoogle } from '@fortawesome/free-solid-svg-icons';
 
