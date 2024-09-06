@@ -39,6 +39,11 @@ function DevApp() {
           typeSelect={typeSelect}
         />
       </div>
+
+      <div className="p-4">
+        <Slider title="COMPLETION"/>
+      </div>
+
     </div>
   );
 }
