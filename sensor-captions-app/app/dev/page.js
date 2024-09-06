@@ -30,6 +30,7 @@ function DevApp() {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       {/* Ribbon Component */}
+      {/*
       <div className="p-4 w-full">
         <Ribbon 
           icons={icons} 
@@ -39,9 +40,20 @@ function DevApp() {
           typeSelect={typeSelect}
         />
       </div>
+      */}
 
+      {/*
       <div className="p-4">
         <Slider title="COMPLETION"/>
+      </div>
+      */}
+
+      <div className="p-4">
+        <Collapsable 
+          isConnected={true} 
+          title="input" 
+          isMenuOpen={true} 
+        />
       </div>
 
     </div>
