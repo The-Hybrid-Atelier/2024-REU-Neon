@@ -10,6 +10,8 @@ To install
 ```
 npm install
 npm install react-chartjs-2 chart.js chartjs-plugin-annotation
+npm install axios
+npm install --save @fortawesome/react-fontawesome @fortawesome/free-solid-svg-icons @fortawesome/fontawesome-svg-core
 ```
 
 To run
