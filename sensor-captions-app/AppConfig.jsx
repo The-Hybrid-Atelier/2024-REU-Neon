@@ -1,7 +1,37 @@
 import { Howl } from 'howler';
+import { faWaveSquare} from '@fortawesome/free-solid-svg-icons';
+import { faGlasses, faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
+import { faHand as faRegularHand } from '@fortawesome/free-regular-svg-icons';
+import { faLightbulb as faRegularLightbulb } from '@fortawesome/free-regular-svg-icons'; // Regular lightbulb
+import { faMusic } from '@fortawesome/free-solid-svg-icons'; // Solid music
+import { faFireBurner } from '@fortawesome/free-solid-svg-icons'; // Solid fire burner
+import { faPhoneVolume } from '@fortawesome/free-solid-svg-icons'; // Solid phone volume
+import { faThinkPeaks } from '@fortawesome/free-brands-svg-icons'; // Think Peaks (Brands)
+import { faVideo } from '@fortawesome/free-solid-svg-icons'; // Solid Video
 
 const HAWS_URL = 'wss://haws.cearto.com/ws/'; // HAWS
 const WEBSOCKET_URL = HAWS_URL;
+const INPUT_MODES = [
+    { id: 0, label: 'Video', value: 'video', icon: faVideo },
+    { id: 1, label: 'Sensor', value: 'sensor', icon: faWaveSquare },
+]
+const OUTPUT_DEVICES = [
+    {id: 0, label: 'GOGGLE', icon: faGlasses},
+    {id: 1, label: 'PHONE', icon: faMobileScreenButton},
+    {id: 2, label: 'BRACELET', icon: faRegularHand}
+];
+const VTT_TYPES = ['light', 'synth', 'sound', 'meter', 'vibration'];
+
+
+const CAPTION_ICON_MAPPING = {
+    'light': faRegularLightbulb,
+    'synth': faMusic,
+    'sound': faFireBurner,
+    'meter': faPhoneVolume,
+    'vibration': faRegularHand
+};
+
+
 const API_COMMAND_TEMPLATE = {
     api: {
         command: {
@@ -27,7 +57,6 @@ const VIDEO_DEFAULT = {
     live: false
 };
 
-const VTT_TYPES = ['light', 'synth', 'sound', 'meter', 'vibration'];
 
 // LIBRARY OF VIBRATION PATTERNS
 const VIBRATION_PATTERNS = [
@@ -48,4 +77,4 @@ const KITCHEN_SOUND_EFFECTS = [
   ];
 
   
-export {VIDEO_DEFAULT, VTT_TYPES, WEBSOCKET_URL, API_COMMAND_TEMPLATE, VIBRATION_PATTERNS, KITCHEN_SOUND_EFFECTS};
+export {VIDEO_DEFAULT, OUTPUT_DEVICES, CAPTION_ICON_MAPPING,  INPUT_MODES, VTT_TYPES, WEBSOCKET_URL, API_COMMAND_TEMPLATE, VIBRATION_PATTERNS, KITCHEN_SOUND_EFFECTS};

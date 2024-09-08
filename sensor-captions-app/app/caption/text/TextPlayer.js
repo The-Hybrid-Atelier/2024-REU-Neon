@@ -12,19 +12,19 @@ import { Remote } from '../../websocket/Remote';
 
 
 
-const TextPlayer = ({}) => {
+const TextPlayer = ({activeCue}) => {
     
-    const [activeCue, setActiveCue] = useState({"text": "No active cue."});
-    const websocketEventHandler = (data) => {
-        if(data?.event === "text-cue") {
-            setActiveCue(data?.data);
-        }
-    }
+    // const [activeCue, setActiveCue] = useState({"text": "No active cue."});
+    // const websocketEventHandler = (data) => {
+    //     if(data?.event === "text-cue") {
+    //         setActiveCue(data?.data);
+    //     }
+    // }
     return (
         <>
-            <Segment attached="top" className="!p-0 flex flex-col justify-center">
+            {/* <Segment attached="top" className="!p-0 flex flex-col justify-center">
                 <Remote name="text-captioner" websocketEventHandler={websocketEventHandler}/>
-            </Segment>
+            </Segment> */}
             <Segment attached className="flex flex-row justify-center !text-2xl">
                 {activeCue && activeCue.text}
             </Segment>

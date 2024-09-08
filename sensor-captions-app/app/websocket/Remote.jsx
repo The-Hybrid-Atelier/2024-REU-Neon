@@ -4,7 +4,7 @@ import { Container, Checkbox, Segment, Header, Button, Label, Icon } from 'seman
 import { WEBSOCKET_URL, API_COMMAND_TEMPLATE } from '../../AppConfig';
 import CollapsibleSegment from '../utils/CollapsibleSegment';
 
-const Remote = forwardRef(({ children, name, apiCommands, websocketEventHandler = () => { } }, ref) => {
+const Remote = forwardRef(({ settings, collapsible, children, name, apiCommands, websocketEventHandler = () => { } }, ref) => {
     const [state, setState] = useState('disconnected');
     const [message, setMessage] = useState('');
 
@@ -93,16 +93,16 @@ const Remote = forwardRef(({ children, name, apiCommands, websocketEventHandler 
     };
 
     const header = (
-        <div className="w-full flex flex-row justify-between items-center">
+        <div className="w-full flex flex-row justify-between items-center p-2">
             <div className="flex flex-row justify-start items-center">
-                <div className={`mr-2 rounded-2xl ${state === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} style={{ height: '20px', width: '20px'}} />
+                <div className={`mr-2 rounded-2xl ${state === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} style={{ height: '20px', width: '20px' }} />
                 <span className="font-bold text-lg">{name}</span>
             </div>
         </div>
     );
 
-    return (
-        <CollapsibleSegment header={header} icon="setting">
+    const ws_settings_contents = (
+        <div className="p-5">
             <Checkbox
                 toggle
                 color="green"
@@ -124,6 +124,18 @@ const Remote = forwardRef(({ children, name, apiCommands, websocketEventHandler 
                     </Button>
                 ))}
             </Button.Group>
+        </div>
+    );
+    const ws_settings = (
+        <>
+            <CollapsibleSegment level={2} header="Websocket Settings" startCollapsed={true} settings={ws_settings_contents} collapsible={false} />
+            {settings && settings.map((setting, index) => (
+                setting.viewable ? <CollapsibleSegment key={index} level={2} header={`${setting.name}`} startSettingCollapsed={setting.startSettingCollapsed} settings={setting.view} collapsible={false} /> : <></>
+            ))}
+        </>
+    );
+    return (
+        <CollapsibleSegment header={header} settings={ws_settings} icon="setting" startCollapsed={false} collapsible={collapsible}>
             {children}
         </CollapsibleSegment>
     );

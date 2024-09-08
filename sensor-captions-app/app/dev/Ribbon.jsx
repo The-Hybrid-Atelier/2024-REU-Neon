@@ -3,56 +3,74 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const Ribbon = ({ icons, labels, isActive, setIsActive, typeSelect }) => {
+const Ribbon = ({ modes, isActive, setIsActive, typeSelect }) => {
   const handleIconClick = (index) => {
+    const selectedMode = modes[index];
+
     if (typeSelect === 'single') {
-      // Single-select: Only the clicked icon is active
-      const newIsActive = icons.map((_, i) => i === index);
-      setIsActive(newIsActive);
+      // Single-select: Only the clicked mode is active
+      setIsActive([selectedMode]);
     } else if (typeSelect === 'multi') {
-      // Multi-select: Toggle the clicked icon's active state
-      const newIsActive = [...isActive];
-      newIsActive[index] = !newIsActive[index];
-      setIsActive(newIsActive);
+      // Multi-select: Toggle the clicked mode's active state
+      const isModeActive = isActive.some(mode => mode.value === selectedMode.value);
+      if (isModeActive) {
+        // Remove the mode from active modes
+        setIsActive(isActive.filter(mode => mode.value !== selectedMode.value));
+      } else {
+        // Add the mode to active modes
+        setIsActive([...isActive, selectedMode]);
+      }
     }
   };
 
   return (
-    <div className="flex w-full justify-around">
-      {icons.map((Icon, index) => (
-        <div
-          key={index}
-          className="flex flex-col items-center cursor-pointer"
-          onClick={() => handleIconClick(index)}
-        >
+    <div className="flex w-full pb-3 pt-3 justify-around shadow-md">
+      {modes?.map((mode, index) => {
+        const isModeActive = isActive.some(activeMode => activeMode.value === mode.value);
+        return (
           <div
-            className={classNames(
-              'flex justify-center items-center w-12 h-12 rounded-full border-2',
-              {
-                'border-[#2A3659]': isActive[index],
-                'border-[#BAC1CB]': !isActive[index],
-              }
-            )}
+            key={index}
+            className="flex flex-col items-center cursor-pointer"
+            onClick={() => handleIconClick(index)}
           >
-            <FontAwesomeIcon
-              icon={Icon}
-              style={{
-                color: isActive[index] ? '#2A3659' : '#BAC1CB', // Sets the icon color
-                fontSize: '24px' // Adjust the icon size as needed
-              }}
-            />
+            <div
+              className={classNames(
+                'flex justify-center items-center w-12 h-12 rounded-full border-2',
+                {
+                  'border-[#2A3659]': isModeActive,
+                  'border-[#BAC1CB]': !isModeActive,
+                }
+              )}
+            >
+              <FontAwesomeIcon
+                icon={mode.icon}
+                style={{
+                  color: isModeActive ? '#2A3659' : '#BAC1CB',
+                  fontSize: '24px',
+                }}
+              />
+            </div>
+            <div className="mt-2 text-sm text-black">{mode.label}</div>
           </div>
-          <div className="mt-2 text-sm text-black">{labels[index]}</div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
 
 Ribbon.propTypes = {
-  icons: PropTypes.arrayOf(PropTypes.elementType).isRequired,
-  labels: PropTypes.arrayOf(PropTypes.string).isRequired,
-  isActive: PropTypes.arrayOf(PropTypes.bool).isRequired,
+  modes: PropTypes.arrayOf(
+    PropTypes.shape({
+      icon: PropTypes.elementType.isRequired, // Icon for the mode
+      label: PropTypes.string.isRequired, // Label for the mode
+      value: PropTypes.string.isRequired, // Unique identifier for the mode
+    })
+  ).isRequired,
+  isActive: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string.isRequired, // Ensure active modes have a value property
+    })
+  ).isRequired,
   setIsActive: PropTypes.func.isRequired,
   typeSelect: PropTypes.oneOf(['single', 'multi']).isRequired, // Ensure typeSelect is either 'single' or 'multi'
 };

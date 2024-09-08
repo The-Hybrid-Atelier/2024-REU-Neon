@@ -52,7 +52,8 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
                     kind: 'subtitles',
                     src: `/api/captions/${userId}/${bendType}/${trial}/${type}.vtt`,
                     srclang: 'en', // Customize this based on the type or language
-                    label: type.charAt(0).toUpperCase() + type.slice(1), // Capitalize the first letter
+                    label: type.charAt(0).toUpperCase() + type.slice(1), // Capitalize the first letter,
+                    value: type,
                     default: type === 'light', // Set the default track if applicable
                 });
             }
@@ -143,10 +144,54 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
                 value: trial.trial,
             }))
         : [];
+    const settings = (
+        <div className="p-5">
+
+            <Header as="h3">Video Metadata</Header>
+            <p><strong>User:</strong> {selectedVideo?.userId}</p>
+            <p><strong>Bend Type:</strong> {selectedVideo?.bendType}</p>
+            <p><strong>Trial:</strong> {selectedVideo?.trial}</p>
+            {selectedVideo?.source?.url && (
+                <p><strong>Video URL:</strong> <a href={selectedVideo?.source?.url} target="_blank" rel="noopener noreferrer">{selectedVideo.source.url}</a> ({selectedVideo.source.type})</p>
+            )}
+            {!selectedVideo?.source?.url && (
+                <p><strong>Video URL:</strong> Video was not found</p>
+            )}
+            <Header as="h3">Available Captions</Header>
+            {selectedVideo?.captions?.length > 0 ? (
+                <List>
+                    {selectedVideo?.captions?.map((track, index) => (
+                        <List.Item key={index}>
+                            <List.Icon name="file text" />
+                            <List.Content>{track.label}</List.Content>
+                        </List.Item>
+                    ))}
+                </List>
+            ) : (
+                <p>No captions found.</p>
+            )}
+            <Header as="h3">Air Data</Header>
+            {selectedVideo?.airdata ? (
+                <List>
+                    <List.Item>
+                        <List.Icon name="chart line" />
+                        <List.Content>
+                            <List.Header>Pressure (kPa)</List.Header>
+                            <List.Description>Available {selectedVideo?.airdata?.data?.length} datapoints</List.Description>
+                        </List.Content>
+                    </List.Item>
+                </List>
+            ) : (
+                <p>No air data found.</p>
+            )}
+        </div>
+    )
+
 
     return (
-        <Segment>
-            <Form>
+
+        // <CollapsibleSegment level={2} header={`Current Video: ${selectedVideo.userId}/${selectedVideo.bendType}/${selectedVideo.trial}`} settings={settings} startCollapsed={false} collapsible={true}>
+            <Form className='!p-5'>
                 <Form.Group widths="equal">
                     <Form.Field>
                         <label>Select User</label>
@@ -188,46 +233,8 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
                 </Form.Group>
 
             </Form>
-            <CollapsibleSegment title="Video Metadata" icon="caret">
-                <Header as="h3">Video Metadata</Header>
-                <p><strong>User:</strong> {selectedVideo?.userId}</p>
-                <p><strong>Bend Type:</strong> {selectedVideo?.bendType}</p>
-                <p><strong>Trial:</strong> {selectedVideo?.trial}</p>
-                {selectedVideo?.source?.url && (
-                    <p><strong>Video URL:</strong> <a href={selectedVideo?.source?.url} target="_blank" rel="noopener noreferrer">{selectedVideo.source.url}</a> ({selectedVideo.source.type})</p>
-                )}
-                {!selectedVideo?.source?.url && (
-                    <p><strong>Video URL:</strong> Video was not found</p>
-                )}
-                <Header as="h3">Available Captions</Header>
-                {selectedVideo?.captions?.length > 0 ? (
-                    <List>
-                        {selectedVideo?.captions?.map((track, index) => (
-                            <List.Item key={index}>
-                                <List.Icon name="file text" />
-                                <List.Content>{track.label}</List.Content>
-                            </List.Item>
-                        ))}
-                    </List>
-                ) : (
-                    <p>No captions found.</p>
-                )}
-                <Header as="h3">Air Data</Header>
-                {selectedVideo?.airdata ? (
-                    <List>
-                        <List.Item>
-                            <List.Icon name="chart line" />
-                            <List.Content>
-                                <List.Header>Pressure (kPa)</List.Header>
-                                <List.Description>Available {selectedVideo?.airdata?.data?.length} datapoints</List.Description>
-                            </List.Content>
-                        </List.Item>
-                    </List>
-                ) : (
-                    <p>No air data found.</p>
-                )}
-            </CollapsibleSegment>
-        </Segment>
+        // </CollapsibleSegment>
+
     );
 };
 
