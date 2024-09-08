@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import CollapsibleSegment from './utils/CollapsibleSegment';
 import TacitCaptionOutput from './components/TacitCaptionOutput';
 import TacitCaptionInput from './components/TacitCaptionInput';
+import { Button, ButtonGroup } from 'semantic-ui-react';
 
 
 
@@ -15,13 +16,11 @@ function App() {
 
 
   return (
-    <div className={`w-full h-full flex flex-col md:flex-row'}`}>
-      
-      <TacitCaptionOutput/>
-      <TacitCaptionInput/>
-          
-      
-      
+    <div className={`w-full h-full flex flex-col items-center justify-center md:flex-row'}`}>
+      <ButtonGroup vertical>
+        <Button as="a" color="blue" href="/player"> Video Player </Button>
+        <Button as="a" color="green" href="/device"> Caption Viewer </Button>
+      </ButtonGroup>
     </div>
   );
 
