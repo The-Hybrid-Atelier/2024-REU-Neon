@@ -6,7 +6,7 @@ const CollapsibleSegment = ({ title, level=1, header, children, settings=false, 
   const [isCollapsed, setIsCollapsed] = useState(startCollapsed);
 
   return (
-      <div className='collapsible-segment w-full h-full'>
+      <div className='collapsible-segment w-full'>
         <div className={`collapsible-segment header ${level === 1 ? " p-2 ": "p-1 bg-white border rounded"} flex border flex-row justify-between items-center p-3`}>
           {header ? header : (
               <span className="font-bold text-md pl-5 italic">{title}</span>
