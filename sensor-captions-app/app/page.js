@@ -11,14 +11,11 @@ import TacitCaptionInput from './components/TacitCaptionInput';
 
 function App() {
   const [clicked, setClicked] = useState("Start");
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
 
-
-  
 
   return (
-    <div className={`w-full h-full flex ${isMobile ? 'flex-col' : 'flex-row'}`}>
+    <div className={`w-full h-full flex flex-col md:flex-row'}`}>
       
       <TacitCaptionOutput/>
       <TacitCaptionInput/>
