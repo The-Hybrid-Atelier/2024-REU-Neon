@@ -3,14 +3,27 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const Ribbon = ({ icons, labels, isActive, onIconClick, typeSelect }) => {
+const Ribbon = ({ icons, labels, isActive, setIsActive, typeSelect }) => {
+  const handleIconClick = (index) => {
+    if (typeSelect === 'single') {
+      // Single-select: Only the clicked icon is active
+      const newIsActive = icons.map((_, i) => i === index);
+      setIsActive(newIsActive);
+    } else if (typeSelect === 'multi') {
+      // Multi-select: Toggle the clicked icon's active state
+      const newIsActive = [...isActive];
+      newIsActive[index] = !newIsActive[index];
+      setIsActive(newIsActive);
+    }
+  };
+
   return (
     <div className="flex w-full justify-around">
       {icons.map((Icon, index) => (
         <div
           key={index}
           className="flex flex-col items-center cursor-pointer"
-          onClick={() => onIconClick(index)}
+          onClick={() => handleIconClick(index)}
         >
           <div
             className={classNames(
@@ -40,7 +53,7 @@ Ribbon.propTypes = {
   icons: PropTypes.arrayOf(PropTypes.elementType).isRequired,
   labels: PropTypes.arrayOf(PropTypes.string).isRequired,
   isActive: PropTypes.arrayOf(PropTypes.bool).isRequired,
-  onIconClick: PropTypes.func.isRequired,
+  setIsActive: PropTypes.func.isRequired,
   typeSelect: PropTypes.oneOf(['single', 'multi']).isRequired, // Ensure typeSelect is either 'single' or 'multi'
 };
 
