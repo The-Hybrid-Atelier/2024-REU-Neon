@@ -42,6 +42,7 @@ const TacitCaptionOutput = () => {
             />
             
             {isActivated("meter") && <TextPlayer activeCue={activeMeterCue}/>}
+            
         </Remote>   
     );
 };

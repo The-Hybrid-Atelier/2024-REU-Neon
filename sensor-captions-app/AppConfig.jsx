@@ -11,6 +11,7 @@ import { faVideo } from '@fortawesome/free-solid-svg-icons'; // Solid Video
 
 const HAWS_URL = 'wss://haws.cearto.com/ws/'; // HAWS
 const WEBSOCKET_URL = HAWS_URL;
+const WINDOWSIZE = 60; // see the last 60 samples on the graph
 const INPUT_MODES = [
     { id: 0, label: 'Video', value: 'video', icon: faVideo },
     { id: 1, label: 'Sensor', value: 'sensor', icon: faWaveSquare },
@@ -77,4 +78,4 @@ const KITCHEN_SOUND_EFFECTS = [
   ];
 
   
-export {VIDEO_DEFAULT, OUTPUT_DEVICES, CAPTION_ICON_MAPPING,  INPUT_MODES, VTT_TYPES, WEBSOCKET_URL, API_COMMAND_TEMPLATE, VIBRATION_PATTERNS, KITCHEN_SOUND_EFFECTS};
+export {VIDEO_DEFAULT, OUTPUT_DEVICES, CAPTION_ICON_MAPPING,  WINDOWSIZE, INPUT_MODES, VTT_TYPES, WEBSOCKET_URL, API_COMMAND_TEMPLATE, VIBRATION_PATTERNS, KITCHEN_SOUND_EFFECTS};
