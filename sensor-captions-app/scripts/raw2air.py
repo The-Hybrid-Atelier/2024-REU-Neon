@@ -103,11 +103,16 @@ def remove_consect(spike_idxs):
 
 # Extract the data from the end of the first spike (beginning clap) to the end of the beginning of the last spike (end clap)
 def extract_data(df, spike_idxs):
-    # If there are no spikes, return the dataframe as is
-    if not spike_idxs:
-        return df
 
-    # Put in pressure values and their corresponding CSV line numbers into a dictionary
+    # If the claps have already been processed, convert time values to unix timestamps and offset the time values
+    if not spike_idxs:
+        df[time_column] = pd.to_datetime(df[time_column], format="%A,-%B-%d-%Y-%H:%M:%S")
+        df[time_column] = df[time_column].apply(lambda x: int(x.timestamp())% 1000000)
+        df[time_column] = (df[time_column] - df[time_column].iloc[0]) * 1000
+        return df
+    
+    # Else if the claps have not been processed, process the claps and clean the data
+    # Put in pressure values' spikes and their corresponding CSV line numbers into a dictionary
     spikes = {}
 
     for i in spike_idxs:
@@ -154,9 +159,17 @@ pressure_column = "Pa"
 # Select only the 'time' and 'pa' columns
 selected_columns = df[[time_column, pressure_column]]
 
-# Get the spikes and extract the data in between the spikes (beginning and end claps)
-spikes = dataSpike(selected_columns)
-extracted_df = extract_data(selected_columns, spikes)
+# Initialize spikes list and extracted_df dataframe
+spikes = None
+extracted_df = None
+
+# If the raw file already has been processed, just need to offset the time values
+if "-" in str(df.iloc[0][time_column]):
+    extracted_df = extract_data(selected_columns, None)
+else:
+    # Get the spikes and extract the data in between the spikes (beginning and end claps)
+    spikes = dataSpike(selected_columns)
+    extracted_df = extract_data(selected_columns, spikes)
 
 # Extract the directory path from the input file
 input_dir = os.path.dirname(input_file)
