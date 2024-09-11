@@ -58,6 +58,7 @@ const SensorViewer = ({ sensorData, width = '100%', height = '100%' }) => {
 
     const options = {
         responsive: true,
+        animation: false,  // Disable animations
         maintainAspectRatio: false,  // Let the height/width be responsive
         interaction: {
             mode: 'nearest',
@@ -79,11 +80,14 @@ const SensorViewer = ({ sensorData, width = '100%', height = '100%' }) => {
             x: {
                 type: 'category',
                 ticks: {
-                    maxTicksLimit: 5,  // Limit X-axis ticks
+                    display: false,  // Hide X-axis labels
+                    maxTicksLimit: 5,  // Limit X-axis ticks (optional if hiding labels)
                 },
             },
             y: {
                 beginAtZero: false,
+                min: 0,  // Set Y-axis minimum value
+                max: 1,  // Set Y-axis maximum value
                 ticks: {
                     maxTicksLimit: 5,  // Limit Y-axis ticks
                 },

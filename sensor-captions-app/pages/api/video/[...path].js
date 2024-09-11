@@ -14,7 +14,7 @@ export default function handler(req, res) {
 
     // Look for a file that ends with "-video" and has one of the allowed extensions
     for (const extension of fileExtensions) {
-      const matchingFile = files.find(file => file.endsWith(`-video.${extension}`));
+      const matchingFile = files.find(file => file.endsWith(`.${extension}`));
 
       if (matchingFile) {
         const filePath = path.join(basePath, matchingFile);

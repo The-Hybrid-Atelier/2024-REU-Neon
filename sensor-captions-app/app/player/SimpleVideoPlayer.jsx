@@ -24,25 +24,22 @@ const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange }, ref) => {
 
     const trackElements = videoElement.textTracks;
 
-    // console.log("Activated Captions", activated_captions);
     if (trackElements.length > 0) {
       for (let i = 0; i < trackElements.length; i++) {
         const track = trackElements[i];
         const captionLabel = track.label;
     
-        // Check if the track's label matches any value in activated_captions
         const isCaptionActive = activated_captions.some(caption => caption.label === captionLabel);
         if (isCaptionActive) {
           track.mode = 'showing'; // Show the caption if active
-          // console.log("Activated", captionLabel);
         } else {
           track.mode = 'disabled'; // Disable the caption if not active
-          // console.log("Deactivated", captionLabel);
         }
     
         track.addEventListener('cuechange', handleCueChange);
       }
     }
+
     return () => {
       if (trackElements.length > 0) {
         for (let i = 0; i < trackElements.length; i++) {
@@ -57,6 +54,7 @@ const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange }, ref) => {
     <>
       {selectedVideo?.source?.url ? (
         <video
+          key={source.url} // Adding a key ensures React re-renders the video element when the source changes
           ref={videoRef}
           controls
           preload="auto"

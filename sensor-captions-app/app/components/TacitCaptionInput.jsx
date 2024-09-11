@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { Container, Segment, Icon, Button, Divider } from 'semantic-ui-react';
+import { Container, Segment, Icon, Button, Divider, ButtonGroup} from 'semantic-ui-react';
 import CaptionController from '../player/CaptionController';
 import TimeSeriesViewer from '../timeseries/TimeSeriesViewer';
-import { INPUT_MODES, VIDEO_DEFAULT, WINDOWSIZE } from '@/AppConfig.jsx'; // Import the VIDEO_DEFAULT
+import { INPUT_MODES, VIDEO_DEFAULT, WINDOWSIZE, AIR_RANGE} from '@/AppConfig.jsx'; // Import the VIDEO_DEFAULT
 import { FolderStructureDropdowns } from '../utils/FolderStructureDropdowns'; // Adjust path as necessary
 import SimpleVideoPlayer from '../player/SimpleVideoPlayer';
 import { Remote } from '../websocket/Remote';
@@ -12,8 +12,8 @@ import { start } from 'tone';
 import SensorViewer from '../timeseries/SensorViewer';
 
 const TacitCaptionInput = () => {
-  const [inputMode, setInputMode] = useState([INPUT_MODES[1]]); // Single-select, default to second mode
-  const [sensorData, setSensorData] = useState([0, 0, 1000, 1000, 0, 0]);
+  const [inputMode, setInputMode] = useState([INPUT_MODES[0]]); // Single-select, default to second mode
+  const [sensorData, setSensorData] = useState([0, 0, 1, 1, 0, 0]);
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_DEFAULT);
   const videoPlayerRef = useRef(null);
   const remoteRef = useRef(null);
@@ -26,15 +26,23 @@ const TacitCaptionInput = () => {
     console.log("Seeking to:", toTime, "from:", currentT);
   };
   const websocketEventHandler = (data) => {
-      if(data?.event === "air-pressure-data") {
-        setSensorData(prevData => {
-            const newData = [...prevData, data?.data];
-            console.log(newData.length, WINDOWSIZE, newData.slice(-WINDOWSIZE).length);
-            if (newData.length > WINDOWSIZE) {
-                return newData.slice(-WINDOWSIZE);
+      if(data?.event === "read-pressure") {
+        
+          const minMaxScalar = (value, min, max) => {
+            return (value - min) / (max - min);
+          };
+
+        
+          setSensorData(prevData => {
+            const scaledData = data?.data.map(value => minMaxScalar(value, AIR_RANGE.min, AIR_RANGE.max));
+            let updatedData = [...prevData, ...scaledData];
+            if (updatedData.length > WINDOWSIZE) {
+              updatedData = updatedData.splice(updatedData.length - WINDOWSIZE);
             }
-            return newData;
-        });
+            return updatedData;
+          });
+        
+
       }
   }
 
@@ -94,11 +102,12 @@ const TacitCaptionInput = () => {
 
   return (
 
-    <Remote name="input-controller" ref={remoteRef} settings={[inputModeSetting, videoSetting]} websocketEventHandler={websocketEventHandler} collapsible={true}>
+    <Remote name="input-controller" ref={remoteRef} settings={[inputModeSetting]} websocketEventHandler={websocketEventHandler} collapsible={false}>
 
       {inputMode[0]?.value === "video" && (
         <>
           {captionSetting.view}
+          {videoSetting.view}
           <SimpleVideoPlayer
             ref={videoPlayerRef}
             selectedVideo={selectedVideo}
@@ -121,8 +130,16 @@ const TacitCaptionInput = () => {
            <SensorViewer
             sensorData={sensorData}
           />
+          <div className="w-full flex flex-row items-center justify-center">
+            <ButtonGroup >
+              <Button color="green" onClick={() => remoteRef.current.jsend({api: "PRESSURE_ON"})}>ON</Button>
+              <Button color="red" onClick={() => remoteRef.current.jsend({api: "PRESSURE_OFF"})}>OFF</Button>
+              {/* <Button color="yellow" onClick={() => remoteRef.current.jsend({api: "LED_COLOR", params:{red: 255, green: 255, blue: 0}})}>Yellow Light</Button> */}
+            </ButtonGroup>
+          </div>
         </div>
       )}
+      
     </Remote>
 
 

@@ -21,11 +21,11 @@ export default function handler(req, res) {
     const kPa = [];
 
     try {
-        // Check if the JSON cache already exists
-        if (fs.existsSync(jsonFilePath)) {
-            const cachedData = fs.readFileSync(jsonFilePath, 'utf8');
-            return res.status(200).json(JSON.parse(cachedData));
-        }
+        // // Check if the JSON cache already exists
+        // if (fs.existsSync(jsonFilePath)) {
+        //     const cachedData = fs.readFileSync(jsonFilePath, 'utf8');
+        //     return res.status(200).json(JSON.parse(cachedData));
+        // }
 
         // If JSON cache doesn't exist, read the CSV file
         fs.createReadStream(filePath)
