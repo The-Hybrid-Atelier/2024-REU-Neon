@@ -26,7 +26,7 @@ const VideoPlayerPage = () => {
         onGraphClick={handleGraphClick} 
       /> */}
       <Remote title="sensorSimulator" ref={remoteRef} >
-        <Button onClick={() => remoteRef.current.jsend({event: "air-pressure-data", data: Math.random()*1000})}>Simulate</Button>
+        <Button onClick={() => remoteRef.current.jsend({event: "read-pressure1", data: [99384+Math.random()*(107412 -99384) ]})}>Simulate</Button>
       </Remote>
 
     </Container>
