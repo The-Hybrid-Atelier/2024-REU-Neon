@@ -42,7 +42,7 @@ export default function handler(req, res) {
             })
             .on('end', () => {
                 const jsonData = { t, videoTime, kPa };
-                fs.writeFileSync(jsonFilePath, JSON.stringify(jsonData)); // Cache the result in air.json
+                // fs.writeFileSync(jsonFilePath, JSON.stringify(jsonData)); // Cache the result in air.json
                 res.status(200).json(jsonData);
             })
             .on('error', (csvError) => {
