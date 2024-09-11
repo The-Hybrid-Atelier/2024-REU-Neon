@@ -1,9 +1,11 @@
 import React, {useRef, useState} from 'react';
 import { Remote } from '../websocket/Remote';
 import Ribbon from '../dev/Ribbon';
-import { CAPTION_ICON_MAPPING } from '@/AppConfig';
+import { CAPTION_ICON_MAPPING, KITCHEN_SOUND_EFFECTS} from '@/AppConfig';
 import TextPlayer from '../caption/text/TextPlayer';
 import VibrationPlayer from '../caption/vibration/VibrationPlayer';
+import MP3SoundPlayer from '../caption/sound/KitchenSoundPlayer';
+import LightPlayer from '../caption/light/LightPlayer';
 const TacitCaptionOutput = () => {
     const remoteRef = useRef(null);
     const [activated_captions, setActivatedCaptions] = useState([]);
@@ -45,7 +47,8 @@ const TacitCaptionOutput = () => {
 
             {isActivated("meter") && <TextPlayer activeCue={activeCue}/>}
             {isActivated("vibration") && <VibrationPlayer activeCue={activeCue}/>}
-            
+            {isActivated("sound") && <MP3SoundPlayer activeCue={activeCue} sounds={KITCHEN_SOUND_EFFECTS}/>}
+            {isActivated("light") && <LightPlayer activeCue={activeCue}/>}
         </Remote>   
     );
 };

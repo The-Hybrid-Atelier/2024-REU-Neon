@@ -9,12 +9,12 @@ const SoundPlayer = forwardRef(({ sounds }, ref) => {
   const handlePlaySound = (soundToPlay, label) => {
     // Stop all currently playing sounds
     sounds.forEach((soundEffect) => {
-      soundEffect.sound.stop();
+      soundEffect.sound?.stop();
     });
 
     // Play the selected sound and update the current sound
-    soundToPlay.volume(isMuted ? 0 : volume);
-    soundToPlay.play();
+    soundToPlay?.volume(isMuted ? 0 : volume);
+    soundToPlay?.play();
     setCurrentSound(label);
   };
 
@@ -26,7 +26,7 @@ const SoundPlayer = forwardRef(({ sounds }, ref) => {
     if (currentSound && !isMuted) {
       sounds.forEach((soundEffect) => {
         if (soundEffect.label === currentSound) {
-          soundEffect.sound.volume(newVolume);
+          soundEffect.sound?.volume(newVolume);
         }
       });
     }
@@ -40,7 +40,7 @@ const SoundPlayer = forwardRef(({ sounds }, ref) => {
     if (currentSound) {
       sounds.forEach((soundEffect) => {
         if (soundEffect.label === currentSound) {
-          soundEffect.sound.volume(newMuteState ? 0 : volume);
+          soundEffect.sound?.volume(newMuteState ? 0 : volume);
         }
       });
     }
@@ -49,6 +49,11 @@ const SoundPlayer = forwardRef(({ sounds }, ref) => {
   // Expose a method to trigger sounds by id
   useImperativeHandle(ref, () => ({
     playSoundById: (id) => {
+      if(id === 0){
+        sounds.forEach((soundEffect) => {
+          soundEffect.sound?.stop();
+        });
+      };
       const soundToPlay = sounds.find((soundEffect) => soundEffect.id === id);
       if (soundToPlay) {
         handlePlaySound(soundToPlay.sound, soundToPlay.label);
@@ -63,7 +68,7 @@ const SoundPlayer = forwardRef(({ sounds }, ref) => {
   }));
 
   return (
-    <Segment textAlign="center">
+    <div className='flex flex-col p-5 items-center justify-center'>
       <div>
         {currentSound ? (
           <Message>
@@ -104,7 +109,7 @@ const SoundPlayer = forwardRef(({ sounds }, ref) => {
         <Icon name={isMuted ? 'volume up' : 'volume off'} />
         {isMuted ? 'UNMUTE' : 'MUTE'}
       </Button>
-    </Segment>
+    </div>
   );
 });
 

@@ -70,12 +70,13 @@ const VIBRATION_PATTERNS = [
 ];
 
 const KITCHEN_SOUND_EFFECTS = [
-    { id: 0, command: 'lightBoiling', label: 'Sound: Light Boiling', sound: new Howl({ src: ['/sounds/light_boiling.wav'], loop: false }) },
-    { id: 1, command: 'bubbling', label: 'Sound: Bubbling', sound: new Howl({ src: ['/sounds/bubbling.wav'], loop: false }) },
-    { id: 2, command: 'bubblingIntense', label: 'Sound: Bubbling Intense', sound: new Howl({ src: ['/sounds/bubbling_intense.wav'], loop: false }) },
-    { id: 3, command: 'deepFry', label: 'Sound: Deep Fry', sound: new Howl({ src: ['/sounds/deep_fry.wav'], loop: false }) },
-    { id: 4, command: 'stoveOn', label: 'Sound: Stove On', sound: new Howl({ src: ['/sounds/stove_on.mp3'], loop: false }) },
-    { id: 5, command: 'bell', label: 'Sound: Bell', sound: new Howl({ src: ['/sounds/bell.wav'], loop: false }) },
+    { id: 0, command: 'noSound', label: 'Sound: Silence', sound: null },
+    { id: 1, command: 'lightBoiling', label: 'Sound: Light Boiling', sound: new Howl({ src: ['/sounds/light_boiling.wav'], loop: false }) },
+    { id: 2, command: 'bubbling', label: 'Sound: Bubbling', sound: new Howl({ src: ['/sounds/bubbling.wav'], loop: false }) },
+    { id: 3, command: 'bubblingIntense', label: 'Sound: Bubbling Intense', sound: new Howl({ src: ['/sounds/bubbling_intense.wav'], loop: false }) },
+    { id: 4, command: 'deepFry', label: 'Sound: Deep Fry', sound: new Howl({ src: ['/sounds/deep_fry.wav'], loop: false }) },
+    { id: 5, command: 'stoveOn', label: 'Sound: Stove On', sound: new Howl({ src: ['/sounds/stove_on.mp3'], loop: false }) },
+    { id: 6, command: 'bell', label: 'Sound: Bell', sound: new Howl({ src: ['/sounds/bell.wav'], loop: false }) },
   ];
 
   

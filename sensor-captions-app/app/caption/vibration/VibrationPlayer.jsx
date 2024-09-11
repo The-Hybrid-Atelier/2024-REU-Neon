@@ -30,7 +30,7 @@ const VibrationPlayer = ({activeCue}) => {
         if (activeCue?.text) {
             try {
                 const patternIndex = parseInt(activeCue.text);
-                console.log(VIBRATION_PATTERNS);
+                // console.log(VIBRATION_PATTERNS);
                 if (patternIndex >= 0 && patternIndex < VIBRATION_PATTERNS.length) {
                     handleVibrate(VIBRATION_PATTERNS[patternIndex].pattern);
                 }else{

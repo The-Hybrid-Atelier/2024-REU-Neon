@@ -25,7 +25,7 @@ const TextPlayer = ({activeCue}) => {
             {/* <Segment attached="top" className="!p-0 flex flex-col justify-center">
                 <Remote name="text-captioner" websocketEventHandler={websocketEventHandler}/>
             </Segment> */}
-            <Segment attached className="flex flex-row justify-center !text-2xl">
+            <Segment attached className="!h-full flex flex-row justify-center !text-2xl">
                 {activeCue && activeCue.text}
             </Segment>
         </>
