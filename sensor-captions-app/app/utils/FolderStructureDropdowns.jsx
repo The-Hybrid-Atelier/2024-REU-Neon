@@ -190,7 +190,7 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
 
     return (
 
-        <CollapsibleSegment level={2} header={`Current Video: ${selectedVideo.userId}/${selectedVideo.bendType}/${selectedVideo.trial}`} settings={settings} startCollapsed={false} collapsible={true}>
+        // <CollapsibleSegment level={2} header={`Current Video: ${selectedVideo.userId}/${selectedVideo.bendType}/${selectedVideo.trial}`} settings={settings} startCollapsed={false} collapsible={true}>
             <Form className='!p-5'>
                 <Form.Group widths="equal">
                     <Form.Field>
@@ -233,7 +233,7 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
                 </Form.Group>
 
             </Form>
-        </CollapsibleSegment>
+        // </CollapsibleSegment>
 
     );
 };

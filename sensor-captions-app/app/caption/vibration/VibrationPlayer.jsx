@@ -13,9 +13,10 @@ import { VIBRATION_PATTERNS } from '@/AppConfig';
 
 
 
-const VibrationPlayer = () => {
+const VibrationPlayer = ({activeCue}) => {
     const [vibrationSupported, setVibrationSupported] = useState(false);
     const [message, setMessage] = useState('');
+
 
     useEffect(() => {
         if (navigator.vibrate) {
@@ -24,6 +25,22 @@ const VibrationPlayer = () => {
             setMessage('Vibration is not supported on this device.');
         }
     }, []);
+
+    useEffect(() => {
+        if (activeCue?.text) {
+            try {
+                const patternIndex = parseInt(activeCue.text);
+                console.log(VIBRATION_PATTERNS);
+                if (patternIndex >= 0 && patternIndex < VIBRATION_PATTERNS.length) {
+                    handleVibrate(VIBRATION_PATTERNS[patternIndex].pattern);
+                }else{
+                    setMessage(`Invalid Vibration Pattern: ${JSON.stringify(activeCue)}`);
+                }
+            }catch (error) {
+                setMessage(`Caption Parsing Error: ${JSON.stringify(activeCue)}`);
+            }
+        }
+    }, [activeCue]);
 
     const handleVibrate = (pattern) => {
         if (vibrationSupported) {

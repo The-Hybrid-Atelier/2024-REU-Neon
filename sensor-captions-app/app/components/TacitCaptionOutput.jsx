@@ -3,10 +3,11 @@ import { Remote } from '../websocket/Remote';
 import Ribbon from '../dev/Ribbon';
 import { CAPTION_ICON_MAPPING } from '@/AppConfig';
 import TextPlayer from '../caption/text/TextPlayer';
+import VibrationPlayer from '../caption/vibration/VibrationPlayer';
 const TacitCaptionOutput = () => {
     const remoteRef = useRef(null);
     const [activated_captions, setActivatedCaptions] = useState([]);
-    const [activeMeterCue, setActiveMeterCue] = useState({"text": "No active cue."});
+    const [activeCue, setActiveCue] = useState({"text": "No active cue."});
     
     // PHONE DEVICE
     const captions = ["light", "meter", "vibration", "sound" ,"synth"]
@@ -19,8 +20,8 @@ const TacitCaptionOutput = () => {
     });
     
     const websocketEventHandler = (data) => {
-        if(data?.event === "meter-cue") {
-            setActiveMeterCue(data?.data);
+        if(data?.data){
+            setActiveCue(data?.data);
         }
     }
     const isActivated = (caption_type) => {
@@ -41,7 +42,9 @@ const TacitCaptionOutput = () => {
                 typeSelect='single'
             />
             
-            {isActivated("meter") && <TextPlayer activeCue={activeMeterCue}/>}
+
+            {isActivated("meter") && <TextPlayer activeCue={activeCue}/>}
+            {isActivated("vibration") && <VibrationPlayer activeCue={activeCue}/>}
             
         </Remote>   
     );
