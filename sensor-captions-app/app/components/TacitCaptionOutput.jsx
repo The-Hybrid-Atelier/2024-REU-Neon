@@ -25,6 +25,17 @@ function rainbowColor(p) {
     const lightness = 50; // 50% lightness for standard brightness
     return hslToHex(hue, saturation, lightness);
 }
+function hexToRgb(hex) {
+    // Remove the leading # if present
+    hex = hex.replace(/^#/, '');
+
+    // Parse the r, g, b values from the hex string
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    return { r, g, b }; // Return an object with r, g, b components
+}
 
 function generateMeter(filledBoxes, numBoxes) {
     const filled = "■".repeat(filledBoxes); // Repeat the filled character
@@ -68,6 +79,9 @@ const TacitCaptionOutput = () => {
 
                 if (isActivated("light")) {
                     setActiveCue({ text: rainbowColor(p) });
+                    // convert from hex to RGB
+                    const { r, g, b } = hexToRgb(rainbowColor(p));
+                    remoteRef.current.jsend({api: "LED_COLOR", params: {red: r, green: g, blue: b}});
                 } else if (isActivated("sound")) {
                     setActiveCue({ text: kid.toString() });
                 }
