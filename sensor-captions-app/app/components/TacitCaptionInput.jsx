@@ -127,8 +127,8 @@ const TacitCaptionInput = () => {
 
   return (
 
-    <Remote name="input-controller" ref={remoteRef} settings={[inputModeSetting]} websocketEventHandler={websocketEventHandler} collapsible={false}>
-
+    <Remote name="input-controller" ref={remoteRef} settings={[]} websocketEventHandler={websocketEventHandler} collapsible={false}>
+      {inputModeSetting.view}
       {inputMode[0]?.value === "video" && (
         <>
           {captionSetting.view}
