@@ -104,17 +104,18 @@ def remove_consect(spike_idxs):
 # Extract the data from the end of the first spike (beginning clap) to the end of the beginning of the last spike (end clap)
 def extract_data(df, spike_idxs):
 
-    # If the claps have already been processed, convert time values to unix timestamps and offset the time values
-    if not spike_idxs:
+    # If the data has time in a different format, convert time values to unix timestamps
+    if "-" in str(df.iloc[0][time_column]):
         df[time_column] = pd.to_datetime(df[time_column], format="%A,-%B-%d-%Y-%H:%M:%S")
         df[time_column] = df[time_column].apply(lambda x: int(x.timestamp())% 1000000)
-        df[time_column] = (df[time_column] - df[time_column].iloc[0]) * 1000
-        return df
+        df[time_column] = df[time_column] *1000
+
     
-    # Else if the claps have not been processed, process the claps and clean the data
+    # Else if the data has time in unix timestamps, proceed as normal
     # Put in pressure values' spikes and their corresponding CSV line numbers into a dictionary
     spikes = {}
 
+    # Get the pressure values and their corresponding CSV line numbers of the spikes
     for i in spike_idxs:
         value = df.iloc[i][pressure_column]
         spikes.update({value: i + 2})
@@ -144,6 +145,7 @@ def extract_data(df, spike_idxs):
 
     # Only write at the end of the start spike and the beginning of the end spike
     extracted_df = df.iloc[line_start : line_end - 2]
+
     return extracted_df
 
 
@@ -163,13 +165,9 @@ selected_columns = df[[time_column, pressure_column]]
 spikes = None
 extracted_df = None
 
-# If the raw file already has been processed, just need to offset the time values
-if "-" in str(df.iloc[0][time_column]):
-    extracted_df = extract_data(selected_columns, None)
-else:
-    # Get the spikes and extract the data in between the spikes (beginning and end claps)
-    spikes = dataSpike(selected_columns)
-    extracted_df = extract_data(selected_columns, spikes)
+# Get the spikes and extract the data in between the spikes (beginning and end claps)
+spikes = dataSpike(selected_columns)
+extracted_df = extract_data(selected_columns, spikes)
 
 # Extract the directory path from the input file
 input_dir = os.path.dirname(input_file)
