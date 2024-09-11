@@ -108,6 +108,8 @@ def extract_data(df, spike_idxs):
     if "-" in str(df.iloc[0][time_column]):
         df[time_column] = pd.to_datetime(df[time_column], format="%A,-%B-%d-%Y-%H:%M:%S")
         df[time_column] = df[time_column].apply(lambda x: int(x.timestamp())% 1000000)
+        df[time_column] = df[time_column] *1000
+
     
     # Else if the data has time in unix timestamps, proceed as normal
     # Put in pressure values' spikes and their corresponding CSV line numbers into a dictionary
@@ -143,7 +145,7 @@ def extract_data(df, spike_idxs):
 
     # Only write at the end of the start spike and the beginning of the end spike
     extracted_df = df.iloc[line_start : line_end - 2]
-    
+
     return extracted_df
 
 
