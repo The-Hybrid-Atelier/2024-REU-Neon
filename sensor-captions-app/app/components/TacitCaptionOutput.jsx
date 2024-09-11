@@ -6,6 +6,7 @@ import TextPlayer from '../caption/text/TextPlayer';
 import VibrationPlayer from '../caption/vibration/VibrationPlayer';
 import MP3SoundPlayer from '../caption/sound/KitchenSoundPlayer';
 import LightPlayer from '../caption/light/LightPlayer';
+import TonalPlayer from '../caption/sound/TonalPlayer';
 const TacitCaptionOutput = () => {
     const remoteRef = useRef(null);
     const [activated_captions, setActivatedCaptions] = useState([]);
@@ -49,6 +50,7 @@ const TacitCaptionOutput = () => {
             {isActivated("vibration") && <VibrationPlayer activeCue={activeCue}/>}
             {isActivated("sound") && <MP3SoundPlayer activeCue={activeCue} sounds={KITCHEN_SOUND_EFFECTS}/>}
             {isActivated("light") && <LightPlayer activeCue={activeCue}/>}
+            {isActivated("synth") && <TonalPlayer activeCue={activeCue}/>}
         </Remote>   
     );
 };

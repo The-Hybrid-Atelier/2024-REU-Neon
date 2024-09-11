@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Container, Header, Segment, Button, Input, Label } from 'semantic-ui-react';
+import { Container, Header, Segment, Button, Input, Label, ButtonGroup} from 'semantic-ui-react';
 import SynthManager from '@/app/utils/SynthManager';  // Adjust the import path as necessary
 
 
@@ -25,15 +25,13 @@ const SynthController = ({intensity, setIntensity}) => {
     synthManagerRef?.current.playSynth(intensity);
   }, [intensity]);
 return (
-    <Container>
-        <Header>Synth Controller</Header>
-        <Segment>
-            {[0, 1, 2, 3, 4, 5, 6].map((synth) => (
+
+        <Segment className="flex flex-col items-center justify-center p-5">
+            {false && [0, 1, 2, 3, 4, 5, 6].map((synth) => (
                 <Button key={synth} onClick={() => handlePlaySynth(synth)}>Play Synth {synth}</Button>
             ))}
-            {intensity}
             <Input
-                label="Intensity"
+                label={`Intensity ${intensity}`}
                 type='range'
                 type="range"
                 min="0"
@@ -41,9 +39,9 @@ return (
                 step="1"
                 value={intensity}
                 onChange={handleIntensityChange}/>
-            <Button onClick={handleToggleMute}>Toggle Mute</Button>
-            <Button onClick={handleStop}>Stop</Button>
+           <br></br>
             <Input
+                label={`Volume ${volume}`}
                 type='range'
                 min="0"
                 max="1"
@@ -51,9 +49,14 @@ return (
                 value={volume}
                 onChange={handleVolumeChange}
                 />
+            <ButtonGroup className="!m-5" vertical>
+              <Button onClick={handleToggleMute}>Toggle Mute</Button>
+              <Button color="red" onClick={handleStop}>Stop</Button>
+            </ButtonGroup>  
+              <SynthManager ref={synthManagerRef} />
         </Segment>
-        <SynthManager ref={synthManagerRef} />
-    </Container>
+        
+
 );
 };
 
