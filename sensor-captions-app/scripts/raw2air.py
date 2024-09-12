@@ -83,7 +83,6 @@ def calculate_average_pressure(df, num_lines=3):
 def dataSpike(df):
     average_pressure = calculate_average_pressure(df)
     diff = 100000 - average_pressure
-    print("Average Pressure: ", average_pressure)
     pressure_threshold = average_pressure + diff
     spikes = df[(df[pressure_column] > pressure_threshold)].index.tolist()
     spikes = remove_consect(spikes)
@@ -124,9 +123,6 @@ def extract_data(df, spike_idxs):
 
     # Sort the dictionary by file lines, with the end of the first spike/clap being the first dict entry, and the start of the last spike/clap being the last dict entry
     spikes = dict(sorted(spikes.items(), key=lambda item: item[1]))
-
-    for key, value in spikes.items():
-        print(key, value)
    
     # Gets the beginning and ending claps/spikes
     spikes_lines = spikes.values()
