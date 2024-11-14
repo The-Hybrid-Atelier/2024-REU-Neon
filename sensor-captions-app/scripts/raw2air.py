@@ -1,5 +1,4 @@
 """
-Author: Joel Beauregard
 
 raw2air.py
 

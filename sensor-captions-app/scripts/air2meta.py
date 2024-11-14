@@ -1,5 +1,4 @@
 """
-Author: Joel Beauregard
 
 air2meta.py
 
