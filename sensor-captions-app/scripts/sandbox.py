@@ -73,7 +73,6 @@ def write_to_file(capvtt_file, start_time, end_time, inten):
 
 
 def detect_events_with_inten(df, meta_out_file):
-
     with open(meta_out_file, "w") as capVttfile:
         # Write the WebVTT header to the file
         capVttfile.write("WEBVTT\n")
