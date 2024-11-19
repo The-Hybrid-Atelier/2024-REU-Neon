@@ -9,9 +9,11 @@ const LightPlayer = ({activeCue}) => {
     const [radius, setRadius] = useState(200);
     const [backgroundColor, setBackgroundColor] = useState('white');
 
-    const isHexColor = (hex) => {
-        return /^#[0-9A-F]{6}$/i.test(hex);
-    }
+    const extractHexColor = (text) => {
+        const match = text.match(/#[0-9A-Fa-f]{6}/);
+        return match ? match[0] : null;
+    };
+        
 
     useEffect(() => {
         if (activeCue?.text) {
@@ -20,8 +22,10 @@ const LightPlayer = ({activeCue}) => {
                 // extract RGB values from the hex color
                 // create a color object with the RGB values
                 // set the color object as the background color
-                if (isHexColor(activeCue.text)) {
-                    setBackgroundColor(activeCue.text);
+                let hexString = extractHexColor(activeCue.text);
+
+                if (hexString) {
+                    setBackgroundColor(hexString);
                 }
             }catch (error) {
                 setMessage(`Caption Parsing Error: ${JSON.stringify(activeCue)}`);
