@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { SoundPlayer } from './SoundPlayer';  // Import the SoundPlayer component
 import { Button, Container, Segment, Header, Message} from 'semantic-ui-react';
 import { text } from '@fortawesome/fontawesome-svg-core';
-import { KITCHEN_SOUND_EFFECTS } from './AppConfig'; // Import the sound effects data
+import { KITCHEN_SOUND_EFFECTS } from '@/AppConfig'; // Import the sound effects data
 
 const extractCommand = (activeText) => {
   // Extract the sound label from the text (remove ♪ and whitespace)
