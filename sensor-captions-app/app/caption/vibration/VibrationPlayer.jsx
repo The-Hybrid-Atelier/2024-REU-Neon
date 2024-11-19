@@ -11,7 +11,16 @@ import { Button, Container, Header, Message, Segment } from 'semantic-ui-react';
 import { Remote } from '../../websocket/Remote';
 import { VIBRATION_PATTERNS } from '@/AppConfig';
 
-
+const parsePattern = (activeText) => {
+    // Extract the pattern name by removing special characters and trimming whitespace
+    const extractedName = activeText.replace(/[≋]/g, '').trim();
+    
+    // Find the matching pattern object by its command
+    const patternObject = VIBRATION_PATTERNS.find(item => item.command === extractedName);
+    
+    // Return the pattern if found, otherwise return the default pattern (0)
+    return patternObject ? patternObject.pattern : VIBRATION_PATTERNS[0].pattern;
+};
 
 const VibrationPlayer = ({activeCue}) => {
     const [vibrationSupported, setVibrationSupported] = useState(false);
@@ -29,11 +38,13 @@ const VibrationPlayer = ({activeCue}) => {
     useEffect(() => {
         if (activeCue?.text) {
             try {
-                const patternIndex = parseInt(activeCue.text);
+                // const patternIndex = parseInt(activeCue.text);
+                const pattern = parsePattern(activeCue.text);
                 // console.log(VIBRATION_PATTERNS);
                 if (patternIndex >= 0 && patternIndex < VIBRATION_PATTERNS.length) {
-                    handleVibrate(VIBRATION_PATTERNS[patternIndex].pattern);
+                    handleVibrate(pattern);
                 }else{
+                    handleVibrate(pattern);
                     setMessage(`Invalid Vibration Pattern: ${JSON.stringify(activeCue)}`);
                 }
             }catch (error) {
