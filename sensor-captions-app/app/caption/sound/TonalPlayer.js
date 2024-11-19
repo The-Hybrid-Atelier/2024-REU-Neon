@@ -21,7 +21,7 @@ const TonalPlayer = ({activeCue}) => {
             // try to parse int
             // verify it is between 0 and 100; raise error if not
             // set the intensity
-            const intensity = countMusicNotes(activeCue.text);
+            let intensity = countMusicNotes(activeCue.text);
             intensity = (intensity / 6) * 100;
             if (intensity >= 0 && intensity <= 100) {
                 setSynthIntensity(intensity);
