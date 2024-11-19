@@ -238,8 +238,11 @@ pressure_column = "Pa"
 parameterized_pressure_column = "P1"
 
 # Read the csv file containing the pressure data into a pandas dataframe
-raw_df = pd.read_csv(csv_file_path)
-
+try:
+    raw_df = pd.read_csv(csv_file_path)
+except IsADirectoryError:
+    sys.exit(1)
+    
 # Detect events in the pressure data and write the caption data to a WebVTT file, then save the updated dataframe to the csv file
 air_df = detect_events_with_meter(raw_df, capvtt_out_file)
 air_df.to_csv(csv_file_path, index=False)

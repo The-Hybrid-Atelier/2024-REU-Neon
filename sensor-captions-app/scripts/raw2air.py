@@ -155,7 +155,12 @@ def extract_data(df, spike_idxs):
 
 # Read the csv file into a pandas dataframe
 input_file = sys.argv[1]
-df = pd.read_csv(input_file)
+
+try:
+    df = pd.read_csv(input_file)
+except IsADirectoryError:
+    sys.exit(1)
+
 df = df.rename(columns={" Pa": "Pa"})
 
 # Get columns that are needed

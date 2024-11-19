@@ -106,7 +106,7 @@ def determine_inten(df, i):
 
     if meta_type == "sound":
         sound_dict = {
-            0: "noSound",
+            0: "",
             1: "lightBoiling",
             2: "bubbling",
             3: "bubblingIntense",
@@ -115,7 +115,7 @@ def determine_inten(df, i):
         inten = sound_dict.get(inten)
     elif meta_type == "vibration":
         vibration_dict = {
-            0: "stop",
+            0: "",
             1: "shortPulse",
             2: "longPulse",
             3: "longDuration",
@@ -172,9 +172,7 @@ def write_to_file(capvtt_file, start_time, end_time, inten):
         elif meta_type == "vibration":
             capvtt_file.write(f"≋≋≋ {inten} ≋≋≋\n\n")
         else:
-            capvtt_file.write("stoveon\n")
-            capvtt_file.write(f"{inten}\n")
-            capvtt_file.write("bell\n\n")
+            capvtt_file.write(f"{inten}\n\n")
 
 
 
@@ -226,7 +224,10 @@ meta_type = sys.argv[2]
 inten_range = determine_type()
 
 # Read the air.csv file into a pandas dataframe
-air_df = pd.read_csv(air_file)
+try:
+    air_df = pd.read_csv(air_file)
+except IsADirectoryError:
+    sys.exit(1)
 
 # Column names
 time_column = "Time"
