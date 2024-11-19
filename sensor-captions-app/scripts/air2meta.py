@@ -95,7 +95,7 @@ import os
 
 # Determine the range of feedback inten based on the meta_type parameter
 def determine_type():
-    meta_dict = {"sound": 5, "light": 6, "synth": 6, "vibration": 4}
+    meta_dict = {"sound": 4, "light": 6, "synth": 6, "vibration": 4}
     return meta_dict.get(meta_type)
 
 
@@ -111,8 +111,6 @@ def determine_inten(df, i):
             2: "bubbling",
             3: "bubblingIntense",
             4: "deepFry",
-            5: "stoveOn",
-            6: "bell",
         }
         inten = sound_dict.get(inten)
     elif meta_type == "vibration":
@@ -138,7 +136,7 @@ def determine_inten(df, i):
         }
 
         inten = light_dict.get(inten)
-    elif meta_type == 'synth':
+    elif meta_type == "synth":
 
         synth_dict = {
             0: "",
@@ -165,13 +163,19 @@ def write_to_file(capvtt_file, start_time, end_time, inten):
         capvtt_file.write(f"{color_box}#{hex_color:06X}\n\n")
     else:
         capvtt_file.write(f"{start_time} --> {end_time}\n")
-        #Add ascii emojis if needed.
+        
+        # Add ascii emojis if needed.
         if meta_type == "sound":
-            capvtt_file.write(f"♪ {inten} ♪\n\n")
+            capvtt_file.write("stoveon\n")
+            capvtt_file.write(f"♪ {inten} ♪\n")
+            capvtt_file.write("bell\n\n")
         elif meta_type == "vibration":
             capvtt_file.write(f"≋≋≋ {inten} ≋≋≋\n\n")
         else:
-            capvtt_file.write(f"{inten}\n\n")
+            capvtt_file.write("stoveon\n")
+            capvtt_file.write(f"{inten}\n")
+            capvtt_file.write("bell\n\n")
+
 
 
 # Detect the events in the pressure data and write the metadata to the WebVTT file
@@ -189,7 +193,7 @@ def detect_events_with_inten(df, meta_out_file):
         prev_inten = None
 
         for index, row in df.iterrows():
-            inten = determine_inten(df, index-1)
+            inten = determine_inten(df, index - 1)
             current_time = formatTime(row[time_column])
             if prev_inten is None:
                 start_time = current_time
@@ -203,7 +207,6 @@ def detect_events_with_inten(df, meta_out_file):
         if start_time is not None and prev_inten is not None:
             end_time = formatTime(df.iloc[-1][time_column])
             write_to_file(capVttfile, start_time, end_time, prev_inten)
-           
 
 
 # Helper function to format time in milliseconds to HH:MM:SS.mmm format
