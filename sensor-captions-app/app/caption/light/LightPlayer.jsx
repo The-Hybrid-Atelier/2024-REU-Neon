@@ -28,6 +28,7 @@ const LightPlayer = ({activeCue}) => {
                     setBackgroundColor(hexString);
                 }
             }catch (error) {
+                setBackgroundColor("#CCCCCC");
                 setMessage(`Caption Parsing Error: ${JSON.stringify(activeCue)}`);
             }
         }
