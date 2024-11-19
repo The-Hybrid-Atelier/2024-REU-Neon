@@ -62,11 +62,11 @@ const AIR_RANGE = {min: 99384, max: 107412}
 
 // LIBRARY OF VIBRATION PATTERNS
 const VIBRATION_PATTERNS = [
+    {command: 'stop', label: 'Stop Vibration', pattern: 0 }
     { command: 'shortPulse', label: 'Vibrate: Short Pulse', pattern: [200, 100, 200] },
     {command: 'longPulse', label: 'Vibrate: Long Pulse', pattern: [500, 200, 500, 200, 500] },
     {command: 'longDuration',  label: 'Vibrate: Long Duration', pattern: [1000, 500, 1000] },
     {command: 'rapidPulse', label: 'Vibrate: Rapid Pulse', pattern: [50, 30, 50, 30, 50, 30] },
-    {command: 'stop', label: 'Stop Vibration', pattern: 0 }
 ];
 
 const KITCHEN_SOUND_EFFECTS = [
