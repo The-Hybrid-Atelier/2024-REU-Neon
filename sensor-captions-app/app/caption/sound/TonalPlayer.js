@@ -26,6 +26,7 @@ const TonalPlayer = ({activeCue}) => {
             if (intensity >= 0 && intensity <= 100) {
                 setSynthIntensity(intensity);
             }else{
+                setSynthIntensity(0);
                 console.log(`Invalid Intensity: ${JSON.stringify(activeCue)}`);
             }
         }catch (error) {
