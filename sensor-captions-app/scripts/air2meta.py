@@ -106,7 +106,7 @@ def determine_inten(df, i):
 
     if meta_type == "sound":
         sound_dict = {
-            0: "noSound",
+            0: "",
             1: "lightBoiling",
             2: "bubbling",
             3: "bubblingIntense",
@@ -115,7 +115,7 @@ def determine_inten(df, i):
         inten = sound_dict.get(inten)
     elif meta_type == "vibration":
         vibration_dict = {
-            0: "stop",
+            0: "",
             1: "shortPulse",
             2: "longPulse",
             3: "longDuration",
