@@ -6,6 +6,13 @@ import { Button, Container, Segment, Header, Message} from 'semantic-ui-react';
 import SynthController from './SynthController';  
 import { Remote } from '../../websocket/Remote';
 
+const countMusicNotes = (text) => {
+    // Match all occurrences of the music note character ♪
+    const matches = text.match(/♪/g);
+    // Return the count or 0 if there are no matches
+    return matches ? matches.length : 0;
+};
+
 const TonalPlayer = ({activeCue}) => {
   const [synthIntensity, setSynthIntensity] = useState(0);
   useEffect(() => {
@@ -14,13 +21,15 @@ const TonalPlayer = ({activeCue}) => {
             // try to parse int
             // verify it is between 0 and 100; raise error if not
             // set the intensity
-            const intensity = parseInt(activeCue.text);
+            const intensity = countMusicNotes(activeCue.text);
+            intensity = (intensity / 6) * 100;
             if (intensity >= 0 && intensity <= 100) {
                 setSynthIntensity(intensity);
             }else{
                 console.log(`Invalid Intensity: ${JSON.stringify(activeCue)}`);
             }
         }catch (error) {
+            setSynthIntensity(0);
             console.log(`Caption Parsing Error: ${JSON.stringify(activeCue)}`);
         }
     }
