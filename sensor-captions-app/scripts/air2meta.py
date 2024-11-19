@@ -172,9 +172,7 @@ def write_to_file(capvtt_file, start_time, end_time, inten):
         elif meta_type == "vibration":
             capvtt_file.write(f"≋≋≋ {inten} ≋≋≋\n\n")
         else:
-            capvtt_file.write("stoveon\n")
-            capvtt_file.write(f"{inten}\n")
-            capvtt_file.write("bell\n\n")
+            capvtt_file.write(f"{inten}\n\n")
 
 
 
