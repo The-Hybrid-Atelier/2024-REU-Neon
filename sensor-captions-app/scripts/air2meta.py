@@ -160,7 +160,7 @@ def write_to_file(capvtt_file, start_time, end_time, inten):
         color_text = "{text-color: #" + f"{hex_color:06X}" + ";}"
 
         capvtt_file.write(f"{start_time} --> {end_time}{color_text}\n")
-        capvtt_file.write(f"{color_box}#{hex_color:06X}\n")
+        capvtt_file.write(f"{color_box}#{hex_color:06X}\n\n")
     else:
         capvtt_file.write(f"{start_time} --> {end_time}\n")
         
@@ -170,7 +170,7 @@ def write_to_file(capvtt_file, start_time, end_time, inten):
             capvtt_file.write(f"♪ {inten} ♪\n")
             capvtt_file.write("bell\n\n")
         elif meta_type == "vibration":
-            capvtt_file.write(f"≋≋≋ {inten} ≋≋≋\n")
+            capvtt_file.write(f"≋≋≋ {inten} ≋≋≋\n\n")
         else:
             capvtt_file.write("stoveon\n")
             capvtt_file.write(f"{inten}\n")
