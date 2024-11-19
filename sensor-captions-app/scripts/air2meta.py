@@ -226,7 +226,10 @@ meta_type = sys.argv[2]
 inten_range = determine_type()
 
 # Read the air.csv file into a pandas dataframe
-air_df = pd.read_csv(air_file)
+try:
+    air_df = pd.read_csv(air_file)
+except IsADirectoryError:
+    sys.exit(1)
 
 # Column names
 time_column = "Time"
