@@ -109,33 +109,37 @@ def extract_data(df, spike_idxs):
         df[time_column] = pd.to_datetime(df[time_column], format="%A,-%B-%d-%Y-%H:%M:%S")
         df[time_column] = df[time_column].apply(lambda x: int(x.timestamp())% 1000000)
         df[time_column] = df[time_column] *1000
-
-    
-    # Else if the data has time in unix timestamps, proceed as normal
-    # Put in pressure values' spikes and their corresponding CSV line numbers into a dictionary
-    spikes = {}
-
-    # Get the pressure values and their corresponding CSV line numbers of the spikes
-    for i in spike_idxs:
-        value = df.iloc[i][pressure_column]
-        spikes.update({value: i + 2})
-
-    # Sort the dictionary by file lines, with the end of the first spike/clap being the first dict entry, and the start of the last spike/clap being the last dict entry
-    spikes = dict(sorted(spikes.items(), key=lambda item: item[1]))
-   
-    # Gets the beginning and ending claps/spikes
-    spikes_lines = spikes.values()
-    correct_spikes_order = [
-        [list(spikes)[0], list(spikes_lines)[0]],
-        [list(spikes)[-1], list(spikes_lines)[-1]],
-    ]
-
-    # Get the line to start at & get the time to offset by after the beginning clap
-    line_start = correct_spikes_order[0][1] - 1
+    line_start = 0
+    line_end = len(df)
     time_offset = df.iloc[line_start][time_column]
 
-    # Get the line to end at
-    line_end = correct_spikes_order[1][1]
+    if(spike_idxs is not None):
+        
+        # Else if the data has time in unix timestamps, proceed as normal
+        # Put in pressure values' spikes and their corresponding CSV line numbers into a dictionary
+        spikes = {}
+
+        # Get the pressure values and their corresponding CSV line numbers of the spikes
+        for i in spike_idxs:
+            value = df.iloc[i][pressure_column]
+            spikes.update({value: i + 2})
+
+        # Sort the dictionary by file lines, with the end of the first spike/clap being the first dict entry, and the start of the last spike/clap being the last dict entry
+        spikes = dict(sorted(spikes.items(), key=lambda item: item[1]))
+    
+        # Gets the beginning and ending claps/spikes
+        spikes_lines = spikes.values()
+        correct_spikes_order = [
+            [list(spikes)[0], list(spikes_lines)[0]],
+            [list(spikes)[-1], list(spikes_lines)[-1]],
+        ]
+
+        # Get the line to start at & get the time to offset by after the beginning clap
+        line_start = correct_spikes_order[0][1] - 1
+        time_offset = df.iloc[line_start][time_column]
+
+        # Get the line to end at
+        line_end = correct_spikes_order[1][1]
 
     # Subtract the time offset from the time, getting the new time value
     for i in range(line_start, line_end - 2):
@@ -167,6 +171,8 @@ extracted_df = None
 
 # Get the spikes and extract the data in between the spikes (beginning and end claps)
 spikes = dataSpike(selected_columns)
+if("e1/u-bend/t1" in os.path.dirname(input_file)):
+    spikes = None
 extracted_df = extract_data(selected_columns, spikes)
 
 # Extract the directory path from the input file
