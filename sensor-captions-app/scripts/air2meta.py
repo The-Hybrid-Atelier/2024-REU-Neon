@@ -95,7 +95,7 @@ import os
 
 # Determine the range of feedback inten based on the meta_type parameter
 def determine_type():
-    meta_dict = {"sound": 5, "light": 6, "synth": 100, "vibration": 4}
+    meta_dict = {"sound": 5, "light": 6, "synth": 6, "vibration": 4}
     return meta_dict.get(meta_type)
 
 
@@ -138,6 +138,18 @@ def determine_inten(df, i):
         }
 
         inten = light_dict.get(inten)
+    elif meta_type == 'synth':
+
+        synth_dict = {
+            0: "",
+            1: "♪",
+            2: "♪♪",
+            3: "♪♪♪",
+            4: "♪♪♪♪",
+            5: "♪♪♪♪♪",
+            6: "♪♪♪♪♪♪",
+        }
+        inten = synth_dict.get(inten)
 
     return inten
 
