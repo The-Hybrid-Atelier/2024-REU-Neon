@@ -154,7 +154,7 @@ def determine_inten(df, i):
 
 def write_sound_cues(capvtt_file, start_time, event_type):
     event_start = formatTime(start_time)
-    event_end = formatTime(start_time + 2000)
+    event_end = formatTime(start_time + 500)
     capvtt_file.write(f"{event_start} --> {event_end}\n")
     capvtt_file.write(f"♪ {event_type} ♪\n\n")
     return event_end
@@ -175,7 +175,7 @@ def write_to_file(capvtt_file, start_time, end_time, inten):
         if meta_type == "sound" and not started_event:
             if inten == "":
                 start_time = formatTime(start_time)
-                event_start = formatTime(end_time - 2000)
+                event_start = formatTime(end_time - 500)
                 capvtt_file.write(f"{start_time} --> {event_start}\n")
                 capvtt_file.write(f" \n\n")
 
