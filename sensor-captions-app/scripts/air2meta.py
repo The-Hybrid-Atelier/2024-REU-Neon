@@ -152,28 +152,58 @@ def determine_inten(df, i):
     return inten
 
 
+def write_sound_cues(capvtt_file, start_time, event_type):
+    event_start = formatTime(start_time)
+    event_end = formatTime(start_time + 2000)
+    capvtt_file.write(f"{event_start} --> {event_end}\n")
+    capvtt_file.write(f"♪ {event_type} ♪\n\n")
+    return event_end
+
 # Write the metadata to the WebVTT file
 def write_to_file(capvtt_file, start_time, end_time, inten):
+
+    global started_event
 
     if meta_type == "light":
         hex_color, color_box = inten
         color_text = "{text-color: #" + f"{hex_color:06X}" + ";}"
 
-        capvtt_file.write(f"{start_time} --> {end_time}{color_text}\n")
+        capvtt_file.write(f"{formatTime(start_time)} --> {formatTime(end_time)}{color_text}\n")
         capvtt_file.write(f"{color_box}#{hex_color:06X}\n\n")
     else:
-        capvtt_file.write(f"{start_time} --> {end_time}\n")
-        
+        # Add sound cues for the sound feedback type if needed
+        if meta_type == "sound" and not started_event:
+            if inten == "":
+                start_time = formatTime(start_time)
+                event_start = formatTime(end_time - 2000)
+                capvtt_file.write(f"{start_time} --> {event_start}\n")
+                capvtt_file.write(f" \n\n")
+
+                event_end = formatTime(end_time)
+                capvtt_file.write(f"{event_start} --> {event_end}\n")
+                capvtt_file.write(f"♪ stoveon ♪")
+            else:
+                start_time = write_sound_cues(capvtt_file, start_time, "stoveOn")
+                end_time = formatTime(end_time)
+                capvtt_file.write(f"{start_time} --> {end_time}\n")
+            started_event = True
+        elif meta_type == "sound" and inten == "" and started_event:
+            start_time = write_sound_cues(capvtt_file, start_time, "bell")
+            end_time = formatTime(end_time)
+            capvtt_file.write(f"{start_time} --> {end_time}\n")
+            started_event = False
+        else:
+            start_time = formatTime(start_time)
+            end_time = formatTime(end_time)
+            capvtt_file.write(f"{start_time} --> {end_time}\n")
+
         # Add ascii emojis if needed.
-        if meta_type == "sound":
-            capvtt_file.write("stoveon\n")
-            capvtt_file.write(f"♪ {inten} ♪\n")
-            capvtt_file.write("bell\n\n")
+        if meta_type == "sound" and inten != "":
+            capvtt_file.write(f"♪ {inten} ♪\n\n")
         elif meta_type == "vibration":
             capvtt_file.write(f"≋≋≋ {inten} ≋≋≋\n\n")
         else:
             capvtt_file.write(f"{inten}\n\n")
-
 
 
 # Detect the events in the pressure data and write the metadata to the WebVTT file
@@ -192,7 +222,7 @@ def detect_events_with_inten(df, meta_out_file):
 
         for index, row in df.iterrows():
             inten = determine_inten(df, index - 1)
-            current_time = formatTime(row[time_column])
+            current_time = row[time_column]
             if prev_inten is None:
                 start_time = current_time
                 prev_inten = inten
@@ -203,7 +233,7 @@ def detect_events_with_inten(df, meta_out_file):
                 start_time = current_time
                 prev_inten = inten
         if start_time is not None and prev_inten is not None:
-            end_time = formatTime(df.iloc[-1][time_column])
+            end_time = df.iloc[-1][time_column]
             write_to_file(capVttfile, start_time, end_time, prev_inten)
 
 
@@ -222,6 +252,7 @@ air_file = sys.argv[1]
 meta_type = sys.argv[2]
 
 inten_range = determine_type()
+started_event = False
 
 # Read the air.csv file into a pandas dataframe
 try:
