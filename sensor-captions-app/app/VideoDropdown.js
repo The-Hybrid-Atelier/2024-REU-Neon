@@ -7,7 +7,7 @@ const dropDownVals = [
   { key: 2, text: 'u-bend-001', value: 2 },
 ];
 
-const VideoDropdown = ({ onDropDown }) => (
+const VideoDropdown = ({ onDropDown, dropDownVals }) => (
   <SemanticDropdown 
     clearable 
     options={dropDownVals} 

@@ -6,6 +6,13 @@ cd sensor-captions-app
 ```
 
 
+WHAT TO EDIT
+```
+Main Page UI: 
+player/page.js calls TacitCaptionInput (has the UI)
+edit UI under components/TacitCaptionInput
+
+
 To install
 ```
 npm install

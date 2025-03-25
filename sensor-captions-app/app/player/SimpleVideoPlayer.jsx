@@ -7,7 +7,14 @@ const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange }, ref) => {
   const videoRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
-    getPlayer: () => videoRef.current,
+    // Return video element and video length (duration)
+    getPlayer: () => {
+      const videoElement = videoRef.current;
+      return {
+        videoElement,  // The video element itself
+        videoLength: videoElement ? videoElement.duration : 0,  // Video duration in seconds
+      };
+    },
   }));
 
   useEffect(() => {
