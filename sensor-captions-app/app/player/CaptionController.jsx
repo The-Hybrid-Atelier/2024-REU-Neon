@@ -27,6 +27,7 @@ const CaptionController = ({ selectedVideo, setSelectedVideo, multipleSelection=
         setIsActive={setActivatedCaptions}
         typeSelect={multipleSelection ? 'multi' : 'single'}
       />
+    
       {/* <p>({activated_captions.length} / {captions.length} available)</p>
       <p>{JSON.stringify(activated_captions)}</p>
       <p>{JSON.stringify(captions)}</p> */}
