@@ -78,7 +78,53 @@ Function:
     - capVtt_file_path: str
         The path to the output WebVTT file.
 
-7. formatTime(mseconds):
+7. detect_peaks_in_range(csv_file_path, capVtt_file_path):
+    - Detects peaks in the pressure data and writes the caption data to a WebVTT file.
+    Parameters:
+    -----------
+    - csv_file_path: str
+        The path to the CSV file containing the pressure data.
+    - capVtt_file_path: str
+        The path to the output WebVTT file.
+
+8. detect_valleys_in_range(csv_file_path, capVtt_file_path):
+    - Detects valleys in the pressure data and writes the caption data to a WebVTT file.
+    Parameters:
+    -----------
+    - csv_file_path: str
+        The path to the CSV file containing the pressure data.
+    - capVtt_file_path: str
+        The path to the output WebVTT file.
+
+9. detect_rise_in_range(csv_file_path, capVtt_file_path):
+    - Detects rise in the pressure data and writes the caption data to a WebVTT file.
+    Parameters:
+    -----------
+    - csv_file_path: str
+        The path to the CSV file containing the pressure data.
+    - capVtt_file_path: str
+        The path to the output WebVTT file.
+
+10. detect_fall_in_range(csv_file_path, capVtt_file_path):
+    - Detects fall in the pressure data and writes the caption data to a WebVTT file.
+    Parameters:
+    -----------
+    - csv_file_path: str
+        The path to the CSV file containing the pressure data.
+    - capVtt_file_path: str
+        The path to the output WebVTT file.
+
+11. detect_steady_in_range(csv_file_path, capVtt_file_path):
+    - Detects steady region in the pressure data and writes the caption data to a WebVTT file.
+    Parameters:
+    -----------
+    - csv_file_path: str
+        The path to the CSV file containing the pressure data.
+    - capVtt_file_path: str
+        The path to the output WebVTT file.
+
+
+12. formatTime(mseconds):
     - Formats time in milliseconds to HH:MM:SS.mmm format.
     Parameters:
     -----------
@@ -125,7 +171,8 @@ def create_meter(df, i, num_boxes=12):
     return meter
 
 
-def write_to_file(capvtt_file, start_time, end_time, pressure, meter):
+def write_to_file(capvtt_file, start_time, end_time, pressure, meter, label):
+    capvtt_file.write(f"{label}\n\n")
     capvtt_file.write(f"{start_time} --> {end_time}\n")
     capvtt_file.write(f"{meter} {pressure} kPa\n\n")
 
@@ -157,7 +204,7 @@ def detect_events_with_meter(df, capVtt_file_path):
         # Iterate through the rows of the dataframe
         for i in range(0, len(df)):
 
-            # Get the current pressure value convert to kpaand the current P1 value
+            # Get the current pressure value convert to kpa and the current P1 value
             current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
             p1_current_value = df.iloc[i][parameterized_pressure_column]
 
@@ -178,7 +225,7 @@ def detect_events_with_meter(df, capVtt_file_path):
                     meter = create_meter(df, i - 1)
 
                     # Write the data to the vtt file
-                    write_to_file(capVttfile, start_time, end_time, prev_press, meter)
+                    write_to_file(capVttfile, start_time, end_time, prev_press, meter, "significant_event_0.03")
 
                     # Update the start time for the next event
                     start_time = end_time
@@ -191,7 +238,7 @@ def detect_events_with_meter(df, capVtt_file_path):
                 meter = create_meter(df, i)
 
                 # Write the data to the vtt file
-                write_to_file(capVttfile, start_time, end_time, current_pressure, meter)
+                write_to_file(capVttfile, start_time, end_time, current_pressure, meter, "significant_event_0.03")
 
                 # Update the tracking variables
                 start_time = end_time
@@ -215,6 +262,185 @@ def detect_events_with_meter(df, capVtt_file_path):
             # Write the data to the vtt file
             write_to_file(capVttfile, start_time, end_time, current_pressure, meter)
     return df
+
+# detect rises in a given time frame
+# use the first and second derivatives of the air pressure data to find the peaks
+def detect_peaks(df, capVtt_file_path):
+    # Find the maximum and minimum pressure values
+    maxPa = find_max_pa(df)
+    minPa = find_min_pa(df)
+
+    # Normalize the pressure values between 0 and 1
+    df = parameterize_pressure(df, maxPa, minPa)
+
+    # Compute first and second derivatives
+    df["first_derivative"] = df[pressure_column].diff()
+    df["second_derivative"] = df["first_derivative"].diff()
+
+    with open(capVtt_file_path, "w") as capVttfile:
+        # Write WebVTT file header
+        capVttfile.write("WEBVTT\n")
+        capVttfile.write("Kind: captions\n")
+        capVttfile.write("Language: en\n\n")
+
+        # Iterate through dataframe, looking for peaks
+        for i in range(1, len(df) - 1):
+            current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
+
+            # Use second derivative to confirm peak
+            if df.iloc[i]["second_derivative"] < 0 and df.iloc[i]["first_derivative"] > 0:
+                start_time = formatTime(df.iloc[i][time_column])
+                end_time = formatTime(df.iloc[i + 1][time_column])
+                meter = create_meter(df, i)
+
+                # Write peak information to the VTT file
+                write_to_file(capVttfile, start_time, end_time, current_pressure, meter, "peak")
+
+    return df
+
+
+# detect valleys in a given time range
+# use the first and second derivatives of the air pressure data to find the valleys
+def detect_valleys(df, capVtt_file_path):
+    # Find the maximum and minimum pressure values
+    maxPa = find_max_pa(df)
+    minPa = find_min_pa(df)
+
+    # Normalize the pressure values between 0 and 1
+    df = parameterize_pressure(df, maxPa, minPa)
+
+    # Compute first and second derivatives
+    df["first_derivative"] = df[pressure_column].diff()
+    df["second_derivative"] = df["first_derivative"].diff()
+
+    with open(capVtt_file_path, "w") as capVttfile:
+        # Write WebVTT file header
+        capVttfile.write("WEBVTT\n")
+        capVttfile.write("Kind: captions\n")
+        capVttfile.write("Language: en\n\n")
+
+        # Iterate through dataframe, looking for valleys
+        for i in range(1, len(df) - 1):
+            current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
+
+            # Use second derivative to confirm valley
+            if df.iloc[i]["second_derivative"] > 0 and df.iloc[i]["first_derivative"] < 0:
+                start_time = formatTime(df.iloc[i][time_column])
+                end_time = formatTime(df.iloc[i + 1][time_column])
+                meter = create_meter(df, i)
+
+                # Write valley information to the VTT file
+                write_to_file(capVttfile, start_time, end_time, current_pressure, meter, "valley")
+
+    return df
+
+
+# detect rise in a given time range
+# use the first derivative of the air pressure data to find the rise regions
+def detect_rise(df, capVtt_file_path):
+    # Find the maximum and minimum pressure values
+    maxPa = find_max_pa(df)
+    minPa = find_min_pa(df)
+
+    # Normalize the pressure values between 0 and 1
+    df = parameterize_pressure(df, maxPa, minPa)
+
+    # Compute first derivative
+    df["first_derivative"] = df[pressure_column].diff()
+
+    with open(capVtt_file_path, "w") as capVttfile:
+        # Write WebVTT file header
+        capVttfile.write("WEBVTT\n")
+        capVttfile.write("Kind: captions\n")
+        capVttfile.write("Language: en\n\n")
+
+        # Iterate through dataframe, looking for rise
+        for i in range(1, len(df) - 1):
+            current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
+
+            # Use first derivative to confirm rise
+            if df.iloc[i]["first_derivative"] > 0:
+                start_time = formatTime(df.iloc[i][time_column])
+                end_time = formatTime(df.iloc[i + 1][time_column])
+                meter = create_meter(df, i)
+
+                # Write rise information to the VTT file
+                write_to_file(capVttfile, start_time, end_time, current_pressure, meter, "rise")
+
+    return df
+
+
+# detect fall in a given time range
+# use the first derivative of the air pressure data to find the fall regions
+def detect_fall(df, capVtt_file_path):
+    # Find the maximum and minimum pressure values
+    maxPa = find_max_pa(df)
+    minPa = find_min_pa(df)
+
+    # Normalize the pressure values between 0 and 1
+    df = parameterize_pressure(df, maxPa, minPa)
+
+    # Compute first derivative
+    df["first_derivative"] = df[pressure_column].diff()
+
+    with open(capVtt_file_path, "w") as capVttfile:
+        # Write WebVTT file header
+        capVttfile.write("WEBVTT\n")
+        capVttfile.write("Kind: captions\n")
+        capVttfile.write("Language: en\n\n")
+
+        # Iterate through dataframe, looking for fall
+        for i in range(1, len(df) - 1):
+            current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
+
+            # Use first derivative to confirm fall
+            if df.iloc[i]["first_derivative"] < 0:
+                start_time = formatTime(df.iloc[i][time_column])
+                end_time = formatTime(df.iloc[i + 1][time_column])
+                meter = create_meter(df, i)
+
+                # Write fall information to the VTT file
+                write_to_file(capVttfile, start_time, end_time, current_pressure, meter, "fall")
+
+    return df
+
+
+# detect steady in a given time range
+# use the first derivative of the air pressure data to find the steady regions
+def detect_steady(df, capVtt_file_path):
+    # Find the maximum and minimum pressure values
+    maxPa = find_max_pa(df)
+    minPa = find_min_pa(df)
+
+    # Normalize the pressure values between 0 and 1
+    df = parameterize_pressure(df, maxPa, minPa)
+
+    # Compute first derivative
+    df["first_derivative"] = df[pressure_column].diff()
+
+    with open(capVtt_file_path, "w") as capVttfile:
+        # Write WebVTT file header
+        capVttfile.write("WEBVTT\n")
+        capVttfile.write("Kind: captions\n")
+        capVttfile.write("Language: en\n\n")
+
+        # Iterate through dataframe, looking for steady regions
+        for i in range(1, len(df) - 1):
+            current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
+
+            # Use first derivative to confirm steady
+            if df.iloc[i]["first_derivative"] == 0:
+                start_time = formatTime(df.iloc[i][time_column])
+                end_time = formatTime(df.iloc[i + 1][time_column])
+                meter = create_meter(df, i)
+
+                # Write steady information to the VTT file
+                write_to_file(capVttfile, start_time, end_time, current_pressure, meter, "steady")
+
+    return df
+
+
+
 
 
 # Helper function to format time in milliseconds to HH:MM:SS.mmm format
@@ -245,4 +471,10 @@ except IsADirectoryError:
     
 # Detect events in the pressure data and write the caption data to a WebVTT file, then save the updated dataframe to the csv file
 air_df = detect_events_with_meter(raw_df, capvtt_out_file)
+air_df = detect_peaks(raw_df, capvtt_out_file)
+air_df = detect_valleys(air_df, capvtt_out_file)  
+air_df = detect_rise(air_df, capvtt_out_file)    
+air_df = detect_fall(air_df, capvtt_out_file)    
+air_df = detect_steady(air_df, capvtt_out_file)
+
 air_df.to_csv(csv_file_path, index=False)
