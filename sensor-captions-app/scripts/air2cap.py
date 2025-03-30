@@ -172,6 +172,7 @@ def create_meter(df, i, num_boxes=12):
 
 
 def write_to_file(capvtt_file, start_time, end_time, pressure, meter, label):
+    #print(f"Writing to file: {start_time} --> {end_time} {meter} {pressure} kPa")
     capvtt_file.write(f"{label}\n\n")
     capvtt_file.write(f"{start_time} --> {end_time}\n")
     capvtt_file.write(f"{meter} {pressure} kPa\n\n")
@@ -260,7 +261,7 @@ def detect_events_with_meter(df, capVtt_file_path):
             meter = create_meter(df, last_line)
 
             # Write the data to the vtt file
-            write_to_file(capVttfile, start_time, end_time, current_pressure, meter)
+            write_to_file(capVttfile, start_time, end_time, current_pressure, meter, "meter")
     return df
 
 # detect rises in a given time frame
@@ -277,11 +278,11 @@ def detect_peaks(df, capVtt_file_path):
     df["first_derivative"] = df[pressure_column].diff()
     df["second_derivative"] = df["first_derivative"].diff()
 
-    with open(capVtt_file_path, "w") as capVttfile:
+    with open(capVtt_file_path, "a") as capVttfile:
         # Write WebVTT file header
-        capVttfile.write("WEBVTT\n")
-        capVttfile.write("Kind: captions\n")
-        capVttfile.write("Language: en\n\n")
+        # capVttfile.write("WEBVTT\n")
+        # capVttfile.write("Kind: captions\n")
+        # capVttfile.write("Language: en\n\n")
 
         # Iterate through dataframe, looking for peaks
         for i in range(1, len(df) - 1):
@@ -313,11 +314,11 @@ def detect_valleys(df, capVtt_file_path):
     df["first_derivative"] = df[pressure_column].diff()
     df["second_derivative"] = df["first_derivative"].diff()
 
-    with open(capVtt_file_path, "w") as capVttfile:
+    with open(capVtt_file_path, "a") as capVttfile:
         # Write WebVTT file header
-        capVttfile.write("WEBVTT\n")
-        capVttfile.write("Kind: captions\n")
-        capVttfile.write("Language: en\n\n")
+        # capVttfile.write("WEBVTT\n")
+        # capVttfile.write("Kind: captions\n")
+        # capVttfile.write("Language: en\n\n")
 
         # Iterate through dataframe, looking for valleys
         for i in range(1, len(df) - 1):
@@ -348,11 +349,11 @@ def detect_rise(df, capVtt_file_path):
     # Compute first derivative
     df["first_derivative"] = df[pressure_column].diff()
 
-    with open(capVtt_file_path, "w") as capVttfile:
+    with open(capVtt_file_path, "a") as capVttfile:
         # Write WebVTT file header
-        capVttfile.write("WEBVTT\n")
-        capVttfile.write("Kind: captions\n")
-        capVttfile.write("Language: en\n\n")
+        # capVttfile.write("WEBVTT\n")
+        # capVttfile.write("Kind: captions\n")
+        # capVttfile.write("Language: en\n\n")
 
         # Iterate through dataframe, looking for rise
         for i in range(1, len(df) - 1):
@@ -383,11 +384,12 @@ def detect_fall(df, capVtt_file_path):
     # Compute first derivative
     df["first_derivative"] = df[pressure_column].diff()
 
-    with open(capVtt_file_path, "w") as capVttfile:
+
+    with open(capVtt_file_path, "a") as capVttfile:
         # Write WebVTT file header
-        capVttfile.write("WEBVTT\n")
-        capVttfile.write("Kind: captions\n")
-        capVttfile.write("Language: en\n\n")
+        # capVttfile.write("WEBVTT\n")
+        # capVttfile.write("Kind: captions\n")
+        # capVttfile.write("Language: en\n\n")
 
         # Iterate through dataframe, looking for fall
         for i in range(1, len(df) - 1):
@@ -418,11 +420,11 @@ def detect_steady(df, capVtt_file_path):
     # Compute first derivative
     df["first_derivative"] = df[pressure_column].diff()
 
-    with open(capVtt_file_path, "w") as capVttfile:
+    with open(capVtt_file_path, "a") as capVttfile:
         # Write WebVTT file header
-        capVttfile.write("WEBVTT\n")
-        capVttfile.write("Kind: captions\n")
-        capVttfile.write("Language: en\n\n")
+        # capVttfile.write("WEBVTT\n")
+        # capVttfile.write("Kind: captions\n")
+        # capVttfile.write("Language: en\n\n")
 
         # Iterate through dataframe, looking for steady regions
         for i in range(1, len(df) - 1):
@@ -472,9 +474,12 @@ except IsADirectoryError:
 # Detect events in the pressure data and write the caption data to a WebVTT file, then save the updated dataframe to the csv file
 air_df = detect_events_with_meter(raw_df, capvtt_out_file)
 air_df = detect_peaks(raw_df, capvtt_out_file)
-air_df = detect_valleys(air_df, capvtt_out_file)  
-air_df = detect_rise(air_df, capvtt_out_file)    
-air_df = detect_fall(air_df, capvtt_out_file)    
-air_df = detect_steady(air_df, capvtt_out_file)
+air_df = detect_valleys(raw_df, capvtt_out_file)  
+air_df = detect_rise(raw_df, capvtt_out_file)    
+air_df = detect_fall(raw_df, capvtt_out_file)    
+air_df = detect_steady(raw_df, capvtt_out_file)
 
 air_df.to_csv(csv_file_path, index=False)
+
+print(f"Output file is being saved to: {capvtt_out_file}")
+

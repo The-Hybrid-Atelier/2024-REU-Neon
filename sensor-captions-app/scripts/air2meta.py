@@ -95,7 +95,7 @@ import os
 
 # Determine the range of feedback inten based on the meta_type parameter
 def determine_type():
-    meta_dict = {"sound": 4, "light": 6, "synth": 6, "vibration": 4}
+    meta_dict = {"sound": 4, "light": 6, "synth": 6, "vibration": 4, "ifttt": 6}
     return meta_dict.get(meta_type)
 
 
@@ -148,6 +148,18 @@ def determine_inten(df, i):
             6: "♪♪♪♪♪♪",
         }
         inten = synth_dict.get(inten)
+    elif meta_type == "ifttt":
+
+        ifttt_dict = {
+            0: "",
+            1: "♪",
+            2: "♪♪",
+            3: "♪♪♪",
+            4: "♪♪♪♪",
+            5: "♪♪♪♪♪",
+            6: "♪♪♪♪♪♪",
+        }
+        inten = ifttt_dict.get(inten)
 
     return inten
 
@@ -210,6 +222,7 @@ def write_to_file(capvtt_file, start_time, end_time, inten):
 def detect_events_with_inten(df, meta_out_file):
 
     with open(meta_out_file, "w") as capVttfile:
+
         # Write the WebVTT header to the file
         capVttfile.write("WEBVTT\n")
         capVttfile.write("Kind: metadata\n")
