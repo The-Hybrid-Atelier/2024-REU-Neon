@@ -21,7 +21,8 @@ const OUTPUT_DEVICES = [
     {id: 1, label: 'PHONE', icon: faMobileScreenButton},
     {id: 2, label: 'BRACELET', icon: faRegularHand}
 ];
-const VTT_TYPES = ['light', 'synth', 'sound', 'meter', 'vibration'];
+const VTT_TYPES = ['light', 'synth', 'sound', 'meter', 'vibration', 'ifttt'];
+// const VTT_TYPES = ['ifttt'];
 
 
 const CAPTION_ICON_MAPPING = {
@@ -29,8 +30,13 @@ const CAPTION_ICON_MAPPING = {
     'synth': faMusic,
     'sound': faFireBurner,
     'meter': faPhoneVolume,
-    'vibration': faRegularHand
+    'vibration': faRegularHand,
+    'ifttt': faMusic
 };
+
+// const CAPTION_ICON_MAPPING = {
+//     'ifttt': faMusic
+// };
 
 
 const API_COMMAND_TEMPLATE = {
