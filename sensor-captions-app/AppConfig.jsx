@@ -21,15 +21,17 @@ const OUTPUT_DEVICES = [
     {id: 1, label: 'PHONE', icon: faMobileScreenButton},
     {id: 2, label: 'BRACELET', icon: faRegularHand}
 ];
-const VTT_TYPES = ['light', 'synth', 'sound', 'meter', 'vibration'];
 
+const VTT_TYPES = ['ifttt', 'light', 'synth', 'sound', 'meter', 'vibration'];
+// const VTT_TYPES = ['ifttt'];
 
 const CAPTION_ICON_MAPPING = {
+    'ifttt': faMusic,
     'light': faRegularLightbulb,
     'synth': faMusic,
     'sound': faFireBurner,
     'meter': faPhoneVolume,
-    'vibration': faRegularHand
+    'vibration': faRegularHand,
 };
 
 
@@ -80,4 +82,12 @@ const KITCHEN_SOUND_EFFECTS = [
   ];
 
   
-export {VIDEO_DEFAULT,AIR_RANGE, OUTPUT_DEVICES, CAPTION_ICON_MAPPING,  WINDOWSIZE, INPUT_MODES, VTT_TYPES, WEBSOCKET_URL, API_COMMAND_TEMPLATE, VIBRATION_PATTERNS, KITCHEN_SOUND_EFFECTS};
+  const BLE_CONFIG = {
+    DEVICE_NAME: 'NeonThing',
+    UART_SERVICE_UUID: '9b47244f-2cde-4158-b0cb-110c034c9ef6',
+    UART_RX_CHARACTERISTIC_UUID: 'f2a7b731-aa35-4c2d-b960-5697b7ad218f',
+    UART_TX_CHARACTERISTIC_UUID: 'ab34a84a-1c95-4124-a058-8afa0fbbb67b'
+  };
+
+
+export {BLE_CONFIG, VIDEO_DEFAULT,AIR_RANGE, OUTPUT_DEVICES, CAPTION_ICON_MAPPING,  WINDOWSIZE, INPUT_MODES, VTT_TYPES, WEBSOCKET_URL, API_COMMAND_TEMPLATE, VIBRATION_PATTERNS, KITCHEN_SOUND_EFFECTS};

@@ -57,7 +57,7 @@ const TacitCaptionOutput = () => {
     }, [activated_captions]);
 
     // PHONE DEVICE
-    const captions = ["light", "meter", "vibration", "sound", "synth"];
+    const captions = ["light", "meter", "vibration", "sound", "synth", "ifttt"];
     const modes = captions.map((caption) => {
         return {
             label: caption,
@@ -124,6 +124,7 @@ const TacitCaptionOutput = () => {
             )}
             {isActivated("light") && <LightPlayer activeCue={activeCue} />}
             {isActivated("synth") && <TonalPlayer activeCue={activeCue} />}
+            {isActivated("ifttt") && <TonalPlayer activeCue={activeCue} />}
             {/* {JSON.stringify(activated_captions)} */}
         </Remote>
     );
