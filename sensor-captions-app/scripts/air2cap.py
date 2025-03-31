@@ -143,6 +143,7 @@ Notes:
 import pandas as pd
 import sys
 import os
+from datetime import datetime, timedelta
 
 
 # Function to find the maximum pressure value in the dataframe
@@ -177,10 +178,14 @@ def write_to_file(capvtt_file, start_time, end_time, pressure, meter, label):
         capvtt_file.write(f"{label}\n\n")
     
     capvtt_file.write(f"{start_time} --> {end_time}\n")
-    capvtt_file.write(f"{meter} {pressure} kPa\n\n")
 
+    # Only write meter and pressure if they are not None
+    if pressure is not None and meter is not None:
+        capvtt_file.write(f"{meter} {pressure} kPa\n\n")
+    else:
+        capvtt_file.write("\n")  # Just write a blank line if no meter/pressure
 
-def ifttt_to_file(input_vtt_file, output_vtt_file):
+def ifttt_to_file(input_vtt_file, output_vtt_file, df):
     # Read input file and parse pressure values
     pressure_values = []
     with open(input_vtt_file, "r") as infile:
@@ -200,7 +205,8 @@ def ifttt_to_file(input_vtt_file, output_vtt_file):
         return
 
     # Find min and max pressure
-    min_pressure, max_pressure = min(pressure_values), max(pressure_values)
+    max_pressure = find_max_pa(df)
+    min_pressure = find_min_pa(df)
 
     # Define music note pressure ranges (evenly spaced between min and max)
     note_ranges = [
@@ -209,26 +215,31 @@ def ifttt_to_file(input_vtt_file, output_vtt_file):
         for i in range(6)
     ]
     
+    #print(f" note ranges: {note_ranges}")
+
     # Open output file for writing
     # Open output file for writing
     with open(output_vtt_file, "w") as outfile:
-        #outfile.write("WEBVTT\n\n")
 
         # Process input again to write output with notes
         for i, line in enumerate(lines):
             if "kPa" in line:
                 try:
-                    pressure = float(line.split()[-2])
-                    note_count = sum(1 for min_p, max_p in note_ranges if min_p <= pressure < max_p)
-                    notes = "♪" * note_count  
-                    outfile.write(f"{notes}\n\n")  # Write only the notes, skipping the pressure value line
+                    pressure = float(line.split()[-2]) * 1000
+
+                    #print(f"pressure: {pressure}")
+
+                    if(pressure > 0):
+                        note_count = sum(1 for min_p, max_p in note_ranges if min_p <= pressure < max_p)
+                        notes = "♪" * note_count  
+                        outfile.write(f"{notes}\n\n")  # Write only the notes, skipping the pressure value line
+
+                        #print(note_count)
                 except ValueError:
                     continue
             else:
                 if((not("peak" in line)) and (not("valley" in line)) and (not("rise" in line)) and (not("fall" in line)) and (not("steady" in line))):
-                    outfile.write(line)  # Keep other lines (timestamps, labels, etc.)
-
-
+                    outfile.write(line)  # Keep other lines (timestamps, labels, etc.) 
 
 
 
@@ -316,6 +327,7 @@ def detect_events_with_meter(df, capVtt_file_path):
 
             # Write the data to the vtt file
             write_to_file(capVttfile, start_time, end_time, current_pressure, meter, "meter")
+
     return df
 
 # detect rises in a given time frame
@@ -350,6 +362,13 @@ def detect_peaks(df, capVtt_file_path):
 
                 # Write peak information to the VTT file
                 write_to_file(capVttfile, start_time, end_time, current_pressure, meter, "peak")
+
+            else:
+                # For non-peak, write only the timestamp without pressure
+                start_time = formatTime(df.iloc[i][time_column])
+                end_time = formatTime(df.iloc[i + 1][time_column])
+                write_to_file(capVttfile, start_time, end_time, None, None, "")  # Empty entry for non-peak
+
 
     return df
 
@@ -529,10 +548,10 @@ except IsADirectoryError:
 # Detect events in the pressure data and write the caption data to a WebVTT file, then save the updated dataframe to the csv file
 air_df = detect_events_with_meter(raw_df, capvtt_out_file)
 air_df2 = detect_peaks(raw_df, capvtt_out_file_ifttt)
-air_df2 = detect_valleys(raw_df, capvtt_out_file_ifttt)  
-air_df2 = detect_rise(raw_df, capvtt_out_file_ifttt)    
-air_df2 = detect_fall(raw_df, capvtt_out_file_ifttt)    
-air_df2 = detect_steady(raw_df, capvtt_out_file_ifttt)
+#air_df2 = detect_valleys(raw_df, capvtt_out_file_ifttt)  
+#air_df2 = detect_rise(raw_df, capvtt_out_file_ifttt)    
+#air_df2 = detect_fall(raw_df, capvtt_out_file_ifttt)    
+#air_df2 = detect_steady(raw_df, capvtt_out_file_ifttt)
 
 air_df.to_csv(csv_file_path, index=False)
 air_df2.to_csv(csv_file_path, index=False)
@@ -544,6 +563,6 @@ print(f"Output file is being saved to: {capvtt_out_file_ifttt}")
 capvtt_out_file_ifttt_output = os.path.join(input_dir, "ifttt.vtt")
 
 print("ifttt general file begins")
-ifttt_to_file(capvtt_out_file_ifttt, capvtt_out_file_ifttt_output)
+ifttt_to_file(capvtt_out_file_ifttt, capvtt_out_file_ifttt_output, raw_df)
 print("ifttt general file ends")
 
