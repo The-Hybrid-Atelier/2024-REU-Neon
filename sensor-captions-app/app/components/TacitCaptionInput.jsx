@@ -18,6 +18,8 @@ function minMaxScalar(value, min, max) {
 
 
 const TacitCaptionInput = () => {
+  const [rate, setRate] = useState(50); // State for the slider value
+  const [bleConnected, setBLEConnected] = useState(false);
   const [inputMode, setInputMode] = useState([INPUT_MODES[0]]); // Single-select, default to second mode
   const [sensorData, setSensorData] = useState([0, 0, 1, 1, 0, 0]);
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_DEFAULT);
@@ -27,6 +29,13 @@ const TacitCaptionInput = () => {
   const [lastLiveCue, setLastLiveCue] = useState(0);
   const inputModeRef = useRef(inputMode); // To store the latest activated_captions
 
+  const handleChangeRate = () => {
+    // Send the rate message when the button is clicked
+    remoteRef.current.jsend({
+      api: "change_rate",
+      params: { rate }
+    });
+  };
 
   useEffect(() => {
     // Sync the latest state of activated_captions to the ref
@@ -40,6 +49,9 @@ const TacitCaptionInput = () => {
     console.log("Seeking to:", toTime, "from:", currentT);
   };
   const websocketEventHandler = (data) => {
+      if(data?.event === "ble-connected") {
+        setBLEConnected(true);
+      }
       if(data?.event === "read-pressure") {
         if(inputModeRef.current[0]?.value === "sensor" ){
             setSensorData(prevData => {
@@ -144,23 +156,42 @@ const TacitCaptionInput = () => {
             onGraphClick={handleSeek}
             width="100%"  // Adjust width as needed
             height="100%"
-          />
-        </>
-      )}
+            />
+          </>
+          )}
 
 
-      {inputMode[0]?.value === "sensor" && (
-        <div className="p-5">
-          <h1> LIVE ({sensorData.length}) </h1>
-           <SensorViewer
+          {inputMode[0]?.value === "sensor" && (
+          <div className="p-5">
+            <h1>{bleConnected ? `LIVE (${sensorData.length})` : "CONNECTING..."}</h1>
+            
+             <SensorViewer
             sensorData={sensorData}
-          />
-          <div className="w-full flex flex-row items-center justify-center">
-            <ButtonGroup >
-              <Button color="green" onClick={() => remoteRef.current.jsend({api: "PRESSURE_ON"})}>ON</Button>
-              <Button color="red" onClick={() => remoteRef.current.jsend({api: "PRESSURE_OFF"})}>OFF</Button>
-              {/* <Button color="yellow" onClick={() => remoteRef.current.jsend({api: "LED_COLOR", params:{red: 255, green: 255, blue: 0}})}>Yellow Light</Button> */}
+            />
+            <div className="w-full flex flex-row items-center justify-center">
+            <div className="p-4">
+            {/* Button group */}
+            <ButtonGroup>
+              <Button color="green" onClick={() => remoteRef.current.jsend({ api: "start" })}>ON</Button>
+              <Button color="red" onClick={() => remoteRef.current.jsend({ api: "stop" })}>OFF</Button>
+              <Button color="yellow" onClick={handleChangeRate}>Change Rate</Button>
             </ButtonGroup>
+            
+            {/* Slider */}
+            <div className="mt-4">
+              <label className="block text-gray-700 mb-2">Rate: {rate} ms</label>
+              <input
+                type="range"
+                min="50"
+                max="1000"
+                step="1"
+                value={rate}
+                onChange={(e) => setRate(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer"
+              />
+            </div>
+          </div>
+            
           </div>
         </div>
       )}

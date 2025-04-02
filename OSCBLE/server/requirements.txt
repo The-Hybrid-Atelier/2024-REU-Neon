@@ -1,0 +1,6 @@
+asyncio
+osc4py3
+python-osc
+bleak
+pymongo
+numpy
