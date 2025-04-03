@@ -231,8 +231,9 @@ def ifttt_to_file(input_vtt_file, output_vtt_file, df):
 
                     if(pressure > 0):
                         note_count = sum(1 for min_p, max_p in note_ranges if min_p <= pressure < max_p)
-                        notes = "♪" * note_count  
-                        outfile.write(f"{notes}\n\n")  # Write only the notes, skipping the pressure value line
+                        outfile.write(f"{note_count}\n\n") #print the note count
+                        #notes = "♪" * note_count  
+                        #outfile.write(f"{notes}\n\n")  # Write only the notes, skipping the pressure value line
 
                         #print(note_count)
                 except ValueError:
