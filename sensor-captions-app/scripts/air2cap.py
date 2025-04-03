@@ -354,8 +354,10 @@ def detect_peaks(df, capVtt_file_path):
         for i in range(1, len(df) - 1):
             current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
 
+            p1_current_value = df.iloc[i][parameterized_pressure_column]
+
             # Use second derivative to confirm peak
-            if df.iloc[i]["second_derivative"] < 0 and df.iloc[i]["first_derivative"] > 0:
+            if df.iloc[i]["second_derivative"] < 0 and df.iloc[i]["first_derivative"] > 0 and p1_current_value > 0.03:
                 start_time = formatTime(df.iloc[i][time_column])
                 end_time = formatTime(df.iloc[i + 1][time_column])
                 meter = create_meter(df, i)
@@ -396,9 +398,10 @@ def detect_valleys(df, capVtt_file_path):
         # Iterate through dataframe, looking for valleys
         for i in range(1, len(df) - 1):
             current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
+            p1_current_value = df.iloc[i][parameterized_pressure_column]
 
             # Use second derivative to confirm valley
-            if df.iloc[i]["second_derivative"] > 0 and df.iloc[i]["first_derivative"] < 0:
+            if df.iloc[i]["second_derivative"] > 0 and df.iloc[i]["first_derivative"] < 0 and p1_current_value > 0.03:
                 start_time = formatTime(df.iloc[i][time_column])
                 end_time = formatTime(df.iloc[i + 1][time_column])
                 meter = create_meter(df, i)
@@ -431,9 +434,10 @@ def detect_rise(df, capVtt_file_path):
         # Iterate through dataframe, looking for rise
         for i in range(1, len(df) - 1):
             current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
+            p1_current_value = df.iloc[i][parameterized_pressure_column]
 
             # Use first derivative to confirm rise
-            if df.iloc[i]["first_derivative"] > 0:
+            if df.iloc[i]["first_derivative"] > 0 and p1_current_value > 0.03:
                 start_time = formatTime(df.iloc[i][time_column])
                 end_time = formatTime(df.iloc[i + 1][time_column])
                 meter = create_meter(df, i)
@@ -467,9 +471,10 @@ def detect_fall(df, capVtt_file_path):
         # Iterate through dataframe, looking for fall
         for i in range(1, len(df) - 1):
             current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
+            p1_current_value = df.iloc[i][parameterized_pressure_column]
 
             # Use first derivative to confirm fall
-            if df.iloc[i]["first_derivative"] < 0:
+            if df.iloc[i]["first_derivative"] < 0 and p1_current_value > 0.03:
                 start_time = formatTime(df.iloc[i][time_column])
                 end_time = formatTime(df.iloc[i + 1][time_column])
                 meter = create_meter(df, i)
@@ -502,9 +507,10 @@ def detect_steady(df, capVtt_file_path):
         # Iterate through dataframe, looking for steady regions
         for i in range(1, len(df) - 1):
             current_pressure = round(df.iloc[i][pressure_column] / 1000, 2)
+            p1_current_value = df.iloc[i][parameterized_pressure_column]
 
             # Use first derivative to confirm steady
-            if df.iloc[i]["first_derivative"] == 0:
+            if df.iloc[i]["first_derivative"] == 0 and p1_current_value > 0.03:
                 start_time = formatTime(df.iloc[i][time_column])
                 end_time = formatTime(df.iloc[i + 1][time_column])
                 meter = create_meter(df, i)
@@ -549,7 +555,7 @@ except IsADirectoryError:
 air_df = detect_events_with_meter(raw_df, capvtt_out_file)
 air_df2 = detect_peaks(raw_df, capvtt_out_file_ifttt)
 #air_df2 = detect_valleys(raw_df, capvtt_out_file_ifttt)  
-#air_df2 = detect_rise(raw_df, capvtt_out_file_ifttt)    
+air_df2 = detect_rise(raw_df, capvtt_out_file_ifttt)    
 #air_df2 = detect_fall(raw_df, capvtt_out_file_ifttt)    
 #air_df2 = detect_steady(raw_df, capvtt_out_file_ifttt)
 
