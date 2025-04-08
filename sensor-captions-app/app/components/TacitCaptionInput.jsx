@@ -116,7 +116,7 @@ const TacitCaptionInput = () => {
               setLastLiveCue(p30);
               console.log("Sending live cue:", p100);
               // Forwarding data to the captions
-              remoteRef.current.jsend({ event: `live-cue`, data: {text: p100} });
+              remoteRef.current.jsend({ event: `live-cue`, data: {text: p100, pressure: value} });
             }
           }
       }

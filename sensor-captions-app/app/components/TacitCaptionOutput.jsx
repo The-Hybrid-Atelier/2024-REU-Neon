@@ -1,41 +1,16 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Remote } from '../websocket/Remote';
 import Ribbon from '../dev/Ribbon';
+import RibbonDropdown from '../dev/RibbonDropdown';
 import { CAPTION_ICON_MAPPING, KITCHEN_SOUND_EFFECTS, AIR_RANGE, VIBRATION_PATTERNS } from '@/AppConfig';
 import TextPlayer from '../caption/text/TextPlayer';
 import VibrationPlayer from '../caption/vibration/VibrationPlayer';
 import MP3SoundPlayer from '../caption/sound/KitchenSoundPlayer';
 import LightPlayer from '../caption/light/LightPlayer';
 import TonalPlayer from '../caption/sound/TonalPlayer';
+import { rainbowColor, hslToHex, hexToRgb} from '../caption/light/Color';
 
-function hslToHex(h, s, l) {
-    l /= 100;
-    const a = s * Math.min(l, 1 - l) / 100;
-    const f = n => {
-        const k = (n + h / 30) % 12;
-        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-        return Math.round(255 * color).toString(16).padStart(2, '0'); // Convert to hex
-    };
-    return `#${f(0)}${f(8)}${f(4)}`; // Combine RGB values into hex
-}
 
-function rainbowColor(p) {
-    const hue = p * 360; // Map p [0, 1] to hue [0, 360]
-    const saturation = 100; // Full saturation for vibrant colors
-    const lightness = 50; // 50% lightness for standard brightness
-    return hslToHex(hue, saturation, lightness);
-}
-function hexToRgb(hex) {
-    // Remove the leading # if present
-    hex = hex.replace(/^#/, '');
-
-    // Parse the r, g, b values from the hex string
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-
-    return { r, g, b }; // Return an object with r, g, b components
-}
 
 function generateMeter(filledBoxes, numBoxes) {
     const filled = "■".repeat(filledBoxes); // Repeat the filled character
@@ -72,6 +47,7 @@ const TacitCaptionOutput = () => {
                 setActiveCue(data?.data);
             } else if (data?.event === "live-cue") {
                 const p = parseInt(data?.data.text) / 100;
+                const pressure = parseInt(data?.data?.pressure);
                 const kid = Math.floor(p * KITCHEN_SOUND_EFFECTS.length);
                 const vid = Math.floor(p * VIBRATION_PATTERNS.length);
                 const sid = Math.floor(p * 100);
@@ -83,15 +59,15 @@ const TacitCaptionOutput = () => {
                     const { r, g, b } = hexToRgb(rainbowColor(p));
                     remoteRef.current.jsend({api: "LED_COLOR", params: {red: r, green: g, blue: b}});
                 } else if (isActivated("sound")) {
-                    setActiveCue({ text: kid.toString() });
+                    setActiveCue({ text: kid.toString(), pressure: pressure });
                 }
                 else if (isActivated("vibration")) {
-                    setActiveCue({ text: vid.toString() });
+                    setActiveCue({ text: vid.toString(), pressure: pressure  });
                 }
                 else if (isActivated("synth")) {
-                    setActiveCue({ text: sid.toString() });
+                    setActiveCue({ text: sid.toString(), pressure: pressure  });
                 } else if (isActivated("meter")) {
-                    setActiveCue({ text: tmeter });
+                    setActiveCue({ text: tmeter, pressure: pressure  });
                 }
             }
         }
@@ -110,22 +86,24 @@ const TacitCaptionOutput = () => {
             ref={remoteRef}
             websocketEventHandler={websocketEventHandler}
         >
-            <Ribbon
+            <RibbonDropdown
                 modes={modes}
                 isActive={activated_captions}
                 setIsActive={setActivatedCaptions}
                 typeSelect="single"
+                label="Select Caption Type"
             />
-
-            {isActivated("meter") && <TextPlayer activeCue={activeCue} />}
-            {isActivated("vibration") && <VibrationPlayer activeCue={activeCue} />}
-            {isActivated("sound") && (
-                <MP3SoundPlayer activeCue={activeCue} sounds={KITCHEN_SOUND_EFFECTS} />
-            )}
-            {isActivated("light") && <LightPlayer activeCue={activeCue} />}
-            {isActivated("synth") && <TonalPlayer activeCue={activeCue} />}
-            {isActivated("ifttt") && <TonalPlayer activeCue={activeCue} />}
-            {/* {JSON.stringify(activated_captions)} */}
+            <div className="flex flex-column items-center justify-center h-full">
+                {isActivated("meter") && <TextPlayer activeCue={activeCue} />}
+                {isActivated("vibration") && <VibrationPlayer activeCue={activeCue} />}
+                {isActivated("sound") && (
+                    <MP3SoundPlayer activeCue={activeCue} sounds={KITCHEN_SOUND_EFFECTS} />
+                )}
+                {isActivated("light") && <LightPlayer activeCue={activeCue} />}
+                {isActivated("synth") && <TonalPlayer activeCue={activeCue} />}
+                {isActivated("ifttt") && <TonalPlayer activeCue={activeCue} />}
+                {/* {JSON.stringify(activated_captions)} */}
+            </div>
         </Remote>
     );
 };

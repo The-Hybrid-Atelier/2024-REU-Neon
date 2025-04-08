@@ -15,6 +15,19 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+.text-outline {
+  text-shadow:
+    -2px -2px 0 #000,
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000,
+    -2px  0px 0 #000,
+     2px  0px 0 #000,
+     0px -2px 0 #000,
+     0px  2px 0 #000;
+}
+
+
 html, body{
   height: 100%;
   width: 100%;
