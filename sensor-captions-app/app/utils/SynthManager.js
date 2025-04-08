@@ -5,10 +5,11 @@ const SynthManager = forwardRef((props, ref) => {
   const gainNodeRef = useRef(null);
   const currentNotesRef = useRef(new Set());
   const synthRef = useRef(null);
+  const samplerRef = useRef(null);
   const isPlayingRef = useRef(false);
 
   useImperativeHandle(ref, () => ({
-    playSynthChord,
+    playSampler,
     toggleMute,
     setVolume,
     pause,
@@ -43,7 +44,39 @@ const SynthManager = forwardRef((props, ref) => {
     const newNotes = desiredNotes.filter(item => ![...currentNotesRef.current].includes(item));
     newNotes.forEach(newNote => triggerNote(newNote));
   };
+  const playSampler = (value) => {
+    if (value < 0 || value > 100) {
+      stop();
+      return;
+    }
+  
+    const notes = ["C3", "F#3", "C4", "F#4", "C5", "F#5", "C6"];
+    let desiredNotes = [];
+  
+    // Map the value from 0-100 to the number of notes to play
+    const numNotes = Math.floor((value / 100) * notes.length);
+  
+    if (numNotes > 0) {
+      if (numNotes == notes.length) {
+        desiredNotes = [notes[notes.length- 1]];
+      } else {
+        desiredNotes = [notes[numNotes]];
+      }
+      // desiredNotes = notes.slice(0, numNotes);
+    } else {
+      desiredNotes = [notes[0]];
+    }
+  
+    // const notesToStop = currentNotesRef
+    const notesToStop = [...currentNotesRef.current].filter(item => !desiredNotes.includes(item));
+    notesToStop.forEach(oldNote => releaseSamplerNote(oldNote));
+    
+    
+    const newNotes = desiredNotes;
+    newNotes.forEach(newNote => triggetNoteSampler(newNote));
+  };
 
+  // LINEAR SYNTH DOESN'T WORK 
   const playSynthLinear = (value) => {
     if (value < 0 || value > 100) {
       stop();
@@ -65,14 +98,16 @@ const SynthManager = forwardRef((props, ref) => {
     console.log(desiredNotes);
   
     // const notesToStop = currentNotesRef
-    // const notesToStop = [...currentNotesRef.current].filter(item => !desiredNotes.includes(item));
-    // notesToStop.forEach(oldNote => releaseNote(oldNote));
-    const notesToStop = [desiredNotes.slice(0, desiredNotes.length-1)];
-    console.log(notesToStop);
+    const notesToStop = [...currentNotesRef.current].filter(item => !desiredNotes.includes(item));
     notesToStop.forEach(oldNote => releaseNote(oldNote));
+    // const notesToStop = [desiredNotes.slice(0, desiredNotes.length-1)];
+    console.log(notesToStop);
+
     
-    // const newNotes = desiredNotes.filter(item => ![...currentNotesRef.current].includes(item));
-    const newNotes = [desiredNotes[desiredNotes.length - 1]];
+    
+    
+    const newNotes = desiredNotes.filter(item => ![...currentNotesRef.current].includes(item));
+    // const newNotes = [desiredNotes[desiredNotes.length - 1]];
     newNotes.forEach(newNote => triggerNote(newNote));
   };
 
@@ -165,7 +200,17 @@ const SynthManager = forwardRef((props, ref) => {
   
   const triggerNote = (note, keep) => {
     if (synthRef.current) {
-      synthRef.current.triggerAttackRelease(note, "1n");
+      synthRef.current.triggerAttackRelease(note, 2);
+      // addHarmonics(note);  // Add harmonics when the note is triggered
+      if (!keep) {
+        currentNotesRef.current.add(note);
+      }
+      isPlayingRef.current = true;
+    }
+  };
+  const triggetNoteSampler = (note, keep) => {
+    if (samplerRef.current) {
+      samplerRef.current.triggerAttackRelease(note, 2);
       // addHarmonics(note);  // Add harmonics when the note is triggered
       if (!keep) {
         currentNotesRef.current.add(note);
@@ -189,6 +234,14 @@ const SynthManager = forwardRef((props, ref) => {
   const releaseNote = (note, keep) => {
     if (synthRef.current) {
       synthRef.current.triggerRelease(note);
+      if (!keep) {
+        currentNotesRef.current.delete(note);
+      }
+    }
+  };
+  const releaseSamplerNote = (note, keep) => {
+    if (samplerRef.current) {
+      samplerRef.current.triggerRelease(note);
       if (!keep) {
         currentNotesRef.current.delete(note);
       }
@@ -249,6 +302,15 @@ const SynthManager = forwardRef((props, ref) => {
         release: 1.5,  // Adjust for smoother release
       },
     }).connect(gainNode);
+    samplerRef.current = new Tone.Sampler({
+      "C3" : "/sounds/tuba_c3.wav",
+      "F#3" : "/sounds/clarinet_fsharp3.wav",
+      "C4" : "/sounds/trombone_c4.wav",
+      "F#4" : "/sounds/oboe_fsharp4.wav",
+      "C5" : "/sounds/french_horns_c5.wav",
+      "F#5" : "/sounds/trumpet_fsharp5.wav",
+      "C6" : "/sounds/flute_c6.wav",
+    }, ).toDestination(); 
   };
 
   const startAudioContext = () => {
@@ -272,6 +334,9 @@ const SynthManager = forwardRef((props, ref) => {
     return () => {
       if (synthRef.current) {
         synthRef.current.dispose();  // Properly dispose of the synth
+      }
+      if (samplerRef.current) {
+        samplerRef.current.dispose();
       }
       window.removeEventListener('click', handleUserGesture);
       window.removeEventListener('keydown', handleUserGesture);

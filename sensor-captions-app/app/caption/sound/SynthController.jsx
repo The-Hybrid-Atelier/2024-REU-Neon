@@ -7,7 +7,7 @@ const SynthController = ({intensity, setIntensity}) => {
   // const [intensity, setIntensity] = useState(0);
   const [volume, setVolume] = useState(1.0);
   const synthManagerRef = useRef();
-  const handlePlaySynth = (value) => synthManagerRef?.current.playSynthChord(value);
+  const handlePlaySynth = (value) => synthManagerRef?.current.playSampler(value);
   const handleToggleMute = () => synthManagerRef?.current.toggleMute();
   const handleVolumeChange = (e, { value }) => {
     setVolume(value);
@@ -22,13 +22,13 @@ const SynthController = ({intensity, setIntensity}) => {
   const handleStop = () => synthManagerRef?.current.stop()
   
   useEffect(() => {
-    synthManagerRef?.current.playSynthChord(intensity);
+    synthManagerRef?.current.playSampler(intensity);
   }, [intensity]);
 return (
 
         <Segment className="flex flex-col items-center justify-center p-5">
             {false && [0, 1, 2, 3, 4, 5, 6].map((synth) => (
-                <Button key={synth} onClick={() => handlePlaySynthChord(synth)}>Play Synth {synth}</Button>
+                <Button key={synth} onClick={() => handlePlaySynth(synth)}>Play Synth {synth}</Button>
             ))}
             <Input
                 label={`Intensity ${intensity}`}
