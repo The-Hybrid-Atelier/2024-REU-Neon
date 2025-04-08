@@ -7,7 +7,7 @@ const SynthController = ({intensity, setIntensity}) => {
   // const [intensity, setIntensity] = useState(0);
   const [volume, setVolume] = useState(1.0);
   const synthManagerRef = useRef();
-  const handlePlaySynth = (value) => synthManagerRef?.current.playSampler(value);
+  const handlePlaySynth = (value) => synthManagerRef?.current.playSampler(value); // Change to playSynth/playSynthChord if needed
   const handleToggleMute = () => synthManagerRef?.current.toggleMute();
   const handleVolumeChange = (e, { value }) => {
     setVolume(value);
@@ -22,7 +22,7 @@ const SynthController = ({intensity, setIntensity}) => {
   const handleStop = () => synthManagerRef?.current.stop()
   
   useEffect(() => {
-    synthManagerRef?.current.playSampler(intensity);
+    synthManagerRef?.current.playSampler(intensity); // Change to playSynth/playSynth Chord if needed
   }, [intensity]);
 return (
 

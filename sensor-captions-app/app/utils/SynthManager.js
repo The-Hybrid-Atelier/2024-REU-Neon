@@ -9,7 +9,7 @@ const SynthManager = forwardRef((props, ref) => {
   const isPlayingRef = useRef(false);
 
   useImperativeHandle(ref, () => ({
-    playSampler,
+    playSampler, // Change to playSynth if needed 
     toggleMute,
     setVolume,
     pause,
