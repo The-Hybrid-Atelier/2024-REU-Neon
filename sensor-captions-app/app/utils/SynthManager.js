@@ -57,18 +57,22 @@ const SynthManager = forwardRef((props, ref) => {
     // const numNotes = Math.floor((value / 100) * notes.length);
   
     if (value > 0) {
-      desiredNotes = 246.9 + value * 3
+      desiredNotes.push(246.9 + value * 3);
       // desiredNotes = notes.slice(0, numNotes);
     } else {
       desiredNotes = [notes[0]];
     }
+    console.log(desiredNotes);
   
     // const notesToStop = currentNotesRef
-    const notesToStop = [...currentNotesRef.current].filter(item => !desiredNotes.includes(item));
+    // const notesToStop = [...currentNotesRef.current].filter(item => !desiredNotes.includes(item));
+    // notesToStop.forEach(oldNote => releaseNote(oldNote));
+    const notesToStop = [desiredNotes.slice(0, desiredNotes.length-1)];
+    console.log(notesToStop);
     notesToStop.forEach(oldNote => releaseNote(oldNote));
     
-    
-    const newNotes = desiredNotes.filter(item => ![...currentNotesRef.current].includes(item));
+    // const newNotes = desiredNotes.filter(item => ![...currentNotesRef.current].includes(item));
+    const newNotes = [desiredNotes[desiredNotes.length - 1]];
     newNotes.forEach(newNote => triggerNote(newNote));
   };
 
@@ -78,16 +82,24 @@ const SynthManager = forwardRef((props, ref) => {
       return;
     }
   
-    // C4 – D4 – E4 – G4 – A4
-    const layer0 = ["C4",  "D4", "G4"];
-    const layer1 = ["E4", "G4", "A4", "D5"];
-    const layer2 = ["A4", "C5", "E5"];
-    const layer3 = ["G4", "B4", "D5", "G5"];
-    const layer4 = ["C5", "D5", "G5", "A5"];
-    const layer5 = ["E5", "G5", "A5", "C6", "D6"];
-    const base = ["E3", "F3", "D4"];
 
-    const chords = [[], base, layer0, layer1, layer2, layer3, layer4, layer5]
+    // const layer0 = ["C4",  "D4", "G4"];
+    // const layer1 = ["E4", "G4", "A4", "D5"];
+    // const layer2 = ["A4", "C5", "E5"];
+    // const layer3 = ["G4", "B4", "D5", "G5"];
+    // const layer4 = ["C5", "D5", "G5", "A5"];
+    // const layer5 = ["E5", "G5", "A5", "C6", "D6"];
+    // const base = ["E3", "F3", "D4"];
+    const layer0 = ["C3", "D4", "A4"];
+    const layer1 = ["A3", "C4", "E5"];
+    const layer2 = ["E3", "C4", "B5"];
+    const layer3 = ["G3", "B4", "D5", "G5"];
+    const layer4 = ["C4", "D5", "G5", "A5"];
+    const layer5 = ["E4", "G5", "A5", "C6", "D6"];
+    const base   = ["E2", "F3", "D4"];
+
+
+    const chords = [base, layer0, layer1, layer2, layer3, layer4, layer5]
 
     let desiredNotes = [];
   
@@ -95,15 +107,21 @@ const SynthManager = forwardRef((props, ref) => {
     const numNotes = Math.floor((value / 100) * (chords.length));
   
     if (numNotes > 0) {
-      desiredNotes = chords[numNotes]
+      if (numNotes == chords.length) {
+        desiredNotes = chords[6];
+      }
+      else{
+        desiredNotes = chords[numNotes];
+      }
       // desiredNotes = notes.slice(0, numNotes);
     } else {
       desiredNotes = chords[0];
     }
+    console.log(desiredNotes);
   
     // const notesToStop = currentNotesRef
     const notesToStop = [...currentNotesRef.current].filter(item => {
-      console.log("Checking if desiredNotes includes:", item);
+      // console.log("Checking if desiredNotes includes:", item);
       if (!Array.isArray(desiredNotes)) {
         console.warn("desiredNotes is not defined or not an array:", desiredNotes);
         return false;
@@ -147,7 +165,7 @@ const SynthManager = forwardRef((props, ref) => {
   
   const triggerNote = (note, keep) => {
     if (synthRef.current) {
-      synthRef.current.triggerAttack(note);
+      synthRef.current.triggerAttackRelease(note, "1n");
       // addHarmonics(note);  // Add harmonics when the note is triggered
       if (!keep) {
         currentNotesRef.current.add(note);
