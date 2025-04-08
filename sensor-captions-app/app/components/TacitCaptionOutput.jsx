@@ -46,28 +46,30 @@ const TacitCaptionOutput = () => {
             if (data?.event === "vtt-cue") {
                 setActiveCue(data?.data);
             } else if (data?.event === "live-cue") {
+                
                 const p = parseInt(data?.data.text) / 100;
                 const pressure = parseInt(data?.data?.pressure);
+                console.log("Received live cue:", p,  pressure);
                 const kid = Math.floor(p * KITCHEN_SOUND_EFFECTS.length);
                 const vid = Math.floor(p * VIBRATION_PATTERNS.length);
                 const sid = Math.floor(p * 100);
                 const tmeter = generateMeter(Math.ceil(p * 10), 10);
 
                 if (isActivated("light")) {
-                    setActiveCue({ text: rainbowColor(p) });
+                    setActiveCue({ text: rainbowColor(p) , sid: sid, pressure: pressure});
                     // convert from hex to RGB
                     const { r, g, b } = hexToRgb(rainbowColor(p));
-                    remoteRef.current.jsend({api: "LED_COLOR", params: {red: r, green: g, blue: b}});
+                    remoteRef.current.jsend({api: "LED_COLOR", sid: sid, params: {red: r, green: g, blue: b}});
                 } else if (isActivated("sound")) {
-                    setActiveCue({ text: kid.toString(), pressure: pressure });
+                    setActiveCue({ text: kid.toString(), sid: sid, pressure: pressure });
                 }
                 else if (isActivated("vibration")) {
-                    setActiveCue({ text: vid.toString(), pressure: pressure  });
+                    setActiveCue({ text: vid.toString(), sid: sid, pressure: pressure  });
                 }
                 else if (isActivated("synth")) {
-                    setActiveCue({ text: sid.toString(), pressure: pressure  });
+                    setActiveCue({ text: sid.toString(), sid: sid, pressure: pressure  });
                 } else if (isActivated("meter")) {
-                    setActiveCue({ text: tmeter, pressure: pressure  });
+                    setActiveCue({ text: tmeter, sid: sid, pressure: pressure  });
                 }
             }
         }

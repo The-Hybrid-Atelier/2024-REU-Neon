@@ -21,9 +21,17 @@ const TonalPlayer = ({activeCue}) => {
             // try to parse int
             // verify it is between 0 and 100; raise error if not
             // set the intensity
-            let intensity = countMusicNotes(activeCue.text);
-            intensity = (intensity/6) * 100;
-            console.log(intensity)
+            
+            if(activeCue.sid){
+                var intensity = activeCue.sid;
+            }else{
+                var intensity = countMusicNotes(activeCue.text);
+                intensity = (intensity/6) * 100;
+            }
+            
+            console.log("Intensity Count: ", intensity);
+            
+            
             if (intensity >= 0 && intensity <= 100) {
                 setSynthIntensity(intensity);
             }else{
@@ -39,7 +47,11 @@ const TonalPlayer = ({activeCue}) => {
 
   return (
     <Segment attached className="flex flex-col justify-center !text-2xl">
+        {activeCue?.pressure && (
+                        <p className="text-outline text-3xl text-white drop-shadow mt-2">{`${(activeCue.pressure / 1000).toFixed(1)} kPa`}</p>
+                    )}
         <Message className="justify-center">{activeCue && activeCue.text}</Message>
+        
         <SynthController intensity={synthIntensity} setIntensity={setSynthIntensity} />
         
     </Segment>

@@ -71,11 +71,11 @@ const LightPlayer = ({ activeCue }) => {
                     {false && activeCue?.text && (
                         <p className="text-outline text-3xl font-semibold text-white drop-shadow">{activeCue.text}</p>
                     )}
-                    {activeCue?.text && (
+                    {activeCue?.text && ! activeCue?.pressure && (
                         <p className="text-outline text-3xl font-semibold text-white drop-shadow">{hexToPressure(backgroundColor).toFixed(1)} kPa</p>
                     )}
                     {activeCue?.pressure && (
-                        <p className="text-outline text-xl text-white drop-shadow mt-2">{`${(activeCue.pressure / 1000).toFixed(1)} kPa`}</p>
+                        <p className="text-outline text-3xl text-white drop-shadow mt-2">{`${(activeCue.pressure / 1000).toFixed(1)} kPa`}</p>
                     )}
                 </div>
 
