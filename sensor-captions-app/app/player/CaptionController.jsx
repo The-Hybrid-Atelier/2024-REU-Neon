@@ -1,5 +1,6 @@
 import React from 'react';
 import CollapsibleSegment from '../utils/CollapsibleSegment';
+import RibbonDropdown from '../dev/RibbonDropdown';
 import Ribbon from '../dev/Ribbon';
 import { CAPTION_ICON_MAPPING } from '@/AppConfig';
 const CaptionController = ({ selectedVideo, setSelectedVideo, multipleSelection=false }) => {
@@ -20,12 +21,13 @@ const CaptionController = ({ selectedVideo, setSelectedVideo, multipleSelection=
   };
   
   return (
-    <div className="w-full h-full flex flex-col">
-      <Ribbon
+    <div className="w-full">
+      <RibbonDropdown
         modes={modes}
         isActive={activated_captions}
         setIsActive={setActivatedCaptions}
         typeSelect={multipleSelection ? 'multi' : 'single'}
+        label="Sensor Caption"
       />
     
       {/* <p>({activated_captions.length} / {captions.length} available)</p>

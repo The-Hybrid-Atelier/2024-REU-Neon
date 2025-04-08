@@ -8,11 +8,12 @@ import SimpleVideoPlayer from '../player/SimpleVideoPlayer';
 import { Remote } from '../websocket/Remote';
 import CollapsibleSegment from '../utils/CollapsibleSegment';
 import Ribbon from '../dev/Ribbon';
+import RibbonDropdown from '../dev/RibbonDropdown';
 import { start } from 'tone';
 import SensorViewer from '../timeseries/SensorViewer';
+import ToolbarOverlay from './ToolbarOverlay';
 
 function minMaxScalar(value, min, max) {
-  // Ensure the value is capped between the min and max range
   return Math.max(0, Math.min(1, (value - min) / (max - min)));
 }
 
@@ -27,6 +28,8 @@ const TacitCaptionInput = () => {
   const remoteRef = useRef(null);
   const [activeCue, setActiveCue] = useState(null);
   const [lastLiveCue, setLastLiveCue] = useState(0);
+  const [timePosition, setTimePosition] = useState(0);
+
   const inputModeRef = useRef(inputMode); // To store the latest activated_captions
 
   const handleChangeRate = () => {
@@ -38,6 +41,39 @@ const TacitCaptionInput = () => {
   };
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      try {
+        const player = videoPlayerRef.current?.getPlayer?.();
+        if (player && typeof player.currentTime === 'number' && !player.paused) {
+          setTimePosition(player.currentTime);
+        }
+      } catch (err) {
+        console.warn("Could not access player time:", err);
+      }
+    }, 250);
+  
+    // Also listen for seeked events
+    const player = videoPlayerRef.current?.getPlayer?.();
+    const handleSeeked = () => {
+      if (player && typeof player.currentTime === 'number') {
+        setTimePosition(player.currentTime);
+      }
+    };
+  
+    if (player?.addEventListener) {
+      player.addEventListener('seeked', handleSeeked);
+    }
+  
+    return () => {
+      clearInterval(interval);
+      if (player?.removeEventListener) {
+        player.removeEventListener('seeked', handleSeeked);
+      }
+    };
+  }, []);
+
+  
+  useEffect(() => {
     // Sync the latest state of activated_captions to the ref
     inputModeRef.current = inputMode;
   }, [inputMode]);
@@ -46,8 +82,10 @@ const TacitCaptionInput = () => {
     const player = videoPlayerRef.current.getPlayer();
     const currentT = player.currentTime;
     player.currentTime = toTime;
+    // setTimePosition(toTime);
     console.log("Seeking to:", toTime, "from:", currentT);
   };
+
   const websocketEventHandler = (data) => {
       if(data?.event === "ble-connected") {
         setBLEConnected(true);
@@ -71,10 +109,11 @@ const TacitCaptionInput = () => {
 
 
             const p10 = Math.ceil(p * 10);
+            const p30 = Math.ceil(p * 30);
             const p100 = Math.ceil(p * 100);
 
-            if(lastLiveCue !== p10) {
-              setLastLiveCue(p10);
+            if(lastLiveCue !== p30) {
+              setLastLiveCue(p30);
               console.log("Sending live cue:", p100);
               // Forwarding data to the captions
               remoteRef.current.jsend({ event: `live-cue`, data: {text: p100} });
@@ -97,30 +136,42 @@ const TacitCaptionInput = () => {
   }
 
 
+
+
   const inputModeSetting = {
     name: "Input Mode",
     viewable: true,
     startSettingCollapsed: true,
     view: (
-      <>
-        <Ribbon
-          modes={INPUT_MODES}
-          isActive={inputMode}
-          setIsActive={setInputMode}
-          typeSelect="single"
-        />
-      </>
+      <div className="h-full flex flex-row items-center">
+        <Button
+          icon
+          circular
+          size="large"
+          onClick={() => {
+            const current = inputMode[0]?.value;
+            const next = current === 'video' ? 'sensor' : 'video';
+            setInputMode([INPUT_MODES.find(m => m.value === next)]);
+          }}
+          primary={inputMode[0]?.value === 'video'}     // ✅ shows primary color when active
+          basic={inputMode[0]?.value !== 'video'}       // ✅ shows outline/disabled look when inactive
+        >
+          <Icon name="video" />
+        </Button>
+      </div>
     )
   };
+  
+  
 
   const videoSetting = {
     name: "Video Source",
     viewable: inputMode[0]?.value === "video",
     startSettingCollapsed: false,
     view: (    
-      <>
+      <div className="h-full w-full flex flex-row items-center mt-5">
         <FolderStructureDropdowns selectedVideo={selectedVideo} setSelectedVideo={setSelectedVideo} />
-      </>
+      </div>
     
     )
   };
@@ -130,53 +181,78 @@ const TacitCaptionInput = () => {
     startSettingCollapsed: false,
     viewable: inputMode[0]?.value === "video",
     view: (
-      <>
+      <div className="h-full w-full flex flex-row items-center">
         <CaptionController selectedVideo={selectedVideo} setSelectedVideo={setSelectedVideo} /> 
-      </>
+      </div>
     )
   };
 
+  const overlay = (
+    <div className="w-full flex align-center space-between py-3">
+      <div className="w-1/2 flex items-center px-3 ml-10">
+        {videoSetting.view}
+      </div>
+      <div className="w-1/2 flex flex-row items-start px-3 ml-10 space-x-3">
+        {captionSetting.view}
+        {inputModeSetting.view}
+      </div>
+
+      
+    </div>
+  );
 
   return (
 
     <Remote name="input-controller" ref={remoteRef} settings={[]} websocketEventHandler={websocketEventHandler} collapsible={false}>
-      {inputModeSetting.view}
+      
+      
       {inputMode[0]?.value === "video" && (
         <>
-          {captionSetting.view}
-          {videoSetting.view}
           <SimpleVideoPlayer
             ref={videoPlayerRef}
             selectedVideo={selectedVideo}
             onCueChange={handleCueChange}
           />
+        </> 
+      )}
+
+        <ToolbarOverlay overlay={overlay}>
           <TimeSeriesViewer
             selectedVideo={selectedVideo}
-            timePosition={100}
+            timePosition={timePosition}
             onGraphClick={handleSeek}
             width="100%"  // Adjust width as needed
             height="100%"
             />
-          </>
-          )}
+        </ToolbarOverlay>
 
 
           {inputMode[0]?.value === "sensor" && (
           <div className="p-5">
-            <h1>{bleConnected ? `LIVE (${sensorData.length})` : "CONNECTING..."}</h1>
+           
             
+            <h1>{bleConnected ? `LIVE (${sensorData.length})` : "CONNECTING..."}</h1>
+            <div className='hidden'>
+              <SimpleVideoPlayer
+              ref={videoPlayerRef}
+              selectedVideo={selectedVideo}
+              onCueChange={handleCueChange}
+            />
+            </div>
              <SensorViewer
             sensorData={sensorData}
             />
             <div className="w-full flex flex-row items-center justify-center">
             <div className="p-4">
-            {/* Button group */}
+            
             <ButtonGroup>
               <Button color="green" onClick={() => remoteRef.current.jsend({ api: "start" })}>ON</Button>
               <Button color="red" onClick={() => remoteRef.current.jsend({ api: "stop" })}>OFF</Button>
               <Button color="yellow" onClick={handleChangeRate}>Change Rate</Button>
+              <Button color="orange" onClick={() => videoPlayerRef.current.getPlayer().play()}>Play</Button>
+              <Button color="orange" onClick={() => videoPlayerRef.current.getPlayer().pause()}>Pause</Button>
             </ButtonGroup>
-            
+
             {/* Slider */}
             <div className="mt-4">
               <label className="block text-gray-700 mb-2">Rate: {rate} ms</label>

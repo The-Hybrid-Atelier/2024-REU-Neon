@@ -191,7 +191,7 @@ const FolderStructureDropdowns = ({ selectedVideo, setSelectedVideo }) => {
     return (
 
         // <CollapsibleSegment level={2} header={`Current Video: ${selectedVideo.userId}/${selectedVideo.bendType}/${selectedVideo.trial}`} settings={settings} startCollapsed={false} collapsible={true}>
-            <Form className='!p-5'>
+            <Form className='!px-5 py-1 w-full'>
                 <Form.Group widths="equal">
                     <Form.Field>
                         <label>Select User</label>

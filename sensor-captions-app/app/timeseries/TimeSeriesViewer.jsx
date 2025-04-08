@@ -25,19 +25,47 @@ ChartJS.register(
     Legend
 );
 
+const verticalLinePlugin = {
+    id: 'verticalLinePlugin',
+    afterDraw: (chart) => {
+        if (!chart || !chart.chartArea) return;
+
+        const { ctx, chartArea: { left, right, top, bottom }, scales: { x } } = chart;
+
+        const time = chart.config.options.plugins.verticalLine?.timePosition;
+        if (!time || !x) return;
+
+        // Find pixel position for the given timePosition
+        const xPos = x.getPixelForValue(time);
+        if (xPos >= left && xPos <= right) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(xPos, top);
+            ctx.lineTo(xPos, bottom);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'red';  // You can customize the color
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+};
+
+ChartJS.register(verticalLinePlugin);
+
+
 const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '100%', height = '100%' }) => {
     const containerRef = useRef(null); // Initialize containerRef
     const [chartData, setChartData] = useState({
-        labels: [],
         datasets: [
             {
                 label: 'Pressure (kPa)',
                 data: [],
                 borderColor: 'steelblue',
+                backgroundColor: 'rgba(70, 130, 180, 0.2)', // lighter area under the line
                 borderWidth: 5,  // Increase the width of the line
-                fill: false,
+                fill: true,
                 pointRadius: 0,  // Remove the data point markers
-                cubicInterpolationMode: 'monotone',  // Enable data smoothing
+                tension: 0.4, // or any value between 0 (sharp) and 1 (smooth)
             },
         ],
 
@@ -45,27 +73,35 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '
 
     useEffect(() => {
         if (selectedVideo?.airdata) {
-            console.log('Selected Video:', selectedVideo);
+            const timeArray = selectedVideo.airdata.t;
+            const pressureArray = selectedVideo.airdata.kPa || selectedVideo.airdata.data; // fallback
+
+            const dataPoints = timeArray.map((t, i) => ({
+                x: t,
+                y: pressureArray[i]
+            }));
+
             setChartData({
-                labels: selectedVideo.airdata.labels,
                 datasets: [
-                    {
-                        label: 'Pressure (kPa)',
-                        data: selectedVideo.airdata.data,
-                        borderColor: 'steelblue',
-                        borderWidth: 2,
-                        fill: false,
-                        display: true
-                    },
-                    {
-                        label: 'Time (ms)',
-                        data: selectedVideo.airdata.t,
-                        display: false, // Add display: false to hide the dataset
-                    }
+                  {
+                    label: 'Pressure (kPa)',
+                    data: dataPoints,
+                    parsing: false,
+                    borderColor: 'steelblue',
+                    backgroundColor: 'rgba(70, 130, 180, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    pointRadius: 0,
+                    tension: 0.4, // <-- replaces cubicInterpolationMode
+                  }
                 ],
-            });
+              });
+              
+
+            console.log("t:", timeArray);
         }
-    }, [selectedVideo.airdata]);
+}, [selectedVideo?.airdata]);
+
 
     const options = {
         responsive: true,
@@ -76,6 +112,9 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '
             intersect: false,
         },
         plugins: {
+            verticalLine: {
+                timePosition: timePosition,
+            },
             tooltip: {
                 enabled: false,  // Disable tooltips
             },
@@ -88,11 +127,15 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '
         },
         scales: {
             x: {
-                type: 'category',
+                type: 'linear',
+                title: {
+                  display: true,
+                  text: 'Time (s)',
+                },
+                min: Math.min(...(selectedVideo?.airdata?.t || [])),
+                max: Math.max(...(selectedVideo?.airdata?.t || [])),
                 ticks: {
-                    // maxRotation: 45,
-                    // minRotation: 45,
-                    maxTicksLimit: 5,  // Reduce to 5 labels on the x-axis
+                  maxTicksLimit: 10,
                 },
             },
             y: {
@@ -104,27 +147,19 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '
                     display: true,
                     text: 'Pressure (kPa)',  // Label for the y-axis
                 },
-            },
-            xAxes: [{
-                type: 'linear',
-                display: true,
-                scaleLabel: {
-                    display: true,
-                },
-                ticks: {
-                    autoSkip: false,  // Disable autoskip to show all labels
-                },
-            }],
+            }
         },
 
         onClick: (event, elements) => {
             if (elements.length && onGraphClick) {
                 const elementIndex = elements[0].index;
-                const time = chartData.labels[elementIndex];
-                const sec = chartData.datasets[1].data[elementIndex];
-                onGraphClick(sec);
+                const point = chartData.datasets[0].data[elementIndex];
+                if (point?.x !== undefined) {
+                    onGraphClick(point.x);
+                }
             }
         },
+        
     };
 
     const calculateBorderWidth = (chartWidth) => {
@@ -140,14 +175,18 @@ const TimeSeriesViewer = ({ selectedVideo, timePosition, onGraphClick, width = '
                     ...chartData,
                     datasets: [
                         {
-                            ...chartData.datasets[0],
-                            borderWidth: calculateBorderWidth(containerRef.current?.clientWidth || 600), // Adjust line thickness
+                          ...chartData.datasets[0],
+                          parsing: false,
+                          borderWidth: calculateBorderWidth(containerRef.current?.clientWidth || 600),
+                          fill: true,
+                          backgroundColor: 'rgba(70, 130, 180, 0.2)',
+                          tension: 0.4,
                         }
-                    ]
+                      ]
                 }}
                 options={options}
                 height={height} // Make sure height is used properly
-                className='bg-white p-3 rounded w-full'
+                className='bg-white px-3 rounded w-full'
             />
         </div>
     );

@@ -40,11 +40,50 @@ export default function handler(req, res) {
                 videoTime.push(formattedTime);
                 kPa.push(parseFloat(row['Pa']) / 1000); // Convert Pa to kPa
             })
+            // .on('end', () => {
+            //     const jsonData = { t, videoTime, kPa };
+            //     // fs.writeFileSync(jsonFilePath, JSON.stringify(jsonData)); // Cache the result in air.json
+            //     res.status(200).json(jsonData);
+            // })
             .on('end', () => {
-                const jsonData = { t, videoTime, kPa };
-                // fs.writeFileSync(jsonFilePath, JSON.stringify(jsonData)); // Cache the result in air.json
+                const correctedT = [...t]; // original time array
+                const correctedVideoTime = [...videoTime];
+            
+                let i = 0;
+                while (i < correctedT.length) {
+                    const current = correctedT[i];
+                    let j = i + 1;
+            
+                    // Find the end of the current duplicate cluster
+                    while (j < correctedT.length && correctedT[j] === current) {
+                        j++;
+                    }
+            
+                    const count = j - i;
+                    if (count > 1) {
+                        const increment = 1 / count;
+                        for (let k = 0; k < count; k++) {
+                            correctedT[i + k] = current + k * increment;
+                        }
+                    }
+            
+                    i = j; // move to the next cluster
+                }
+            
+                const formattedVideoTime = correctedT.map(sec => {
+                    const m = Math.floor(sec / 60);
+                    const s = Math.floor(sec % 60);
+                    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                });
+            
+                const jsonData = {
+                    t: correctedT,
+                    videoTime: formattedVideoTime,
+                    kPa
+                };
+            
                 res.status(200).json(jsonData);
-            })
+            })            
             .on('error', (csvError) => {
                 console.error('CSV parsing error:', csvError);
                 res.status(500).json({ error: 'Error processing CSV file' });
