@@ -26,6 +26,7 @@ const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange }, ref) => {
       const track = event.target;
       if (track.activeCues.length > 0) {
         onCueChange(track.activeCues[0]);
+        console.log("cue change detected");
       }
     };
 

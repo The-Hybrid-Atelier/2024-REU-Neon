@@ -17,6 +17,7 @@ const CaptionController = ({ selectedVideo, setSelectedVideo, multipleSelection=
       ...prevState,
       activated_captions: updatedCaptions
     }));
+    // console.log(updatedCaptions);
   };
   
   return (

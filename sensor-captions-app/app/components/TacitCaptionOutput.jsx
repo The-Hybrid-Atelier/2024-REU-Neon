@@ -67,6 +67,7 @@ const TacitCaptionOutput = () => {
     });
 
     const websocketEventHandler = (data) => {
+        console.log("websocketEventHandler");
         if (data?.data) {
             if (data?.event === "vtt-cue") {
                 setActiveCue(data?.data);
