@@ -1,4 +1,5 @@
 import React from 'react';
+import IconButton from '../Button';
 
 const VideoController = () => {
     return (
@@ -6,7 +7,7 @@ const VideoController = () => {
             {/* Your VideoController content here */}
             <h2>Video Controller</h2>
             {buttonLabelsLeft.map((label, index) => (
-                <CustomButton
+                <IconButton
                     key={index}
                     icon={svgIconsLeft[index]}
                     isActive={buttonsLeft[index]}

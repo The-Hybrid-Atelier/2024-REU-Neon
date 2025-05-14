@@ -280,5 +280,5 @@ const SynthManager = forwardRef((props, ref) => {
 
   return null;
 });
-
+SynthManager.displayName = 'SynthManager';
 export default SynthManager;

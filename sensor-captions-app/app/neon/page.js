@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import VideoJS from './VideoJS';
 import "videojs-youtube";
 import "./neon.css";
-import KitchenSoundPlayer from '../caption/sound/SoundPlayer';
+import KitchenSoundPlayer from '../caption/sound/KitchenSoundPlayer';
 import VibrationPlayer from '../caption/vibration/VibrationPlayer';
 import { initWebSocket, getReadings, vibrate, light, collectData, command } from '../utils/websocket';
 import { ConfigProvider } from '../utils/Configs';

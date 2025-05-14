@@ -80,4 +80,6 @@ const SimpleVideoPlayer = forwardRef(({ selectedVideo, onCueChange }, ref) => {
   );
 });
 
+SimpleVideoPlayer.displayName = 'SimpleVideoPlayer'; // Set display name for debugging
+
 export default SimpleVideoPlayer;

@@ -141,4 +141,5 @@ const Remote = forwardRef(({ settings, collapsible, children, name, apiCommands,
     );
 });
 
+Remote.displayName = 'Remote'; // Set display name for debugging
 export { Remote };

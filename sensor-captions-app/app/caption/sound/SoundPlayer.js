@@ -80,7 +80,7 @@ const SoundPlayer = forwardRef(({ sounds }, ref) => {
       </div>
       <h3>Sound Effects</h3>
       <Button.Group vertical>
-        {sounds.map((soundEffect) => (
+        {sounds && sounds.map((soundEffect) => (
           <Button
             key={soundEffect.id}
             onClick={() => handlePlaySound(soundEffect.sound, soundEffect.label)}
@@ -112,5 +112,7 @@ const SoundPlayer = forwardRef(({ sounds }, ref) => {
     </div>
   );
 });
+
+SoundPlayer.displayName = 'SoundPlayer';
 
 export { SoundPlayer };
