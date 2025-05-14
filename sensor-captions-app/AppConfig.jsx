@@ -21,7 +21,7 @@ const OUTPUT_DEVICES = [
     {id: 1, label: 'PHONE', icon: faMobileScreenButton},
     {id: 2, label: 'BRACELET', icon: faRegularHand}
 ];
-const VTT_TYPES = ['ifttt', 'light', 'synth', 'sound', 'meter', 'vibration'];
+const VTT_TYPES = ['light', 'synth', 'sound', 'meter', 'vibration']; // 'ifttt'
 
 
 const CAPTION_ICON_MAPPING = {

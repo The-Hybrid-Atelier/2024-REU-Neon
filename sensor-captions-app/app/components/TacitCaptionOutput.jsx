@@ -1,15 +1,16 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Remote } from '../websocket/Remote';
-import Ribbon from '../dev/Ribbon';
 import RibbonDropdown from '../dev/RibbonDropdown';
-import { CAPTION_ICON_MAPPING, KITCHEN_SOUND_EFFECTS, AIR_RANGE, VIBRATION_PATTERNS } from '@/AppConfig';
+
+// Caption Players
+import { CAPTION_ICON_MAPPING, KITCHEN_SOUND_EFFECTS, AIR_RANGE, VIBRATION_PATTERNS, VTT_TYPES} from '@/AppConfig';
 import TextPlayer from '../caption/text/TextPlayer';
 import VibrationPlayer from '../caption/vibration/VibrationPlayer';
 import MP3SoundPlayer from '../caption/sound/KitchenSoundPlayer';
 import LightPlayer from '../caption/light/LightPlayer';
 import TonalPlayer from '../caption/sound/TonalPlayer';
-import { rainbowColor, hslToHex, hexToRgb} from '../caption/light/Color';
 
+import { rainbowColor, hslToHex, hexToRgb} from '../caption/light/Color';
 
 
 function generateMeter(filledBoxes, numBoxes) {
@@ -32,7 +33,7 @@ const TacitCaptionOutput = () => {
     }, [activated_captions]);
 
     // PHONE DEVICE
-    const captions = ["light", "meter", "vibration", "sound", "synth", "ifttt"];
+    const captions = VTT_TYPES;
     const modes = captions.map((caption) => {
         return {
             label: caption,
@@ -76,8 +77,7 @@ const TacitCaptionOutput = () => {
     };
 
     const isActivated = (caption_type) => {
-        // Use the ref to access the latest value of activated_captions
-        return activatedCaptionsRef.current.some(
+        return activated_captions.some(
             (caption) => caption.value === caption_type
         );
     };
@@ -95,7 +95,7 @@ const TacitCaptionOutput = () => {
                 typeSelect="single"
                 label="Select Caption Type"
             />
-            <div className="flex flex-column items-center justify-center h-full">
+            <div className="flex flex-column items-start justify-center h-full">
                 {isActivated("meter") && <TextPlayer activeCue={activeCue} />}
                 {isActivated("vibration") && <VibrationPlayer activeCue={activeCue} />}
                 {isActivated("sound") && (
