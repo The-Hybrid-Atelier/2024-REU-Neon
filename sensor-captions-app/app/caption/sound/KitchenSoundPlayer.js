@@ -11,7 +11,7 @@ const extractCommand = (activeText) => {
 
   // Find the matching command based on the label
   const soundEffect = KITCHEN_SOUND_EFFECTS.find(effect =>
-      effect.label.toLowerCase().includes(soundLabel.toLowerCase())
+      effect.command.toLowerCase() === soundLabel.toLowerCase()
   );
 
   // Return the command or null if not found
@@ -38,6 +38,7 @@ const MP3SoundPlayer = ({activeCue, sounds}) => {
 };
 
   useEffect(() => {
+      console.log(activeCue);
         if (activeCue?.sid !== undefined) {
             const soundID = Math.floor((activeCue.sid / 100) * 4);
             const name = KITCHEN_SOUND_EFFECTS[soundID]?.command;
@@ -62,6 +63,7 @@ const MP3SoundPlayer = ({activeCue, sounds}) => {
                 // const patternIndex = parseInt(activeCue.text);
                 // const sound = sounds.find(sound => sound.id === patternIndex);
                 const soundName = extractCommand(activeCue.text);
+                console.log("extracted sound name", soundName); 
                 if (soundName) {
                     // triggerSoundByID(patternIndex);
                     triggerSoundByName(soundName);
