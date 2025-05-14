@@ -62,9 +62,34 @@ const VIDEO_DEFAULT = {
 const AIR_RANGE = {min: 99384, max: 107412}
 
 // LIBRARY OF VIBRATION PATTERNS
-const VIBRATION_PATTERNS = [
+const VIBRATION_PATTERNS_LEGACY = [
     {command: 'stop', label: 'Stop Vibration', pattern: 0 },
-    { command: 'shortPulse', label: 'Vibrate: Short Pulse', pattern: [200, 100, 200] },
+    {command: 'shortPulse', label: 'Vibrate: Short Pulse', pattern: [200, 100, 200] },
+    {command: 'longPulse', label: 'Vibrate: Long Pulse', pattern: [500, 200, 500, 200, 500] },
+    {command: 'longDuration',  label: 'Vibrate: Long Duration', pattern: [1000, 500, 1000] },
+    {command: 'rapidPulse', label: 'Vibrate: Rapid Pulse', pattern: [50, 30, 50, 30, 50, 30] }
+];
+const VIBRATION_PATTERNS = [
+  { command: 'stop', label: 'Level 0: No Vibration', pattern: 0 },
+
+  // Level 1: Single short pulse — minimal feedback
+  { command: 'level1', label: 'Level 1: Single Tap', pattern: [100] },
+
+  // Level 2: Two short pulses — slightly stronger
+  { command: 'level2', label: 'Level 2: Double Tap', pattern: [100, 50, 100] },
+
+  // Level 3: Short pulses with less gap — faster feedback
+  { command: 'level3', label: 'Level 3: Triple Pulse', pattern: [100, 30, 100, 30, 100] },
+
+  // Level 4: Longer pulses — more sustained perception
+  { command: 'level4', label: 'Level 4: Sustained Pulse', pattern: [300, 100, 300] },
+
+  // Level 5: Rapid intense pulses — max perceived intensity
+  { command: 'level5', label: 'Level 5: Rapid Burst', pattern: [80, 30, 80, 30, 80, 30, 80] },
+
+  // LEGACY
+  {command: 'stop', label: 'Stop Vibration', pattern: 0 },
+    {command: 'shortPulse', label: 'Vibrate: Short Pulse', pattern: [200, 100, 200] },
     {command: 'longPulse', label: 'Vibrate: Long Pulse', pattern: [500, 200, 500, 200, 500] },
     {command: 'longDuration',  label: 'Vibrate: Long Duration', pattern: [1000, 500, 1000] },
     {command: 'rapidPulse', label: 'Vibrate: Rapid Pulse', pattern: [50, 30, 50, 30, 50, 30] }

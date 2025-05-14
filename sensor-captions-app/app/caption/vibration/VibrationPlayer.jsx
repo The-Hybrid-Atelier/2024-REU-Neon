@@ -36,7 +36,20 @@ const VibrationPlayer = ({activeCue}) => {
     }, []);
 
     useEffect(() => {
-        if (activeCue?.text) {
+        if(activeCue?.sid){
+            const patternID = Math.floor((activeCue.sid / 100) * 6);
+            const pattern = VIBRATION_PATTERNS[patternID]?.pattern;
+            try {
+                if (pattern) {
+                    handleVibrate(pattern);
+                } else {
+                    setMessage(`Invalid Vibration Pattern ID: ${patternID} -- ${pattern}`);
+                }
+            } catch (error) {
+                setMessage(`Live Caption Parsing Error: ${JSON.stringify(activeCue)}`);
+            }
+        }
+        else if (activeCue?.text) {
             try {
                 // const patternIndex = parseInt(activeCue.text);
                 const pattern = parsePattern(activeCue.text);
@@ -48,7 +61,7 @@ const VibrationPlayer = ({activeCue}) => {
                     setMessage(`Invalid Vibration Pattern: ${JSON.stringify(activeCue)}`);
                 }
             }catch (error) {
-                setMessage(`Caption Parsing Error: ${JSON.stringify(activeCue)}`);
+                setMessage(`Closed Caption Parsing Error: ${JSON.stringify(activeCue)}`);
             }
         }
     }, [activeCue]);

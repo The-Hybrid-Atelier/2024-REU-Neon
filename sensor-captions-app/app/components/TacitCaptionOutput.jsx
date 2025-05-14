@@ -77,11 +77,15 @@ const TacitCaptionOutput = () => {
     };
 
     const isActivated = (caption_type) => {
+        return activatedCaptionsRef.current.some(
+            (caption) => caption.value === caption_type
+        );
+    };
+    const isCaption = (caption_type) => {
         return activated_captions.some(
             (caption) => caption.value === caption_type
         );
     };
-
     return (
         <Remote
             name="output-controller"
@@ -95,15 +99,15 @@ const TacitCaptionOutput = () => {
                 typeSelect="single"
                 label="Select Caption Type"
             />
+     
+           
             <div className="flex flex-column items-start justify-center h-full">
-                {isActivated("meter") && <TextPlayer activeCue={activeCue} />}
-                {isActivated("vibration") && <VibrationPlayer activeCue={activeCue} />}
-                {isActivated("sound") && (
-                    <MP3SoundPlayer activeCue={activeCue} sounds={KITCHEN_SOUND_EFFECTS} />
-                )}
-                {isActivated("light") && <LightPlayer activeCue={activeCue} />}
-                {isActivated("synth") && <TonalPlayer activeCue={activeCue} />}
-                {isActivated("ifttt") && <TonalPlayer activeCue={activeCue} />}
+                {isCaption("meter") && <TextPlayer activeCue={activeCue} />}
+                {isCaption("vibration") && <VibrationPlayer activeCue={activeCue} />}
+                {isCaption("sound") && <MP3SoundPlayer activeCue={activeCue} sounds={KITCHEN_SOUND_EFFECTS} />}
+                {isCaption("light") && <LightPlayer activeCue={activeCue} />}
+                {isCaption("synth") && <TonalPlayer activeCue={activeCue} />}
+                {isCaption("ifttt") && <TonalPlayer activeCue={activeCue} />}
                 {/* {JSON.stringify(activated_captions)} */}
             </div>
         </Remote>

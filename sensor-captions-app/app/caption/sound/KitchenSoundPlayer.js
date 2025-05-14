@@ -23,6 +23,7 @@ const extractCommand = (activeText) => {
 const MP3SoundPlayer = ({activeCue, sounds}) => {
   const [message, setMessage] = useState({text: "No active cue."}); 
   const kitchenSoundPlayerRef = useRef();
+  const lastSoundIDRef = useRef(null);
   const triggerSoundByID = (id) => { 
     if (kitchenSoundPlayerRef.current) { 
         kitchenSoundPlayerRef.current.playSoundById(id);
@@ -37,7 +38,26 @@ const MP3SoundPlayer = ({activeCue, sounds}) => {
 };
 
   useEffect(() => {
-        if (activeCue?.text) {
+        if (activeCue?.sid !== undefined) {
+            const soundID = Math.floor((activeCue.sid / 100) * 4);
+            const name = KITCHEN_SOUND_EFFECTS[soundID]?.command;
+
+            try {
+                if (name) {
+                    if (lastSoundIDRef.current !== soundID) {
+                        triggerSoundByName(name);
+                        setMessage(`Playing Sound: ${name}`);
+                        lastSoundIDRef.current = soundID; // update ref
+                    }
+                } else {
+                    triggerSoundByName("noSound");
+                    setMessage(`Invalid Sound ID: ${soundID} -- ${name}`);
+                }
+            } catch (error) {
+                setMessage(`Live Caption Parsing Error: ${JSON.stringify(activeCue)}`);
+            }
+        }
+        else if (activeCue?.text) {
             try {
                 // const patternIndex = parseInt(activeCue.text);
                 // const sound = sounds.find(sound => sound.id === patternIndex);
