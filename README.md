@@ -2,7 +2,7 @@
 
 ###  Externalizing Tacit Skills within Neon Glass Bending Practices through Sensor-Video Synchronized Cues
 
-![TacitCaptions](https://raw.githubusercontent.com/The-Hybrid-Atelier/TacitCaptions/main/teaser.png)
+![TacitCaptions](https://raw.githubusercontent.com/The-Hybrid-Atelier/TacitCaptions/teaser.png)
 
 This repository is the official implementation of the GAS 2025 journal.
 
